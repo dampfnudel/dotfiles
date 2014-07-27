@@ -1,0 +1,27 @@
+# OS
+# {
+
+    .DS_STORE
+    Thumbs.db
+
+# }
+
+# backups
+# {
+
+    *.bu
+    *.old
+
+# }
+
+# languages
+# {
+
+    # python
+    # {
+
+    *.pyc
+
+    # }
+
+# }

@@ -1,0 +1,398 @@
+"        ▄█    █▄   ▄█    ▄▄▄▄███▄▄▄▄      ▄████████  ▄████████
+"       ███    ███ ███  ▄██▀▀▀███▀▀▀██▄   ███    ███ ███    ███
+"       ███    ███ ███▌ ███   ███   ███   ███    ███ ███    █▀
+"       ███    ███ ███▌ ███   ███   ███  ▄███▄▄▄▄██▀ ███
+"       ███    ███ ███▌ ███   ███   ███ ▀▀███▀▀▀▀▀   ███
+"       ███    ███ ███  ███   ███   ███ ▀███████████ ███    █▄
+" ████  ███    ███ ███  ███   ███   ███   ███    ███ ███    ███
+" ████   ▀██████▀  █▀    ▀█   ███   █▀    ███    ███ ████████▀
+"                                                ███    ███
+
+" ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.vimrc
+
+" TODO
+"i auf I mappen
+"dokmentende auch am dokumentanfang
+"enter != n for search
+"
+" plugins
+" {
+
+    " vundle
+    " {
+
+        set nocompatible              " be iMproved, required
+        filetype off                  " required
+
+        " set the runtime path to include Vundle and initialize
+        set rtp+=~/.vim/bundle/Vundle.vim
+        call vundle#begin()
+        " alternatively, pass a path where Vundle should install plugins
+        "let path = '~/some/path/here'
+        "call vundle#rc(path)
+
+        " The following are examples of different formats supported.
+        " Keep Plugin commands between here and filetype plugin indent on.
+        " scripts on GitHub repos
+
+
+        " let Vundle manage Vundle, required
+        Plugin 'gmarik/Vundle.vim'
+
+    " }
+
+    Plugin 'scrooloose/nerdtree'
+    Plugin 'bling/vim-airline'
+    Plugin 'kien/ctrlp.vim'
+    Plugin 'vim-scripts/tComment'
+    Plugin 'altercation/vim-colors-solarized'
+    Plugin 'Lokaltog/vim-easymotion'
+    Plugin 'tpope/vim-surround'
+    Plugin 'sjl/gundo.vim'
+    Plugin 'flazz/vim-colorschemes'
+
+    " plugin examples
+    " {
+
+        " gitbub
+        " {
+
+            "Plugin 'rstacruz/sparkup'
+            "Plugin 'tpope/vim-fugitive'
+
+            " subdirectory
+            " {
+
+                " The sparkup vim script is in a subdirectory of this repo called vim.
+                " Pass the path to set the runtimepath properly.
+                "Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
+
+            " }
+
+        " }
+
+        " http://vim-scripts.org/vim/scripts.html
+        " {
+
+            "Plugin 'L9'
+
+        " }
+
+
+        " local file
+        " {
+
+            "Plugin 'file:///home/markus/path/to/plugin'
+
+        " }
+
+    " }
+
+
+    call vundle#end()             " required
+    filetype plugin indent on     " required
+    " To ignore plugin indent changes, instead use:
+    "filetype plugin on
+    "
+    " Brief help
+    " :PluginList          - list configured plugins
+    " :PluginInstall(!)    - install (update) plugins
+    " :PluginSearch(!) foo - search (or refresh cache first) for foo
+    " :PluginClean(!)      - confirm (or auto-approve) removal of unused plugins
+    "
+    " see :h vundle for more details or wiki for FAQ
+    " NOTE: comments after Plugin commands are not allowed.
+    " Put your stuff after this line
+
+    " }
+
+" }
+
+" keybindings
+" {
+
+    " leader-key
+    let mapleader="."
+
+    " Visual shifting (does not exit Visual mode)
+    vnoremap < <gv
+    vnoremap > >gv
+
+    " Ctrl-j/k deletes blank line below/above
+    nnoremap <silent><C-j> m`:silent +g/\m^\s*$/d<CR>``:noh<CR>
+    nnoremap <silent><C-k> m`:silent -g/\m^\s*$/d<CR>``:noh<CR>
+
+    " Enter inserts a blank line before/after the current line
+    nmap <S-Enter> O<Esc>j
+    nmap <CR> o<Esc>k nnoremap <silent><A-k> :set paste<CR>m`O<Esc>``:set nopaste<CR>
+
+    " OSX {
+
+        if has("gui_macvim")
+
+            " tab navigation
+            nnoremap <M-D-Right> :tabnext<CR>
+            nnoremap <M-D-Left> :tabprev<CR>
+            " Press Ctrl-Tab to switch between open tabs (like browser tabs) to 
+            " the right side. Ctrl-Shift-Tab goes the other way.
+            noremap <C-Tab> :tabnext<CR>
+            noremap <C-S-Tab> :tabprev<CR>
+
+            " Switch to specific tab numbers with Command-number
+            noremap <D-1> :tabn 1<CR>
+            noremap <D-2> :tabn 2<CR>
+            noremap <D-3> :tabn 3<CR>
+            noremap <D-4> :tabn 4<CR>
+            noremap <D-5> :tabn 5<CR>
+            noremap <D-6> :tabn 6<CR>
+            noremap <D-7> :tabn 7<CR>
+            noremap <D-8> :tabn 8<CR>
+            noremap <D-9> :tabn 9<CR>
+            " Command-0 goes to the last tab
+            noremap <D-0> :tablast<CR>
+        endif
+
+    " }
+
+" }
+
+
+" environment
+" {
+
+    " identify platform
+    " {
+
+        silent function! OSX()
+            return has('macunix')
+        endfunction
+        silent function! LINUX()
+            return has('unix') && !has('macunix') && !has('win32unix')
+        endfunction
+        silent function! WINDOWS()
+            return  (has('win16') || has('win32') || has('win64'))
+        endfunction
+    " }
+
+    " basics
+    " {
+
+        set nocompatible        " Must be first line
+        if !WINDOWS()
+            remap <silent>ë :set paste
+            m`O
+            set shell=/bin/sh
+        endif
+
+    " }
+
+    " windows compatible
+    " {
+
+        " On Windows, also use '.vim' instead of 'vimfiles'; this makes synchronization
+        " across (heterogeneous) systems easier.
+        if WINDOWS()
+          set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
+        endif
+
+    " }
+
+" }
+
+
+" general
+" {
+
+    " font size
+    set guifont=Monospace:h14
+    " syntax highlighting
+    syntax on
+    " highlight current line
+    set cursorline
+    " show line numbers
+    set nu
+    " Highlight problematic whitespace
+    set list
+    set listchars=tab:›\ ,trail:•,extends:#,nbsp:.
+    " enable mouse usage
+    set mouse=a
+    " hide mouse cursor while typing
+    scriptencoding utf-8
+    " move from endofline to startofline
+    "set whichwrap+=<,>,[,]     " ! can cause problems
+    set whichwrap+=h,l
+    " Auto fold code
+    set nofoldenable
+
+    " enable copy-paste from system clipboard
+    if has('clipboard')
+        if LINUX()   " On Linux use + register for copy-paste
+            set clipboard=unnamedplus
+        else         " On mac and Windows, use * register for copy-paste
+            set clipboard=unnamed
+        endif
+    endif
+
+    " nativ indent detection
+    set autoindent
+    set smartindent
+    " activate language detection
+    filetype plugin indent on
+
+" }
+
+
+" search
+" {
+
+    " highlight search terms
+    set hlsearch
+    " find while typing
+    set incsearch
+    " case insensitive search
+    set ignorecase
+
+" }
+
+
+" formatting
+" {
+
+    " use indents of 4 spaces
+    set shiftwidth=4
+    " tabs length is 4 spaces
+    set tabstop=4
+    " tabs are spaces, not tabs
+    set expandtab
+    " delete indents
+    set softtabstop=4
+
+" }
+
+
+" plugins
+" {
+
+    " solarized
+    " {
+
+        syntax enable
+        " Set colorscheme to solarized
+        colorscheme solarized
+
+        " Change the Solarized background to dark or light depending upon the time of 
+        " day (5 refers to 5AM and 17 to 5PM). Change the background only if it is not 
+        " already set to the value we want.
+        function! SetSolarizedBackground()
+            if strftime("%H") >= 5 && strftime("%H") < 17 
+                if &background != 'light'
+                    set background=light
+                endif
+            else
+                if &background != 'dark'
+                    set background=dark
+                endif
+            endif
+        endfunction
+
+        " Set background on launch
+        call SetSolarizedBackground()
+
+        " Every time you save a file, call the function to check the time and change 
+        " the background (if necessary).
+        if has("autocmd")
+            autocmd bufwritepost * call SetSolarizedBackground()
+        endif
+
+    " }
+
+
+    " NERDTRee
+    " {
+
+        if has('gui_running')
+
+                " set NERDTree size
+            let NERDTreeWinSize=20
+
+            " NERDTree on startup and new tab
+            autocmd vimenter * NERDTree
+            autocmd TabEnter * NERDTree
+
+            " focus filebuffer on startup, new buffer and new tab
+            autocmd vimenter * wincmd l
+            autocmd BufNew * wincmd l
+            autocmd TabEnter * wincmd l
+
+            " close all open buffers on entering a window if the only
+            autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
+
+            " from spf13
+            let NERDTreeShowBookmarks=1
+            let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
+            let NERDTreeChDirMode=0
+            let NERDTreeQuitOnOpen=1
+            let NERDTreeMouseMode=2
+            let NERDTreeShowHidden=1
+            let NERDTreeKeepTreeInNewTab=1
+            let g:nerdtree_tabs_open_on_gui_startup=1
+
+            " Initialize NERDTree as needed {
+            function! NERDTreeInitAsNeeded()
+                redir => bufoutput
+                buffers!
+                redir END
+                let idx = stridx(bufoutput, "NERD_tree")
+                if idx > -a
+                    NERDTreeMirror
+                    NERDTreeFind
+                    wincmd l
+                endif
+            endfunction
+        endif
+
+    " }
+
+    " Airline
+    " {
+
+        "autocmd TabEnter * AirlineToggle
+
+    " }
+
+
+    " easymotion
+    " {
+
+        let g:EasyMotion_do_mapping = 0 " Disable default mappings
+
+        " Bi-directional find motion
+        " Jump to anywhere you want with minimal keystrokes, with just one key binding.
+        " `s{char}{label}`
+        nmap s <Plug>(easymotion-s)
+        " or
+        " `s{char}{char}{label}`
+        " Need one more keystroke, but on average, it may be more comfortable.
+        nmap s <Plug>(easymotion-s2)
+
+        " Turn on case sensitive feature
+        let g:EasyMotion_smartcase = 1
+
+        " JK motions: Line motions
+        map <Leader>j <Plug>(easymotion-j)
+        map <Leader>k <Plug>(easymotion-k)
+        map <Leader>w <Plug>(easymotion-w)
+        map <Leader>W <Plug>(easymotion-W)
+
+    " }
+
+    " Gundo
+    " {
+
+        nnoremap <D-ü> :GundoToggle<CR>
+
+    " }
+
+" }
+
+" vim: set ft=zsh ts=4 sw=4 expandtab :

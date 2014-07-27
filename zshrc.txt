@@ -1,0 +1,371 @@
+#          ▄███████▄     ▄████████    ▄█    █▄       ▄████████  ▄████████
+#         ██▀     ▄██   ███    ███   ███    ███     ███    ███ ███    ███
+#               ▄███▀   ███    █▀    ███    ███     ███    ███ ███    █▀
+#          ▀█▀▄███▀▄▄   ███         ▄███▄▄▄▄███▄▄  ▄███▄▄▄▄██▀ ███
+#           ▄███▀   ▀ ▀███████████ ▀▀███▀▀▀▀███▀  ▀▀███▀▀▀▀▀   ███
+#         ▄███▀                ███   ███    ███   ▀███████████ ███    █▄
+# ████    ███▄     ▄█    ▄█    ███   ███    ███     ███    ███ ███    ███
+# ████     ▀████████▀  ▄████████▀    ███    █▀      ███    ███ ████████
+#                                                   ███    ███
+
+# ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.zshrc
+
+# TODO
+# syntaxhighlighting
+# findo
+# grepo
+# sshs
+# open specific files aliases
+# more rip functions
+# user scripts
+
+# zsh configs
+# {
+
+    #colored dirs
+    eval `dircolors /Users/mbayer/Settings/ColorSchemes/solarized/dircolors-solarized/dircolors.256dark`
+    unsetopt correct_all
+
+    #unset mailcheck
+    unset MAILCHECK
+
+    # enable dirstack
+    DIRSTACKFILE="$HOME.cache/zsh/dirs"
+    if [[ -f $DIRSTACKFILE ]] && [[ $#dirstack -eq 0 ]]; then
+      dirstack=( ${(f)"$(< $DIRSTACKFILE)"} )
+      [[ -d $dirstack[1] ]] && cd $dirstack[1]
+    fi
+    chpwd() {
+      print -l $PWD ${(u)dirstack} >$DIRSTACKFILE
+    }
+
+    DIRSTACKSIZE=20
+
+    setopt autopushd pushdsilent pushdtohome
+
+    ## Remove duplicate entries
+    setopt pushdignoredups
+
+    ## This reverts the +/- operators.
+    setopt pushdminus
+
+# }
+
+# oh-my-zsh configs
+# {
+
+    ZSH=$HOME/.oh-my-zsh
+    ZSH_THEME="bay"
+    #ZSH_THEME="random"
+    CASE_SENSITIVE="true"
+    COMPLETION_WAITING_DOTS="true"
+
+    # Example aliases
+    # alias zshconfig="mate ~/.zshrc"
+    # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+    # Set to this to use case-sensitive completion
+    # CASE_SENSITIVE="true"
+
+    # Comment this out to disable weekly auto-update checks
+    # DISABLE_AUTO_UPDATE="true"
+
+    # Uncomment following line if you want to disable colors in ls
+    # DISABLE_LS_COLORS="true"
+
+    # Uncomment following line if you want to disable autosetting terminal title.
+    # DISABLE_AUTO_TITLE="true"
+
+    # Uncomment following line if you want red dots to be displayed while waiting for completion
+    # COMPLETION_WAITING_DOTS="true"
+
+    # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
+    # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
+    # Example format: plugins=(rails git textmate ruby lighthouse)
+    plugins=(gradle osx brew git git-flow python pip fabric)
+
+    source $ZSH/oh-my-zsh.sh
+
+    export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+    export TERM=xterm-256color
+
+
+    if [[ -n $SSH_CONNECTION ]]; then
+      export EDITOR='vim'
+    else
+      export EDITOR='mvim'
+    fi
+
+# }
+
+# welcome (executed on session start
+# {
+
+    # Fortune Ponies welcomes you
+    fortune | ponysay
+
+# }
+
+# environment
+# {
+
+    export HOME=/Users/mbayer/
+    export LANG=de_DE.UTF-8
+    export LC_ALL=de_DE.UTF-8
+
+# }
+
+# python
+# {
+
+    path=(
+        $path
+        /usr/bin/python
+        /usr/local/bin/python3
+    )
+
+    # virtualenv
+    export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
+    export PROJECT_HOME=$HOME/Workspace
+    export WORKON_HOME=$HOME/Workspace/Envs
+    export VIRTUALENV_ROOT=$WORKON_HOME
+    source /usr/local/bin/virtualenvwrapper.sh
+
+# }
+# TODO
+# colors
+# {
+# Black        0;30     Dark Gray     1;30
+# Blue         0;34     Light Blue    1;34
+# Green        0;32     Light Green   1;32
+# Cyan         0;36     Light Cyan    1;36
+# Red          0;31     Light Red     1;31
+# Purple       0;35     Light Purple  1;35
+# Brown/Orange 0;33     Yellow        1;33
+# Light Gray   0;37     White         1;37
+    nc='\e[0m' # No Color
+    black='\e[0;30m'
+    red='\e[0;31m'
+    orange='\e[0;33m'
+    green='\e[0;32m'
+
+# }
+
+# keybindings
+# {
+
+    bindkey '\e[A' history-beginning-search-backward
+    bindkey '\e[B' history-beginning-search-forward
+
+# }
+
+# aliases
+# {
+    alias ls='gls --color=auto'
+    alias la="ls -la"
+    alias ll="ls -lah"
+    alias l="ls -lah"
+    alias lh='ls -lah'                # human readable (sizes) long and all ;-)
+    alias lls='ls -l -h -g -F --color=auto'
+    alias lc='ls -aCF'
+    alias lsam='ls -am'               # List files horizontally
+    alias lr='ls -lR'                 # recursive
+    alias lsx='ls -ax'                # sort right to left rather then in columns
+    alias lss='ls -shaxSr'            # sort by size
+    alias lt='ls -latr'               # sort by date
+    alias lm='ls -al |more'           # pipe through 'more'
+    alias bootstrap='svn cat svn://svn.zope.org/repos/main/zc.buildout/trunk/bootstrap/bootstrap.py > bootstrap.py'
+    alias bootstrap1.6='svn cat svn://svn.zope.org/repos/main/zc.buildout/tags/1.6.0/bootstrap/bootstrap.py > bootstrap.py'
+    alias bootstrap1.5.2='svn cat svn://svn.zope.org/repos/main/zc.buildout/tags/1.5.2/bootstrap/bootstrap.py > bootstrap.py'
+    alias clean_svn='find ./ -type d -name ".svn" -exec rm -Rf {} \;'
+    alias clean_pyc='find ./ -type f -name "*.pyc" -exec rm -Rf {} \;'
+    alias grep='grep --color'
+    alias df='df -h'
+    alias zfg="./bin/instance fg;stty sane"
+    alias zfb="./bin/buildout -v"
+    alias daily="mvim ~/google_drive/daily/$(date '+%Y-%m-%d').rst"
+    alias todo="mvim ~/Dropbox/todos.taskpaper"
+    alias tvim="mvim --remote-tab-silent"
+    alias managesettings="$HOME/Dropbox/Settings/Scripts/manage_settings.sh"
+    alias macrip='find . -name .DS_Store -exec rm {} \; && find . -name ._.DS_Store -exec rm {} \;'
+    alias doch='su -c "$(history -p !-1)"'
+    alias git_ignore_del='git ls-files --deleted -z | git update-index --assume-unchanged -z --stdin'
+    alias wtf='echo ¯\_(ツ)_/¯'
+
+    # inquant aliases
+    alias vdbg="ssh -p 2222 vagrant@127.0.0.1 -R 9000:localhost:9000"
+
+    #gnualiases
+    alias dircolors='gdircolors'
+
+    # Directory navigation aliases
+    alias ..='cd ..'
+    alias ...='cd ../..'
+    alias ....='cd ../../..'
+    alias .....='cd ../../../..'
+    alias ......='cd ../../../../..'
+    alias .......='cd ../../../../../..'
+    alias ........='cd ../../../../../../..'
+    alias .........='cd ../../../../../../../..'
+
+    # numFiles: number of (non-hidden) files in current directory
+    alias numFiles='echo $(ls -1 | wc -l)'
+
+    # finderComment: show the SpotLight comment for a file
+    finderComment () { mdls "$1" | grep kMDItemFinderComment ; }
+
+    # showTimes: show the modification, metadata-change, and access times of a file
+    showTimes () { stat -f "%N:   %m %c %a" "$@" ; }
+
+    # rm_DS_Store_files: removes all .DS_Store file from the current dir and below
+    alias rm_DS_Store_files='find . -name .DS_Store -exec rm {} \;'
+    alias rm_pyc_files='find . -name "*.pyc" -exec rm {} \;'
+    alias rm_svn_files='find . -type d -name .svn -exec rm -rf {} \;'
+
+    # find all .git directories and exec "git pull" on the parent.
+    alias gprec='find . -name .git -exec sh -c "cd \"{}\"/../ && pwd && git pull" \;'
+
+    # I often can't recall what I named this alias, so make it work either way:Â·
+    alias findgrep='grepfind'
+
+# }
+
+# functions
+# {
+
+    # zipf: to create a ZIP archive of a file or folder
+    zipf () { zip -r "$1".zip "$1" ; }
+
+    # searching
+    # ff:  to find a file under the current directory
+    ff () { /usr/bin/find . -name "$@" ; }
+
+    # ffs: to find a file whose name starts with a given string
+    ffs () { /usr/bin/find . -name "$@"'*' ; }
+
+    # ffe: to find a file whose name ends with a given string
+    ffe () { /usr/bin/find . -name '*'"$@" ; }
+
+    # grepfind: to grep through files found by find, e.g. grepf pattern '*.c'
+    # note that 'grep -r pattern dir_name' is an alternative if want all filesÂ·
+    grepfind () { find . -type f -name "$2" -print0 | xargs -0 grep "$1" ; }
+
+
+    # grepincl: to grep through the /usr/include directory
+    grepincl () { (cd /usr/include; find . -type f -name '*.h' -print0 | xargs -0 grep "$1" ) ; }
+
+    # locatemd: to search for a file using Spotlight's metadata
+    function locatemd { mdfind "kMDItemDisplayName == '$@'wc"; }
+
+    # locaterecent: to search for files created since yesterday using Spotlight
+    # This is an illustration of using $time in a query
+    # See: http://developer.apple.com/documentation/Carbon/Conceptual/SpotlightQuery/index.html
+    function locaterecent { mdfind 'kMDItemFSCreationDate >= $time.yesterday'; }
+
+    # list_all_apps: list all applications on the system
+    list_all_apps() { mdfind 'kMDItemContentTypeTree == "com.apple.application"c' ; }
+
+    # find_larger: find files larger than a certain size (in bytes)
+    find_larger() { find . -type f -size +${1}c ; }
+
+    # an example of using Perl to search Unicode files for a string:
+    # find /System/Library -name Localizable.strings -print0 | xargs -0 perl -n -e 'use Encode; $_ = decode("utf16be", $_>
+    # but note that it might be better to use 'iconv'
+
+    # example of using the -J option to xargs to specify a placeholder:
+    # find . -name "*.java" -print0 | xargs -0 -J % cp % destinationFolder
+
+    # findword: search for a word in the Unix word list
+    findword () { /usr/bin/grep ^"$@"$ /usr/share/dict/words ; }
+
+    # extract an archive
+    # {
+
+        extract () {
+            if [ -f $1 ] ; then
+                case $1 in
+                    *.tar.bz2)  tar xjf $1      ;;
+                    *.tar.gz)   tar xzf $1      ;;
+                    *.bz2)      bunzip2 $1      ;;
+                    *.rar)      rar x $1        ;;
+                    *.gz)       gunzip $1       ;;
+                    *.tar)      tar xf $1       ;;
+                    *.tbz2)     tar xjf $1      ;;
+                    *.tgz)      tar xzf $1      ;;
+                    *.zip)      unzip $1        ;;
+                    *.Z)        uncompress $1   ;;
+                    *)          echo "'$1' cannot be extracted via extract()" ;;
+            esac
+            else
+                echo "'$1' is not a valid file"
+            fi
+        }
+
+    # }
+
+    # show available color codes
+    # {
+
+        typeset -Ag FX FG BG
+
+        FX=(
+            reset     "%{[00m%}"
+            bold      "%{[01m%}" no-bold      "%{[22m%}"
+            italic    "%{[03m%}" no-italic    "%{[23m%}"
+            underline "%{[04m%}" no-underline "%{[24m%}"
+            blink     "%{[05m%}" no-blink     "%{[25m%}"
+            reverse   "%{[07m%}" no-reverse   "%{[27m%}"
+        )
+
+        for color in {000..255}; do
+            FG[$color]="%{[38;5;${color}m%}"
+            BG[$color]="%{[48;5;${color}m%}"
+        done
+
+        ZSH_SPECTRUM_TEXT=${ZSH_SPECTRUM_TEXT:-Arma virumque cano Troiae qui primus ab oris}
+
+        # Show all 256 colors with color number
+        function spectrum_ls() {
+          for code in {000..255}; do
+            print -P -- "$code: %F{$code}$ZSH_SPECTRUM_TEXT%f"
+          done
+        }
+
+        # Show all 256 colors where the background is set to specific color
+        function spectrum_bls() {
+          for code in {000..255}; do
+            print -P -- "$BG[$code]$code: $ZSH_SPECTRUM_TEXT %{$reset_color%}"
+          done
+        }
+    # }
+
+    # find files and open them if accepted with mvim
+    # {
+
+        findo() {
+            find . -iname "$*" -ok mvim --remote-tab-silent {} \;
+        }
+
+    # }
+
+    # find strings in files and open them if accepted with mvim
+    # {
+
+        grepo() {
+            for f in `grep -l -nr "$*" .`; do
+                echo "Open: ${green}$f${nc}? [y | n | a(bort)]"
+                read yn
+                case $yn in
+                    [Yy]* ) mvim --remote-tab-silent $f;;
+                    [Nn]* ) ;;
+                    [Aa]* ) break;;
+                    * ) echo "y | n | a(bort)";;
+                esac
+            done
+        }
+
+    # }
+
+# }
+# vim: set ft=zsh ts=4 sw=4 expandtab :
