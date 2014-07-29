@@ -1,4 +1,4 @@
 dotfiles
 ========
 
-Configs and settings
+configs and settings
