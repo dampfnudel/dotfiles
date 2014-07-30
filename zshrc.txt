@@ -192,7 +192,7 @@
     alias doch='su -c "$(history -p !-1)"'
     alias git_ignore_del='git ls-files --deleted -z | git update-index --assume-unchanged -z --stdin'
     alias wtf='echo ¯\_(ツ)_/¯'
-
+    alias printip='ifconfig | grep "inet " | grep -v 127.0.0.1 | cut -d\  -f2'
     # inquant aliases
     alias vdbg="ssh -p 2222 vagrant@127.0.0.1 -R 9000:localhost:9000"
 
