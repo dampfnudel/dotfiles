@@ -34,14 +34,14 @@ local s_blue="033"
 local s_cyan="037"
 local s_green="064"
 
-# molokai
-local mk_green="034"
-local mk_pink="198"
+# monokai
+local mk_green="148"
+local mk_magenta="197"
 local mk_white="253"
-local mk_aqua="051"
-local mk_magenta="057"
-local mk_yellow="220"
-local mk_orange="202"
+local mk_aqua="081"
+local mk_violet="141"
+local mk_yellow="186"
+local mk_orange="208"
 
 case "$theme" in
     "ocean")
@@ -71,13 +71,13 @@ case "$theme" in
         c_dirty_flag=$cred
         c_working_dir=$cblack
         ;;
-    "molokai")
+    "monokai")
         c_user_host=$mk_green
         c_privs=$mk_white
         c_token=$mk_aqua
         c_token_fail=$mk_yellow
-        c_branch_name=$mk_magenta
-        c_dirty_flag=$mk_pink
+        c_branch_name=$mk_violet
+        c_dirty_flag=$mk_magenta
         c_working_dir=$mk_orange
         ;;
     "solarized")
