@@ -18,6 +18,12 @@ esac
 
 case $2 in
     "vimrc" )
+        if [ "$1" == "import" ]
+        then
+            file= "vimrc.txt"
+        else
+            file= ".vimrc"
+        fi
         echo "->vim"
         ;;
     "zshrc" )
@@ -31,3 +37,9 @@ case $2 in
         exit 1
         ;;
 esac
+
+# import vimrc
+if [ "$1" == "import" && "$2" == "vimrc" ]
+then
+    cp 
+fi
