@@ -1,8 +1,116 @@
-local theme="molokai"
+# activated theme
+local theme="solarized"
 
-local sflash="⚡"
+# special chars
 local slambda="λ"
+local ssun="✱"
+local sgit="±"
 local sarrows="»"
+
+# colors
+local rc="%{$reset_color%}"
+
+local cblue="027"
+local cdark="025"
+local caqua="051"
+local cred="196"
+local corange="202"
+local cpurple="013"
+local cgreen="082"
+local clightgreen="076"
+local clightblue="111"
+local cyellow="229"
+local cdarkblue="019"
+local cblack="008"
+
+# solarized colors
+local s_base="234"
+local s_yellow="136"
+local s_orange="166"
+local s_red="160"
+local s_magenta="125"
+local s_violet="061"
+local s_blue="033"
+local s_cyan="037"
+local s_green="064"
+
+# molokai
+local mk_green="034"
+local mk_pink="198"
+local mk_white="253"
+local mk_aqua="051"
+local mk_magenta="057"
+local mk_yellow="220"
+local mk_orange="202"
+
+case "$theme" in
+    "ocean")
+        c_user_host=$cblue
+        c_privs=$cdark
+        c_token=$caqua
+        c_token_fail=$corange
+        c_branch_name=$cpurple
+        c_dirty_flag=$cred
+        c_working_dir="white"
+        ;;
+    "desert")
+        c_user_host=$cyellow
+        c_privs=$cdark
+        c_token=$caqua
+        c_token_fail=$corange
+        c_branch_name=$cpurple
+        c_dirty_flag=$cred
+        c_working_dir="white"
+        ;;
+    "solaire")
+        c_user_host=$cgreen
+        c_privs=$cdark
+        c_token=$cdarkblue
+        c_token_fail=$corange
+        c_branch_name=$cpurple
+        c_dirty_flag=$cred
+        c_working_dir=$cblack
+        ;;
+    "molokai")
+        c_user_host=$mk_green
+        c_privs=$mk_white
+        c_token=$mk_aqua
+        c_token_fail=$mk_yellow
+        c_branch_name=$mk_magenta
+        c_dirty_flag=$mk_pink
+        c_working_dir=$mk_orange
+        ;;
+    "solarized")
+        c_user_host=$s_cyan
+        c_privs=$s_yellow
+        c_token=$s_violet
+        c_token_fail=$s_red
+        c_branch_name=$s_green
+        c_dirty_flag=$s_orange
+        c_working_dir=$s_blue
+        ;;
+esac
+
+# parts
+local sign="$sarrows$sarrows$sarrows λ"
+
+local user="%{$FG[$c_user_host]%}%n$rc"
+local host="%{$FG[$c_user_host]%}%m$rc"
+local privs="(%{$FG[$c_privs]%}%#% $rc)"
+local token="%(?,%{$FG[$c_token]%}$sign$rc,%{$FG[$c_token_fail]%}$sign$rc)"
+local wdir="%{$FG[$c_working_dir]%}%d$rc"
+
+ZSH_THEME_GIT_PROMPT_PREFIX="$rc [ %{$FG[$c_branch_name]%} $sgit "
+ZSH_THEME_GIT_PROMPT_SUFFIX=" $rc]"
+ZSH_THEME_GIT_PROMPT_DIRTY=" %{$FG[$c_dirty_flag]%}$ssun%{$FG[$c5]%}"
+ZSH_THEME_GIT_PROMPT_CLEAN=""
+
+# assemble
+PROMPT=$'$user$privs$host [$wdir] $(git_prompt_info)
+ $token '
+
+# additional signs
+local sflash="⚡"
 local sangle="❯"
 local splus="✚"
 local scircle="✹"
@@ -10,11 +118,9 @@ local sx="✖"
 local sarrow="➜"
 local sminux="═"
 local sstar="✭"
-local sgit="±"
 local splane="✈"
 local ssx="✂"
 local sarrowfat="➦"
-local ssun="✱"
 local scx="✗"
 local slx="✖"
 local ssomething="☁"
@@ -46,86 +152,12 @@ local s="ǂ"
 local s="ĭ"
 local s="Ť"
 local s="Ŧ"
-local rc="%{$reset_color%}"
 
-local cblue="027"
-local cdark="025"
-local caqua="051"
-local cred="196"
-local corange="202"
-local cpurple="013"
-local cgreen="082"
-local clightgreen="076"
-local clightblue="111"
-local cyellow="229"
-local cdarkblue="019"
-local cblack="008"
-
-local mk_green="034"
-local mk_pink="198"
-#001
-local mk_white="253"
-local mk_aqua="051"
-local mk_magenta="057"
-#005
-local mk_yellow="220"
-local mk_orange="202"
-
-case "$theme" in
-    "ocean")
-        c0=$cblue
-        c1=$cdark
-        c2=$caqua
-        c3=$corange
-        c4=$cpurple
-        c5=$cred
-        c6="white"
-        ;;
-    "desert")
-        c0=$cyellow
-        c1=$cdark
-        c2=$caqua
-        c3=$corange
-        c4=$cpurple
-        c5=$cred
-        c6="white"
-        ;;
-    "solaire")
-        c0=$cgreen
-        c1=$cdark
-        c2=$cdarkblue
-        c3=$corange
-        c4=$cpurple
-        c5=$cred
-        c6=$cblack
-        ;;
-    "molokai")
-        c0=$mk_green
-        c1=$mk_white
-        c2=$mk_aqua
-        c3=$mk_yellow
-        c4=$mk_magenta
-        c5=$mk_pink
-        c6=$mk_orange
-        ;;
-esac
-
-local sign="$sarrows$sarrows$sarrows λ"
-
-local user="%{$FG[$c0]%}%n$rc"
-local host="%{$FG[$c0]%}%m$rc"
-local privs="(%{$FG[$c1]%}%#% $rc)"
-local token="%(?,%{$FG[$c2]%}$sign$rc,%{$FG[$c3]%}$sign$rc)"
-local wdir="%{$FG[$c6]%}%d$rc"
-
-ZSH_THEME_GIT_PROMPT_PREFIX="$rc [ %{$FG[$c4]%} $sgit "
-ZSH_THEME_GIT_PROMPT_SUFFIX=" $rc]"
-ZSH_THEME_GIT_PROMPT_DIRTY=" %{$FG[$c3]%}$ssun%{$FG[$c4]%}"
-ZSH_THEME_GIT_PROMPT_CLEAN=""
-
-PROMPT=$'$user$privs$host [$wdir] $(git_prompt_info)
- $token '
-
+# More symbols to choose from:
+# ☀ ✹ ☄ ♆ ♀ ♁ ♐ ♇ ♈ ♉ ♚ ♛ ♜ ♝ ♞ ♟ ♠ ♣ ⚢ ⚲ ⚳ ⚴ ⚥ ⚤ ⚦ ⚒ ⚑ ⚐ ♺ ♻ ♼ ☰ ☱ ☲ ☳ ☴ ☵ ☶ ☷
+# ✡ ✔ ✖ ✚ ✱ ✤ ✦ ❤ ➜ ➟ ➼ ✂ ✎ ✐ ⨀ ⨁ ⨂ ⨍ ⨎ ⨏ ⨷ ⩚ ⩛ ⩡ ⩱ ⩲ ⩵  ⩶ ⨠ 
+# ⬅ ⬆ ⬇ ⬈ ⬉ ⬊ ⬋ ⬒ ⬓ ⬔ ⬕ ⬖ ⬗ ⬘ ⬙ ⬟  ⬤ 〒 ǀ ǁ ǂ ĭ Ť Ŧ
+# ⑊ Ⓞ ⑃ ⓜ ⑁ ⓧ ⑂ ⓡ ⑄ ♒ ⓤ 𝝙
 
 
 
