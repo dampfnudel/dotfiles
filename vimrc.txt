@@ -11,10 +11,7 @@
 " ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.vimrc
 
 " TODO
-"i auf I mappen
-"dokmentende auch am dokumentanfang
-"enter != n for search
-"
+
 " plugins
 " {
 
@@ -113,6 +110,10 @@
 
     " leader-key
     let mapleader="."
+
+    " insert after cursor
+    noremap i a
+    noremap a i
 
     " Visual shifting (does not exit Visual mode)
     vnoremap < <gv
