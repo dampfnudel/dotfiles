@@ -247,6 +247,10 @@
     " activate language detection
     filetype plugin indent on
 
+    " store the backup files in this location
+    set backupdir=~/.vim/backup
+    set dir=~/.vim/backup//,/var/tmp//,/tmp//,.
+
 " }
 
 
