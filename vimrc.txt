@@ -156,6 +156,14 @@
 
 " }
 
+" Commands
+" {
+
+    " pretty print json
+    :command Pjson %!python -m json.tool
+
+" }
+
 
 " environment
 " {
