@@ -364,6 +364,8 @@
     " easymotion
     " {
 
+        # map forward and backword easymotion to f
+        nnoremap f H:call EasyMotion#WB(0, 0)<CR>
         let g:EasyMotion_do_mapping = 0 " Disable default mappings
 
         " Bi-directional find motion
