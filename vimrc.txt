@@ -165,6 +165,15 @@
 
 " }
 
+" abbrevations
+" {
+
+    autocmd FileType python abbr pdb import pdb; pdb.set_trace()
+    autocmd FileType python abbr ipdb from ipdb import set_trace; set_trace()
+    autocmd FileType python abbr emb from IPython import embed; embed()
+
+" }
+
 
 " environment
 " {
