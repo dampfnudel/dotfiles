@@ -191,10 +191,9 @@
     alias macrip='find . -name .DS_Store -exec rm {} \; && find . -name ._.DS_Store -exec rm {} \;'
     alias doch='su -c "$(history -p !-1)"'
     alias git_ignore_del='git ls-files --deleted -z | git update-index --assume-unchanged -z --stdin'
-    alias wtf='echo ¯\_(ツ)_/¯'
+    alias wtf='printf "¯\_(ツ)_/¯"'
     alias printip='ifconfig | grep "inet " | grep -v 127.0.0.1 | cut -d\  -f2'
-    # inquant aliases
-    alias vdbg="ssh -p 2222 vagrant@127.0.0.1 -R 9000:localhost:9000"
+    alias dirs='dirs -vp'
 
     #gnualiases
     alias dircolors='gdircolors'
@@ -208,6 +207,10 @@
     alias .......='cd ../../../../../..'
     alias ........='cd ../../../../../../..'
     alias .........='cd ../../../../../../../..'
+
+    # files
+    alias zshrc='mvim --remote-tab-silent ~/.zshrc'
+    alias vimrc='mvim --remote-tab-silent ~/.vimrc'
 
     # numFiles: number of (non-hidden) files in current directory
     alias numFiles='echo $(ls -1 | wc -l)'

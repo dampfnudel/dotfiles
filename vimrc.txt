@@ -111,10 +111,6 @@
     " leader-key
     let mapleader="."
 
-    " insert after cursor
-    noremap i a
-    noremap a i
-
     " Visual shifting (does not exit Visual mode)
     vnoremap < <gv
     vnoremap > >gv
