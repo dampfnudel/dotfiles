@@ -193,8 +193,6 @@
 
         set nocompatible        " Must be first line
         if !WINDOWS()
-            remap <silent>ë :set paste
-            m`O
             set shell=/bin/sh
         endif
 
@@ -382,7 +380,7 @@
     " easymotion
     " {
 
-        # map forward and backword easymotion to f
+        " map forward and backword easymotion to f
         nnoremap f H:call EasyMotion#WB(0, 0)<CR>
         let g:EasyMotion_do_mapping = 0 " Disable default mappings
 
