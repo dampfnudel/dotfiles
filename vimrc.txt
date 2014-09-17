@@ -105,7 +105,7 @@
 
 " }
 
-" keybindings
+" keymappings / keybindings
 " {
 
     " leader-key
@@ -118,6 +118,7 @@
     " Ctrl-j/k deletes blank line below/above
     nnoremap <silent><C-j> m`:silent +g/\m^\s*$/d<CR>``:noh<CR>
     nnoremap <silent><C-k> m`:silent -g/\m^\s*$/d<CR>``:noh<CR>
+    map ä viw
 
     " Enter inserts a blank line before/after the current line
     nmap <S-Enter> O<Esc>j
