@@ -22,11 +22,15 @@
 # zsh configs
 # {
 
-    #colored dirs
-    eval `dircolors /Users/mbayer/Settings/ColorSchemes/solarized/dircolors-solarized/dircolors.256dark`
+    # colored dirs
+    alias dircolors='gdircolors'
+    # @mbp
+    # eval `dircolors /Users/mbayer/Settings/ColorSchemes/solarized/dircolors-solarized/dircolors.256dark`
+    # @iq
+    eval `dircolors utilities/dircolors-monobay/monobay.256dark`
     unsetopt correct_all
 
-    #unset mailcheck
+    # unset mailcheck
     unset MAILCHECK
 
     # enable dirstack
@@ -82,10 +86,11 @@
     # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
     # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
     # Example format: plugins=(rails git textmate ruby lighthouse)
-    plugins=(gradle osx brew git git-flow python pip fabric)
+    plugins=(gradle osx brew git git-flow python pip fabric zsh-syntax-highlighting)
 
     source $ZSH/oh-my-zsh.sh
 
+    # @mbp
     export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
 
     export TERM=xterm-256color
@@ -103,7 +108,8 @@
 # {
 
     # Fortune Ponies welcomes you
-    fortune | ponysay
+    # @mbp
+    # fortune | ponysay
 
 # }
 
@@ -122,13 +128,23 @@
     path=(
         $path
         /usr/bin/python
-        /usr/local/bin/python3
+        # @mbp
+        # /usr/local/bin/python3
+        # @iq
+        /usr/local/bin/python
     )
 
     # virtualenv
-    export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
-    export PROJECT_HOME=$HOME/Workspace
-    export WORKON_HOME=$HOME/Workspace/Envs
+    # @mbp
+    # export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
+    # export PROJECT_HOME=$HOME/Workspace
+    # export WORKON_HOME=$HOME/Workspace/Envs
+    # export VIRTUALENV_ROOT=$WORKON_HOME
+    # source /usr/local/bin/virtualenvwrapper.sh
+    # @iq
+    export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python
+    export PROJECT_HOME=$HOME/develop
+    export WORKON_HOME=$HOME/.virtualenvs
     export VIRTUALENV_ROOT=$WORKON_HOME
     source /usr/local/bin/virtualenvwrapper.sh
 
@@ -194,9 +210,6 @@
     alias wtf='printf "¯\_(ツ)_/¯"'
     alias printip='ifconfig | grep "inet " | grep -v 127.0.0.1 | cut -d\  -f2'
     alias dirs='dirs -vp'
-
-    #gnualiases
-    alias dircolors='gdircolors'
 
     # Directory navigation aliases
     alias ..='cd ..'
