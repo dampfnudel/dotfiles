@@ -10,24 +10,17 @@
 
 # ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.zshrc
 
-# TODO
-# syntaxhighlighting
-# findo
-# grepo
-# sshs
-# open specific files aliases
-# more rip functions
-# user scripts
-
 # zsh configs
 # {
 
     # colored dirs
     alias dircolors='gdircolors'
-    # @mbp
-    # eval `dircolors /Users/mbayer/Settings/ColorSchemes/solarized/dircolors-solarized/dircolors.256dark`
-    # @iq
-    eval `dircolors utilities/dircolors-monobay/monobay.256dark`
+    # @mbp {
+        eval `dircolors /Users/mbayer/Settings/ColorSchemes/solarized/dircolors-solarized/dircolors.256dark`
+    # }
+    # @imb {
+        # eval `dircolors utilities/dircolors-monobay/monobay.256dark`
+    # }
     unsetopt correct_all
 
     # unset mailcheck
@@ -90,8 +83,9 @@
 
     source $ZSH/oh-my-zsh.sh
 
-    # @mbp
-    export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
+    # @mbp {
+        export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
+    # }
 
     export TERM=xterm-256color
 
@@ -108,8 +102,9 @@
 # {
 
     # Fortune Ponies welcomes you
-    # @mbp
-    # fortune | ponysay
+    # @mbp {
+        fortune | ponysay
+    # }
 
 # }
 
@@ -128,25 +123,29 @@
     path=(
         $path
         /usr/bin/python
-        # @mbp
-        # /usr/local/bin/python3
-        # @iq
-        /usr/local/bin/python
+        # @mbp {
+            /usr/local/bin/python3
+        # }
+        # @imb {
+            # /usr/local/bin/python
+        # }
     )
 
     # virtualenv
-    # @mbp
-    # export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
-    # export PROJECT_HOME=$HOME/Workspace
-    # export WORKON_HOME=$HOME/Workspace/Envs
-    # export VIRTUALENV_ROOT=$WORKON_HOME
-    # source /usr/local/bin/virtualenvwrapper.sh
-    # @iq
-    export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python
-    export PROJECT_HOME=$HOME/develop
-    export WORKON_HOME=$HOME/.virtualenvs
-    export VIRTUALENV_ROOT=$WORKON_HOME
-    source /usr/local/bin/virtualenvwrapper.sh
+    # @mbp {
+        export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
+        export PROJECT_HOME=$HOME/Workspace
+        export WORKON_HOME=$HOME/Workspace/Envs
+        export VIRTUALENV_ROOT=$WORKON_HOME
+        source /usr/local/bin/virtualenvwrapper.sh
+    # }
+    # @imb {
+        # export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python
+        # export PROJECT_HOME=$HOME/develop
+        # export WORKON_HOME=$HOME/.virtualenvs
+        # export VIRTUALENV_ROOT=$WORKON_HOME
+        # source /usr/local/bin/virtualenvwrapper.sh
+    # }
 
 # }
 # TODO

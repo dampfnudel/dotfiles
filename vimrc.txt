@@ -118,7 +118,10 @@
     " Ctrl-j/k deletes blank line below/above
     nnoremap <silent><C-j> m`:silent +g/\m^\s*$/d<CR>``:noh<CR>
     nnoremap <silent><C-k> m`:silent -g/\m^\s*$/d<CR>``:noh<CR>
+    " visually mark inner word
     map ä viw
+    " copy line without identation and linebreak
+    map ö ^v$<Left>y
 
     " Enter inserts a blank line before/after the current line
     nmap <S-Enter> O<Esc>j
