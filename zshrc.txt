@@ -244,6 +244,19 @@
     # I often can't recall what I named this alias, so make it work either way:Â·
     alias findgrep='grepfind'
 
+    # mac
+    alias show_hidden='defaults write com.apple.Finder AppleShowAllFiles YES && killall Finder'
+    alias hide_hidden='defaults write com.apple.Finder AppleShowAllFiles NO && killall Finder'
+
+    #bookmarks
+    alias cdet='cd /Users/mbayer/Develop/eventicker/eventicker-rdbms'
+    alias cdta='cd /Users/mbayer/Develop/termxplorer/application'
+    alias cdtc='cd /Users/mbayer/Develop/termxplorer/core'
+
+    # services
+    alias etp='/Users/mbayer/Develop/eventicker/eventicker-postgres/bin/supervisord'
+    alias etd='/Users/mbayer/Develop/eventicker/eventicker-rdbms/bin/start_django'
+
 # }
 
 # functions
