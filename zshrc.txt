@@ -220,6 +220,26 @@
     alias ........='cd ../../../../../../..'
     alias .........='cd ../../../../../../../..'
 
+    # @mbp {
+    # }
+    # @imb {
+        # alias cdd='cd ~/Develop'
+        # alias cdet='cd ~/Develop/eventicker/eventicker-rdbms'
+        # alias cdtx='cd ~/Develop/termxplorer'
+        # alias cdta='cd ~/Develop/termxplorer/application'
+        # alias cdtc='cd ~/Develop/termxplorer/core'
+    # }
+
+    # Services
+    # @mbp {
+    # }
+    # @imb {
+        # alias etd='~/Develop/eventicker/eventicker-rdbms/bin/start_django'
+        # alias etp='~/Develop/eventicker/eventicker-postgres/bin/supervisord'
+        # alias va='cd ~/Develop/termxplorer && vagrant up'
+        # alias vassh='cd ~/Develop/termxplorer && vagrant ssh'
+    # }
+
     # files
     alias zshrc='mvim --remote-tab-silent ~/.zshrc'
     alias vimrc='mvim --remote-tab-silent ~/.vimrc'
