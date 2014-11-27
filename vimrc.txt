@@ -118,11 +118,10 @@
     " Ctrl-j/k deletes blank line below/above
     nnoremap <silent><C-j> m`:silent +g/\m^\s*$/d<CR>``:noh<CR>
     nnoremap <silent><C-k> m`:silent -g/\m^\s*$/d<CR>``:noh<CR>
-    " visually mark inner word
     map ä viw
-    " copy line without identation and linebreak
-    map ü ^v$<Left>y
+    map ü ^v$<Left>
     map ö :nohl<Enter>
+
 
     " Enter inserts a blank line before/after the current line
     nmap <S-Enter> O<Esc>j
@@ -169,11 +168,11 @@
 " abbrevations
 " {
 
-    autocmd FileType python abbr pdb import pdb; pdb.set_trace()
-    autocmd FileType python abbr ipdb from ipdb import set_trace; set_trace()
-    autocmd FileType python abbr emb from IPython import embed; embed()
-    autocmd FileType python abbr utf8 # -*- coding: <encoding name> -*-<esc>o<del><esc>
-    autocmd FileType python abbr author __author__ = 'Markus Bayer <markus.bayer@inquant.de>'<CR>__docformat__ = 'plaintext'<CR><del><esc>o<del>
+    autocmd FileType python abbr pdb import pdb; pdb.set_trace()<BS><esc>
+    autocmd FileType python abbr ipdb from ipdb import set_trace; set_trace()<BD><esc>
+    autocmd FileType python abbr emb from IPython import embed; embed()<BS><esc>
+    autocmd FileType python abbr p_utf8 # -*- coding: <encoding name> -*-<esc>o<del><esc>
+    autocmd FileType python abbr p_author __author__ = 'Markus Bayer <markus.bayer@inquant.de>'<CR>__docformat__ = 'plaintext'<CR><del><esc>o<del>
     abbr vimline # vim: set ft=python ts=4 sw=4 expandtab :<del><esc>
 
 " }
@@ -422,3 +421,4 @@
 " }
 
 " vim: set ft=zsh ts=4 sw=4 expandtab :
+
