@@ -169,7 +169,7 @@
 " {
 
     autocmd FileType python abbr pdb import pdb; pdb.set_trace()<BS><esc>
-    autocmd FileType python abbr ipdb from ipdb import set_trace; set_trace()<BD><esc>
+    autocmd FileType python abbr ipdb from ipdb import set_trace; set_trace()<BS><esc>
     autocmd FileType python abbr emb from IPython import embed; embed()<BS><esc>
     autocmd FileType python abbr p_utf8 # -*- coding: <encoding name> -*-<esc>o<del><esc>
     autocmd FileType python abbr p_author __author__ = 'Markus Bayer <markus.bayer@inquant.de>'<CR>__docformat__ = 'plaintext'<CR><del><esc>o<del>
