@@ -236,6 +236,7 @@
     # @imb {
         # alias etd='~/Develop/eventicker/eventicker-rdbms/bin/start_django'
         # alias etp='~/Develop/eventicker/eventicker-postgres/bin/supervisord'
+        # alias etb='cd ~/Develop/eventicker/eventicker-rdbms/ && ./bin/buildout -c develop.cfg'
         # alias va='cd ~/Develop/termxplorer && vagrant up'
         # alias vassh='cd ~/Develop/termxplorer && vagrant ssh'
     # }
