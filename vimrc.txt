@@ -48,7 +48,10 @@
     Plugin 'tpope/vim-surround'
     Plugin 'sjl/gundo.vim'
     Plugin 'flazz/vim-colorschemes'
-    Plugin 'gregsexton/MatchTag'
+    Plugin 'gregsexton/MatchTag'                        " brew install ctags
+    Plugin 'nvie/vim-flake8'                            " pip install pep8
+    Plugin 'tpope/vim-fugitive'
+    Plugin 'Keithbsmiley/swift.vim'
 
     " plugin examples
     " {
@@ -170,6 +173,7 @@
 " abbrevations
 " {
 
+    autocmd BufNewFile,BufReadPost *.md set filetype=markdown
     autocmd FileType python abbr pdb import pdb; pdb.set_trace()<BS><esc>
     autocmd FileType python abbr ipdb from ipdb import set_trace; set_trace()<BS><esc>
     autocmd FileType python abbr emb from IPython import embed; embed()<BS><esc>
@@ -437,6 +441,19 @@
 
         let g:airline_detect_modified=1
         let g:airline_theme = 'wombat'
+    " }
+
+
+    " tabbar
+    " {
+
+        " Proper Ctags locations
+        let g:tagbar_ctags_bin='/usr/local/bin/ctags'
+        " Default is 40, seems too wide
+        let g:tagbar_width=26
+        " Display panel with F8
+        nmap <F8> :TagbarToggle<CR>
+
     " }
 
 " }
