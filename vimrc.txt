@@ -48,10 +48,11 @@
     Plugin 'tpope/vim-surround'
     Plugin 'sjl/gundo.vim'
     Plugin 'flazz/vim-colorschemes'
-    Plugin 'gregsexton/MatchTag'                        " brew install ctags
+    Plugin 'gregsexton/MatchTag'
     Plugin 'nvie/vim-flake8'                            " pip install pep8
     Plugin 'tpope/vim-fugitive'
     Plugin 'Keithbsmiley/swift.vim'
+    Plugin 'majutsushi/tagbar'                          " brew install ctags
 
     " plugin examples
     " {
