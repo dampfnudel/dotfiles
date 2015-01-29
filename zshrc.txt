@@ -423,5 +423,21 @@
 
     # }
 
+    # tab completion for commands (input from last command)
+    # {
+        _prev-result () {
+            hstring=$(eval `fc -l -n -1`)
+            set -A hlist ${(@s/
+    /)hstring}
+            compadd - ${hlist}
+        }
+
+        zle -C prev-comp menu-complete _prev-result
+        # use with <esc>e:
+        # find . -name "settings.py.*"
+        # vim <Esc>e<Tab>
+        bindkey '\ee' prev-comp
+    # }
+
 # }
 # vim: set ft=zsh ts=4 sw=4 expandtab :
