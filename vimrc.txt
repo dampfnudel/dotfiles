@@ -53,6 +53,7 @@
     Plugin 'tpope/vim-fugitive'
     Plugin 'Keithbsmiley/swift.vim'
     Plugin 'majutsushi/tagbar'                          " brew install ctags
+    Plugin 'mhinz/vim-startify'
 
     " plugin examples
     " {
@@ -455,6 +456,46 @@
         " Display panel with F8
         nmap <F8> :TagbarToggle<CR>
 
+    " }
+
+    " startify
+    " {
+        " :SLoad
+        " :SSave
+        " :SDelete
+        let g:startify_bookmarks = [ '~/.vimrc' ]
+        let g:startify_change_to_dir = 1
+        let g:startify_change_to_vcs_root = 0
+        let g:startify_custom_footer = ''
+        let g:startify_custom_header = [
+                \ '',
+                \ '        ▄█    █▄   ▄█    ▄▄▄▄███▄▄▄▄  ',
+                \ '       ███    ███ ███  ▄██▀▀▀███▀▀▀██▄',
+                \ '       ███    ███ ███▌ ███   ███   ███',
+                \ '       ███    ███ ███▌ ███   ███   ███',
+                \ '       ███    ███ ███▌ ███   ███   ███',
+                \ '       ███    ███ ███  ███   ███   ███',
+                \ ' ████  ███    ███ ███  ███   ███   ███',
+                \ ' ████   ▀██████▀  █▀    ▀█   ███   █▀ ',
+                \ ]
+        let g:startify_custom_indices = []
+        let g:startify_disable_at_vimenter = 0
+        let g:startify_enable_special = 1
+        let g:startify_files_number = 10
+        let g:startify_list_order = ['files', 'dir', 'bookmarks', 'sessions']
+        let g:startify_relative_path = 0
+        let g:startify_session_autoload = 0
+        let g:startify_session_delete_buffers = 0
+        let g:startify_session_dir = '~/.vim/session'
+        let g:startify_session_persistence = 0
+        let g:startify_session_savecmds = []
+        let g:startify_session_savevars = [
+               \ 'g:startify_session_savevars',
+               \ 'g:startify_session_savecmds',
+               \ 'g:random_plugin_use_feature'
+               \ ]
+        let g:startify_skiplist_server = []
+        let g:startify_skiplist = []
     " }
 
 " }
