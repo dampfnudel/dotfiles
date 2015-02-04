@@ -54,6 +54,7 @@
     Plugin 'Keithbsmiley/swift.vim'
     Plugin 'majutsushi/tagbar'                          " brew install ctags
     Plugin 'mhinz/vim-startify'
+    Plugin 'vim-scripts/YankRing.vim'
 
     " plugin examples
     " {
@@ -262,7 +263,8 @@
 
     " nativ indent detection
     set autoindent
-    set smartindent
+    # set smartindent                               " fucks up python comment indents
+    set nosmartindent
     " activate language detection
     filetype plugin indent on
 
@@ -499,6 +501,12 @@
                \ ]
         let g:startify_skiplist_server = []
         let g:startify_skiplist = []
+    " }
+
+
+    " YankRing
+    " {
+        nnoremap <silent> <F7> :YRShow<CR>
     " }
 
 " }
