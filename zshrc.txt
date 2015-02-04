@@ -507,7 +507,7 @@
         _prev-result () {
             hstring=$(eval `fc -l -n -1`)
             set -A hlist ${(@s/
-    /)hstring}
+/)hstring}
             compadd - ${hlist}
         }
 
