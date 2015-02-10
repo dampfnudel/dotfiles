@@ -180,7 +180,7 @@
     autocmd FileType python abbr pdb import pdb; pdb.set_trace()<esc>
     autocmd FileType python abbr ipdb from ipdb import set_trace; set_trace()<esc>
     autocmd FileType python abbr emb from IPython import embed; embed()<esc>
-    autocmd FileType python abbr p_utf8 # -*- coding: <encoding name> -*-<esc>o<del><esc>
+    autocmd FileType python abbr p_utf8 # -*- coding: utf-8 -*-<esc>o<del><esc>
     autocmd FileType python abbr p_author __author__ = 'Markus Bayer <markus.bayer@inquant.de>'<CR>__docformat__ = 'plaintext'<CR><del><esc>o<del>
     abbr vimline # vim: set ft=python ts=4 sw=4 expandtab :<del><esc>
 
