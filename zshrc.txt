@@ -16,7 +16,7 @@
     # colored dirs
     alias dircolors='gdircolors'
     # @mbp {
-        eval `dircolors /Users/mbayer/Settings/ColorSchemes/solarized/dircolors-solarized/dircolors.256dark`
+        eval `dircolors /Users/mbayer/Settings/ColorSchemes/monobay.256dark`
     # }
     # @imb {
         # eval `dircolors utilities/dircolors-monobay/monobay.256dark`
@@ -507,7 +507,7 @@
         _prev-result () {
             hstring=$(eval `fc -l -n -1`)
             set -A hlist ${(@s/
-    /)hstring}
+/)hstring}
             compadd - ${hlist}
         }
 
