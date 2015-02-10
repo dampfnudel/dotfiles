@@ -272,6 +272,11 @@
     set backupdir=~/.vim/backup
     set dir=~/.vim/backup//,/var/tmp//,/tmp//,.
 
+    " disable audio bell
+    if has('gui_running')
+        autocmd GUIEnter * set vb t_vb=
+    endif
+
 " }
 
 
