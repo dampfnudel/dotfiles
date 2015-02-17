@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
+
 import re
 import sys
 import getopt
+
 
 """
 this script uncomments outcommented lines between matching tags and
@@ -27,31 +29,6 @@ example:
     # <§ end arch §>
 """
 
-def main(argv):
-   inputfile = ''
-   outputfile = ''
-   identifier = ''
-   try:
-      opts, args = getopt.getopt(argv,"hi:o:",["input=","output=","identifier"])
-   except getopt.GetoptError:
-      print 'checkout.py -i <inputfile> -o <outputfile> -id <identifier>'
-      sys.exit(2)
-   for opt, arg in opts:
-      if opt == '-h':
-         print 'checkout.py -i <inputfile> -o <outputfile> -id <identifier>'
-         sys.exit()
-      elif opt == "-i":
-         inputfile = arg
-      elif opt == "-o":
-         outputfile = arg
-      elif opt == "-ident":
-         identifier = arg
-   print 'Input file is', inputfile
-   print 'Output file is', outputfile
-   print 'Identifier is', identifier
-
-if __name__ == "__main__":
-   main(sys.argv[1:])
 
 def read_tag(line):
     """
@@ -80,8 +57,13 @@ def comment_line(line, comment_char):
     string comment_char: the char initiating a comment
     string processed_line: the commented out line
     """
-    # TODO check if not already commented out
-    # TODO replace code by \S*
+    # check if not already commented out
+    regex_str = r"^\s+%s.*$" % comment_char
+    pattern = re.compile(regex_str)
+    match = re.search(pattern, line)
+    if match:
+        return line
+
     pattern = re.compile(r"(?P<whitespace>^\s*)(?P<code>.*$)")
 
     match = re.search(pattern, line)
@@ -92,6 +74,7 @@ def comment_line(line, comment_char):
 
     return processed_line
 
+
 def uncomment_line(line, comment_char):
     """
     removes the char initiating a comment of a line in a textfile
@@ -99,7 +82,7 @@ def uncomment_line(line, comment_char):
     string comment_char: the char initiating a comment
     string processed_line: the uncommented line
     """
-    # TODO replace code by \S*
+    print "uncommend ----------------"
     # check für comment after whitespace
     pattern_string = "(?P<whitespace>^\s*)(?P<comment>%s)(?P<code>.*$)" % comment_char
     pattern = re.compile(pattern_string)
@@ -115,24 +98,31 @@ def uncomment_line(line, comment_char):
 
         if match:
             processed_line = match.group("code")
+            # recursively remove all comment_chars
+            # return uncomment_line(processed_line, comment_char)
+            # return processed_line
+            # return uncomment_line(processed_line, comment_char)
+
         else:
             # line is not commented out
             return line
 
-    return processed_line
+    # return processed_line
+    return uncomment_line(processed_line, comment_char)
 
-def process_file(file_in_name, file_out_name, target_identifier):
+
+def process_file(file_in_name, file_out_name, template):
     """
     string file_in_name: the (file)name of the input file
     string file_out_name: the (file)name of the output file
-    string target_identifier: the template tag identifier
+    string template: the template tag identifier
     """
     lines_in = []
     lines_out = []
     with open(file_in_name) as file_in:
         lines_in = file_in.readlines()
 
-# flush the output file
+    # flush the output file
     with open(file_out_name, "w+") as file_out:
         pass
 
@@ -145,14 +135,14 @@ def process_file(file_in_name, file_out_name, target_identifier):
                 template_tag = read_tag(line_in)
                 tag_in_line = True
 
-                if template_tag["identifier"] != target_identifier:
+                if template_tag["identifier"] != template:
                     if template_tag["control"] == "begin":
                         mode = "comment"
                         print "changed mode to comment"
                     elif template_tag["control"] == "end":
                         mode = "normal"
                         print "changed mode to normal"
-                elif template_tag["identifier"] == target_identifier:
+                elif template_tag["identifier"] == template:
                     if template_tag["control"] == "begin":
                         mode = "uncomment"
                         print "changed mode to uncomment"
@@ -167,9 +157,34 @@ def process_file(file_in_name, file_out_name, target_identifier):
             else:
                 file_out.write(line_in)
 
-target_identifier = "mbp"
-file_in_name = "test"
-file_out_name = "output"
+
+def main(argv):
+    inputfile = ""
+    outputfile = ""
+    identifier = ""
+    try:
+      opts, args = getopt.getopt(argv,"i:o:t:",["i=","o=","t="])
+    except getopt.GetoptError:
+        print "checkout.py -i <inputfile> -o <outputfile> -t <template>"
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == "-h":
+            print "checkout.py -i <inputfile> -o <outputfile> -t <template>"
+            sys.exit()
+        elif opt == "-i":
+            inputfile = arg
+        elif opt == "-o":
+            outputfile = arg
+        elif opt == "-t":
+            template = arg
+
+    if inputfile and outputfile and template:
+        print "-i: %s" % inputfile
+        print "-o: %s" % outputfile
+        print "-t: %s" % template
+
+        process_file(inputfile, outputfile, template)
 
 
-
+if __name__ == "__main__":
+    main(sys.argv[1:])
