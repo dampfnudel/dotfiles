@@ -252,7 +252,7 @@
 
 # aliases
 # {
-    alias f='jump'
+    alias j='jump'
     alias ls='gls --color=auto'
     alias la="ls -la"
     alias ll="ls -lah"
@@ -308,17 +308,24 @@
 
     # Services
     # @mbp {
+        alias etb='cd /Users/mbayer/Workspace/eventicker/eventicker-rdbms && ./bin/buildout -c develop.cfg && cd -'
+        alias etp='/Users/mbayer/Workspace/eventicker/eventicker-postgres/bin/supervisord && cd -'
+        alias etd='/Users/mbayer/Workspace/eventicker/eventicker-rdbms/bin/start_django && cd -'
+        alias ete='/Users/mbayer/Workspace/elasticsearch-1.0.0/bin/elasticsearch && cd -'
+        alias etf='/Users/mbayer/Workspace/etfetcher/bin/celery -A etfetcher.worker.tasks worker -P eventlet --loglevel=warning -c 1 --hostname=markus.bayer@inquant.de && cd -'
+        alias etff='/Users/mbayer/Workspace/etfetcher/bin/flask_server && cd -'
+        alias etfwp='/Users/mbayer/Workspace/etfetcher/bin/worker_fetch_events_place && cd -'
     # }
     # @imb {
         # alias etb='cd /Users/mbayer/Develop/eventicker/eventicker-rdbms && ./bin/buildout -c develop.cfg && cd -'
-        # alias etp='/Users/mbayer/Develop/eventicker/eventicker-postgres/bin/supervisord'
-        # alias etd='/Users/mbayer/Develop/eventicker/eventicker-rdbms/bin/start_django'
-        # alias ete='/Users/mbayer/Develop/elasticsearch-1.0.0/bin/elasticsearch'
-        # alias etf='/Users/mbayer/Develop/etfetcher/bin/celery -A etfetcher.worker.tasks worker -P eventlet --loglevel=warning -c 1 --hostname=markus.bayer@inquant.de'
-        # alias etff='/Users/mbayer/Develop/etfetcher/bin/flask_server'
-        # alias etfwp='/Users/mbayer/Develop/etfetcher/bin/worker_fetch_events_place'
-        # alias va='cd ~/Develop/termxplorer && vagrant up'
-        # alias vassh='cd ~/Develop/termxplorer && vagrant ssh'
+        # alias etp='/Users/mbayer/Develop/eventicker/eventicker-postgres/bin/supervisord && cd -'
+        # alias etd='/Users/mbayer/Develop/eventicker/eventicker-rdbms/bin/start_django && cd -'
+        # alias ete='/Users/mbayer/Develop/elasticsearch-1.0.0/bin/elasticsearch && cd -'
+        # alias etf='/Users/mbayer/Develop/etfetcher/bin/celery -A etfetcher.worker.tasks worker -P eventlet --loglevel=warning -c 1 --hostname=markus.bayer@inquant.de && cd -'
+        # alias etff='/Users/mbayer/Develop/etfetcher/bin/flask_server && cd -'
+        # alias etfwp='/Users/mbayer/Develop/etfetcher/bin/worker_fetch_events_place && cd -'
+        # alias va='cd ~/Develop/termxplorer && vagrant up && cd -'
+        # alias vassh='cd ~/Develop/termxplorer && vagrant ssh && cd -'
     # }
 
     # files
@@ -348,15 +355,6 @@
     # mac
     alias show_hidden='defaults write com.apple.Finder AppleShowAllFiles YES && killall Finder'
     alias hide_hidden='defaults write com.apple.Finder AppleShowAllFiles NO && killall Finder'
-
-    #bookmarks
-    alias cdet='cd /Users/mbayer/Develop/eventicker/eventicker-rdbms'
-    alias cdta='cd /Users/mbayer/Develop/termxplorer/application'
-    alias cdtc='cd /Users/mbayer/Develop/termxplorer/core'
-
-    # services
-    alias etp='/Users/mbayer/Develop/eventicker/eventicker-postgres/bin/supervisord'
-    alias etd='/Users/mbayer/Develop/eventicker/eventicker-rdbms/bin/start_django'
 
 # }
 
