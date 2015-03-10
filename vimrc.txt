@@ -55,6 +55,11 @@
     Plugin 'majutsushi/tagbar'                          " brew install ctags
     Plugin 'mhinz/vim-startify'
     Plugin 'vim-scripts/YankRing.vim'
+    Plugin 'itchyny/screensaver.vim'
+    Plugin 'itchyny/thumbnail.vim'
+    Plugin 'itchyny/calendar.vim'
+    Plugin 'vim-scripts/matrix.vim--Yang'
+    Plugin 'gcmt/wildfire.vim'
 
     " plugin examples
     " {
@@ -492,7 +497,16 @@
         let g:startify_disable_at_vimenter = 0
         let g:startify_enable_special = 1
         let g:startify_files_number = 10
-        let g:startify_list_order = ['files', 'dir', 'bookmarks', 'sessions']
+        let g:startify_list_order = [
+                \ ['   My most recently used files'],
+                \ 'files',
+                \ ['   My most recently used files in the current directory:'],
+                \ 'dir',
+                \ ['   Sessions:'],
+                \ 'sessions',
+                \ ['   Bookmarks:'],
+                \ 'bookmarks',
+                \ ]
         let g:startify_relative_path = 0
         let g:startify_session_autoload = 0
         let g:startify_session_delete_buffers = 0
@@ -514,7 +528,12 @@
         nnoremap <silent> <F7> :YRShow<CR>
     " }
 
+    " calendar.vim
+    " {
+        let g:calendar_google_calendar = 1
+    " }
+
+
 " }
 
 " vim: set ft=zsh ts=4 sw=4 expandtab :
-
