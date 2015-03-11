@@ -268,7 +268,7 @@
 
     " nativ indent detection
     set autoindent
-    # set smartindent                               " fucks up python comment indents
+    " set smartindent                               " fucks up python comment indents
     set nosmartindent
     " activate language detection
     filetype plugin indent on
