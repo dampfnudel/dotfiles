@@ -132,12 +132,12 @@ ZSH_THEME_GIT_PROMPT_SUFFIX="$rc"
 ZSH_THEME_GIT_PROMPT_DIRTY=""
 ZSH_THEME_GIT_PROMPT_CLEAN=""
 
-ZSH_THEME_GIT_PROMPT_ADDED="%{%B%F{green}%} ✚ $rc"
-ZSH_THEME_GIT_PROMPT_MODIFIED="%{%B%F{blue}%} ✎ $rc"
-ZSH_THEME_GIT_PROMPT_DELETED="%{%B%F{red}%} ✖ $rc"
-ZSH_THEME_GIT_PROMPT_RENAMED="%{%B%F{magenta}%} ⇆ $rc"
-ZSH_THEME_GIT_PROMPT_UNMERGED="%{%B%F{yellow}%} ⌥ $rc"
-ZSH_THEME_GIT_PROMPT_UNTRACKED="%{%B%F{cyan}%} � $rc"
+ZSH_THEME_GIT_PROMPT_ADDED="%{%B%F{$mk_violet}%} ✚ $rc"
+ZSH_THEME_GIT_PROMPT_MODIFIED="%{%B%F{$mk_violet}%} ✎ $rc"
+ZSH_THEME_GIT_PROMPT_DELETED="%{%B%F{$mk_violet}%} ✖ $rc"
+ZSH_THEME_GIT_PROMPT_RENAMED="%{%B%F{$mk_violet}%} ⇆ $rc"
+ZSH_THEME_GIT_PROMPT_UNMERGED="%{%B%F{$mk_violet}%} ⌥ $rc"
+ZSH_THEME_GIT_PROMPT_UNTRACKED="%{%B%F{$mk_violet}%} � $rc"
 
 
 
@@ -179,15 +179,15 @@ function echo_git_time_since_commit() {
             fi
 
             if [ "$HOURS" -gt 24 ]; then
-                echo "$COLOR${DAYS}d${SUB_HOURS}h${SUB_MINUTES}m%{$reset_color%} ]"
+                echo " $COLOR${DAYS}d${SUB_HOURS}h${SUB_MINUTES}m%{$reset_color%} ]"
             elif [ "$MINUTES" -gt 60 ]; then
-                echo "$COLOR${HOURS}h${SUB_MINUTES}m%{$reset_color%} ]"
+                echo " $COLOR${HOURS}h${SUB_MINUTES}m%{$reset_color%} ]"
             else
-                echo "$COLOR${MINUTES}m%{$reset_color%} ]"
+                echo " $COLOR${MINUTES}m%{$reset_color%} ]"
             fi
         else
             COLOR="$ZSH_THEME_GIT_TIME_SINCE_COMMIT_NEUTRAL"
-            echo "$COLOR~ ]"
+            echo " $COLOR~ ]"
         fi
     fi
 }
@@ -201,11 +201,11 @@ fi
 function echo_virtualenv_name {
     virtualenv_name=$(basename "$VIRTUAL_ENV")
     if [[ "$virtualenv_name" != "" ]]; then
-        echo "[ %{%B%F{cyan}%}$virtualenv_name$rc ]"
-    fi
+            echo "[ %{%B%F{cyan}%}$virtualenv_name$rc ]"
+        fi
 
-    # [ $VIRTUAL_ENV ] && echo "[ %{%B%F{cyan}%}"`basename $VIRTUAL_ENV`"$rc]"
-}
+        # [ $VIRTUAL_ENV ] && echo "[ %{%B%F{cyan}%}"`basename $VIRTUAL_ENV`"$rc]"
+    }
 
 function echo_time() {
     echo "%{%B%F{white}%}"`date +%H:%M:%S`
@@ -278,7 +278,34 @@ function echo_pwd() {
 
 function echo_prefix () {
     # color depends on return code
+    weekday=$(date +"%A")
+
     local token="λ"
+
+    case "$weekday" in
+        "Montag")
+            local token="༄༅"
+            ;;
+        "Dienstag")
+            local token="λ"
+            ;;
+        "Mittwoch")
+            local token="λ"
+            ;;
+        "Donnerstag")
+            local token="λ"
+            ;;
+        "Freitag")
+            local token="λ"
+            ;;
+        "Samstag")
+            local token="λ"
+            ;;
+        "Sonntag")
+            local token="✱"
+            ;;
+    esac
+
     echo "%(?,%{%B%F{$c_token}%}$token$rc,%{%B%F{$c_token_fail}%}$token$rc)"
 }
 
@@ -287,7 +314,6 @@ function echo_top_left_corner() {
 }
 
 function echo_top_right_corner() {
-    # echo "══╗"
     echo "╗"
 }
 
@@ -301,6 +327,7 @@ function echo_git() {
 
 function echo_filler() {
     # set -A topline
+    arrangement=-3
     topline=()
     top_left_corner=$(echo_top_left_corner)
     if [[ "$virtualenv_name" != "" ]]; then
@@ -320,98 +347,30 @@ function echo_filler() {
     fi
     virtualenv_name=$(echo_virtualenv_name)
     if [[ "$virtualenv_name" != "" ]]; then
+        arrangement=$arrangement+3
         topline+=("$(echo_virtualenv_name)")
     fi
     _git=$(echo_git)
     if [[ "$_git" != "" ]]; then
+        arrangement=$arrangement+2
         topline+=("$(echo_git)")
     fi
 
-    # echo $#topline
-    # for (( i=1; i<=$#topline; i++ )); do
-    #     echo $i
-    #     echo $toppine[$i]
-    # done
-
-
     i_width=${(S)topline//\%\{*\}\%\}} # search-and-replace color escapes
-    # echo $i_width
     i_width=${#${(%)i_width}} # expand all escapes and count the chars
     i_len=$#topline
-    strange=0
-    if [[ "$i_len" == 3 ]]; then
-        strange=-3
-    elif [[ "$i_len" == 4 ]]; then
-        strange=0
-    elif [[ "$i_len" == 5 ]]; then
-        strange=3
-    fi
-    # i_width=${topline}
-    # print $i_len
-    xmod=$(( $i_len % 2 ))
 
-    # i_filler=$(( $COLUMNS - $i_width + $i_len - $strange + 1))
-    i_filler=$(( $COLUMNS - $i_width + $i_len*3 + $strange))
-    # echo "$COLUMNS - $i_width + $i_len"
-    # echo $i_filler
-    # echo $i_filler
+    i_filler=$(( $COLUMNS - $i_width + $i_len*3 + $arrangement))
+
     echo "${(l:$i_filler::═:)}"
-    # echo "$COLUMNS"
-    # echo "$i_width"
-    # echo "$i_filler"
-
-    # local topline_width
-    # topline_width=${#${(%)topline}}
-    # topline_width=${(S)$topline//\%\{*\%\}}
-    # topline_width=${(S)$topline//\%\{*\}\%\}}
-    # %{$fg[white]%}
-    # %{%B%F{$c_token}%}
-
-    # i_width=${#${(%)i_width}}
-    # local i_filler
-
-    # echo $i_width
-
 }
 
 
 # assemble the prompt
-top_left_corner_part=$(echo_top_left_corner)
-user_host_part=$(echo_user_host)
-pwd_part=$(echo_pwd)
-virtualenv_name_part=$(echo_virtualenv_name)
-# git_prompt_info_part=($(git_prompt_info))
-# git_prompt_status_part=($(git_prompt_status))
-# git_time_since_commit_part=$(echo_git_time_since_commit)
-git_part=$(echo_git)
-top_right_corner_part=$(echo_top_right_corner)
-
-# # array holding the top line
-# set -A topline
-# topline+=($top_left_corner_part)
-# topline+=($user_host_part)
-# topline+=($pwd_part)
-# topline+=($(echo_virtualenv_name))
-# topline+=($git_part)
-# # topline+=($top_right_corner_part)
-
-
-LENGTH=${#user_host}
-
-
-# $top_left_corner_part$user_host_part$pwd_part$virtualenv_name_part$git_prompt_info_part$git_prompt_status_part$git_time_since_commit_part
 PROMPT=$'
-$top_left_corner_part$user_host_part$pwd_part$(echo_virtualenv_name)$(git_prompt_info)$(git_prompt_status)$(echo_git_time_since_commit)$(echo_filler)$top_right_corner_part
+$(echo_top_left_corner)$(echo_user_host)$(echo_pwd)$(echo_virtualenv_name)$(git_prompt_info)$(git_prompt_status)$(echo_git_time_since_commit)$(echo_filler)$(echo_top_right_corner)
 ╚══════► $(echo_prefix) '
 
-local sblow="༅"
-local sbigblow="༄"
-
-
-PS2='$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
-$PR_BLUE$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT(\
-$PR_LIGHT_GREEN%_$PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
-$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_NO_COLOUR '
+PS2='[ %{%B%F{$mk_yellow}%}%_$rc ]'
 
 RPROMPT='[ $(echo_time) $(echo_battery) $(echo_cmds) ]═════╝'
-
