@@ -12,12 +12,12 @@
 
 # features include:
 # - different color themes
-# - responsiv filler of the first line
-# - a token for each weekday
+# - responsiv prompt
+# - different token for each weekday
 # - show privileges
 # - show if pwd is writable
 # - git infos (branchname, status, colored time since last commit)
-# - time
+# - time (with day and night!!)
 # - battery status
 # - amount of commands entered
 # - color output of the last commands returncode
@@ -40,19 +40,19 @@ case "$theme" in
         local inkpot_cyan="117"
         local inkpot_blue="031"
         local inkpot_orange="172"
-        local inkpot_magenta="213"
+        local inkpot_magenta="135"
         local inkpot_yellow="222"
         local inkpot_brown="181"
         local inkpot_green="122"
 
         local c_user_host="%{%B%F{$inkpot_violet}%}"
         local c_privs="%{%B%F{$inkpot_cyan}%}"
-        local c_pwd="%{%B%F{$inkpot_magenta}%}"
+        local c_pwd="%{%B%F{$inkpot_green}%}"
         local c_virtual_env="%{%B%F{$inkpot_yellow}%}"
-        local c_git="%{%B%F{$inkpot_blue}%}"
+        local c_git="%{%B%F{$inkpot_magenta}%}"
         local c_token="%{%B%F{$inkpot_orange}%}"
-        local c_time="%{%B%F{$inkpot_green}%}"
-        local c_cmds="%{%B%F{$inkpot_brown}%}"
+        local c_time="%{%B%F{$inkpot_brown}%}"
+        local c_cmds="%{%B%F{$inkpot_blue}%}"
         ;;
     "monokai")
         local monokai_green="148"
@@ -62,6 +62,8 @@ case "$theme" in
         local monokai_violet="141"
         local monokai_yellow="186"
         local monokai_orange="208"
+        # 42	253	143	
+        # 173	80	77	
 
         local c_user_host="%{%B%F{$monokai_green}%}"
         local c_privs="%{%B%F{$monokai_white}%}"
@@ -170,7 +172,7 @@ function echo_virtualenv_name {
 
 function echo_time() {
     # show sun or moon
-    if [[ $(date +%H) > 17 ]]; then
+    if [[ $(date +%H) > 17 || $(date +%H) < 07 ]]; then
         local dok="☾"
     else
         local dok="☀"

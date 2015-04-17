@@ -47,7 +47,8 @@
     Plugin 'Lokaltog/vim-easymotion'
     Plugin 'tpope/vim-surround'
     Plugin 'sjl/gundo.vim'
-    Plugin 'flazz/vim-colorschemes'
+    " Plugin 'flazz/vim-colorschemes'
+    Plugin 'embayer/vim_colorschemes'
     Plugin 'gregsexton/MatchTag'
     Plugin 'nvie/vim-flake8'                            " pip install pep8
     Plugin 'tpope/vim-fugitive'
@@ -143,7 +144,6 @@
     " OSX {
 
         if has("gui_macvim")
-
             " tab navigation
             nnoremap <M-D-Right> :tabnext<CR>
             nnoremap <M-D-Left> :tabprev<CR>
@@ -167,6 +167,18 @@
         endif
 
     " }
+
+" }
+
+" Color
+" {
+
+if has("gui_macvim")
+    colorscheme inkpot
+else
+    colorscheme neonwave
+
+endif
 
 " }
 
@@ -236,6 +248,8 @@
 " general
 " {
 
+    syntax enable
+    set guicursor+=n-v-c:blinkon0
     " font size
     set guifont=Menlo:h15
     " syntax highlighting
@@ -286,6 +300,17 @@
 
 " }
 
+" Color
+" {
+
+    if has("gui_macvim")
+        colorscheme inkpot
+    else
+        colorscheme neonwave
+
+    endif
+
+" }
 
 " search
 " {
@@ -321,10 +346,8 @@
     " solarized
     " {
 
-        syntax enable
         " Set colorscheme to solarized
         " colorscheme solarized
-        colorscheme inkpot
 
         " Change the Solarized background to dark or light depending upon the time of 
         " day (5 refers to 5AM and 17 to 5PM). Change the background only if it is not 
@@ -536,7 +559,5 @@
         let g:calendar_google_calendar = 1
     " }
 
-
 " }
-
 " vim: set ft=zsh ts=4 sw=4 expandtab :
