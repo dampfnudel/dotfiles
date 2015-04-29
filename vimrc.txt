@@ -11,29 +11,18 @@
 " ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.vimrc
 
 " TODO
+" Sessions
 
-" plugins
-" {
+" plugins {{{
 
     " vundle
     " {
         " :PluginInstall to install
-
         set nocompatible              " be iMproved, required
         filetype off                  " required
-
         " set the runtime path to include Vundle and initialize
         set rtp+=~/.vim/bundle/Vundle.vim
         call vundle#begin()
-        " alternatively, pass a path where Vundle should install plugins
-        "let path = '~/some/path/here'
-        "call vundle#rc(path)
-
-        " The following are examples of different formats supported.
-        " Keep Plugin commands between here and filetype plugin indent on.
-        " scripts on GitHub repos
-
-
         " let Vundle manage Vundle, required
         Plugin 'gmarik/Vundle.vim'
 
@@ -47,7 +36,6 @@
     Plugin 'Lokaltog/vim-easymotion'
     Plugin 'tpope/vim-surround'
     Plugin 'sjl/gundo.vim'
-    " Plugin 'flazz/vim-colorschemes'
     Plugin 'embayer/vim_colorschemes'
     Plugin 'gregsexton/MatchTag'
     Plugin 'nvie/vim-flake8'                            " pip install pep8
@@ -60,82 +48,162 @@
     Plugin 'itchyny/thumbnail.vim'
     Plugin 'itchyny/calendar.vim'
     Plugin 'vim-scripts/matrix.vim--Yang'
-    Plugin 'gcmt/wildfire.vim'
+    Plugin 'terryma/vim-expand-region'
+    Plugin 'airblade/vim-gitgutter'
 
     " plugin examples
     " {
-
         " gitbub
         " {
-
             "Plugin 'rstacruz/sparkup'
-            "Plugin 'tpope/vim-fugitive'
-
             " subdirectory
             " {
-
                 " The sparkup vim script is in a subdirectory of this repo called vim.
                 " Pass the path to set the runtimepath properly.
                 "Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
-
             " }
-
         " }
-
         " http://vim-scripts.org/vim/scripts.html
         " {
-
             "Plugin 'L9'
-
         " }
-
-
         " local file
         " {
-
             "Plugin 'file:///home/markus/path/to/plugin'
-
         " }
-
     " }
-
-
     call vundle#end()             " required
     filetype plugin indent on     " required
-    " To ignore plugin indent changes, instead use:
-    "filetype plugin on
-    "
-    " Brief help
-    " :PluginList          - list configured plugins
-    " :PluginInstall(!)    - install (update) plugins
-    " :PluginSearch(!) foo - search (or refresh cache first) for foo
-    " :PluginClean(!)      - confirm (or auto-approve) removal of unused plugins
-    "
-    " see :h vundle for more details or wiki for FAQ
-    " NOTE: comments after Plugin commands are not allowed.
-    " Put your stuff after this line
-
     " }
 
-" }
+" }}}
 
-" keymappings / keybindings
-" {
+" general {{{
+
+    silent function! OSX()
+        return has('macunix')
+    endfunction
+    silent function! LINUX()
+        return has('unix') && !has('macunix') && !has('win32unix')
+    endfunction
+    silent function! WINDOWS()
+        return  (has('win16') || has('win32') || has('win64'))
+    endfunction
+
+    set nocompatible        " Must be first line
+    if !WINDOWS()
+        set shell=/bin/sh
+    endif
+
+    " store the backup files in this location
+    set backup
+    set backupdir=~/.vim/backup
+    set dir=~/.vim/backup//,/var/tmp//,/tmp//,.
+    set writebackup
+
+
+    " On Windows, also use '.vim' instead of 'vimfiles'; this makes synchronization
+    " across (heterogeneous) systems easier.
+    if WINDOWS()
+      set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
+    endif
+
+    " extensions
+    autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.md set filetype=markdown
+    autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.tracwiki set filetype=tracwiki
+
+" }}}
+
+" ui {{{
+
+    " syntax highlighting
+    syntax on
+    syntax enable
+    " highlight current line
+    set cursorline
+    " show line numbers
+    set nu
+    " no blinking cursor
+    set guicursor+=n-v-c:blinkon0
+    " font size
+    set guifont=Menlo:h15
+    " Highlight problematic whitespace
+    set list
+    set listchars=tab:›\ ,trail:•,extends:#,nbsp:.
+    " enable mouse usage
+    set mouse=a
+    " hide mouse cursor while typing
+    " move from endofline to startofline
+    "set whichwrap+=<,>,[,]     " ! can cause problems
+    set whichwrap+=h,l
+    " do not fold code
+    set nofoldenable
+    " highlight current line
+    set wildmenu
+    " redraw only when we need to
+    set lazyredraw
+
+    " nativ indent detection
+    set autoindent
+    set nosmartindent
+    " activate language detection
+    filetype plugin indent on
+
+
+    " disable audio bell
+    if has('gui_running')
+        autocmd GUIEnter * set vb t_vb=
+    endif
+
+    " folding
+    set foldenable
+    set foldmethod=marker
+    set foldlevel=0
+    " only in vimrc
+
+    " Color
+    " {
+        if has("gui_macvim")
+            colorscheme gruvbox
+            set background=dark
+        else
+            colorscheme neonwave
+        endif
+    " }
+
+" }}}
+
+" keymappings / keybindings {{{
+
+    " hardmode
+    nnoremap <Left> <nop>
+    nnoremap <Right> <nop>
+    nnoremap <Up> <nop>
+    nnoremap <Down> <nop>
 
     " leader-key
-    let mapleader="."
+    let mapleader=","
 
     " Visual shifting (does not exit Visual mode)
     vnoremap < <gv
     vnoremap > >gv
 
+    " highlight last inserted text
+    nnoremap gV `[v`]
+
+    " move to beginning/end of line
+    nnoremap B ^
+    nnoremap E $
+
     " Ctrl-j/k deletes blank line below/above
     nnoremap <silent><C-j> m`:silent +g/\m^\s*$/d<CR>``:noh<CR>
     nnoremap <silent><C-k> m`:silent -g/\m^\s*$/d<CR>``:noh<CR>
+    " visually select word under cursor
     map ä viw
+    " visually select line under cursor (without $)
     map ü ^v$<Left>
+    " clear highlights
     map ö :nohl<Enter>
-
 
     " Enter inserts a blank line before/after the current line
     nmap <S-Enter> O<Esc>j
@@ -153,6 +221,7 @@
             noremap <C-S-Tab> :tabprev<CR>
 
             " Switch to specific tab numbers with Command-number
+            "
             noremap <D-1> :tabn 1<CR>
             noremap <D-2> :tabn 2<CR>
             noremap <D-3> :tabn 3<CR>
@@ -163,115 +232,42 @@
             noremap <D-8> :tabn 8<CR>
             noremap <D-9> :tabn 9<CR>
             " Command-0 goes to the last tab
+            " remap <silent>ë :set paste
+            " m`O
             noremap <D-0> :tablast<CR>
         endif
-
     " }
 
-" }
+" }}}
 
-" Color
-" {
-
-if has("gui_macvim")
-    colorscheme inkpot
-else
-    colorscheme neonwave
-
-endif
-
-" }
-
-" Commands
-" {
+" commands {{{
 
     " pretty print json
     :command Pjson %!python -m json.tool
 
-" }
-
-" abbrevations
-" {
-
-    autocmd BufNewFile,BufReadPost *.md set filetype=markdown
-    autocmd FileType python abbr pdb import pdb; pdb.set_trace()<esc>
-    autocmd FileType python abbr ipdb from ipdb import set_trace; set_trace()<esc>
-    autocmd FileType python abbr emb from IPython import embed; embed()<esc>
-    autocmd FileType python abbr p_utf8 # -*- coding: utf-8 -*-<esc>o<del><esc>
-    autocmd FileType python abbr p_author __author__ = 'Markus Bayer <markus.bayer@inquant.de>'<CR>__docformat__ = 'plaintext'<CR><del><esc>o<del>
-    abbr vimline # vim: set ft=python ts=4 sw=4 expandtab :<del><esc>
-
-" }
-
-
-" environment
-" {
-
-    " identify platform
+    " abbrevations
     " {
-
-        silent function! OSX()
-            return has('macunix')
-        endfunction
-        silent function! LINUX()
-            return has('unix') && !has('macunix') && !has('win32unix')
-        endfunction
-        silent function! WINDOWS()
-            return  (has('win16') || has('win32') || has('win64'))
-        endfunction
+        autocmd FileType python abbr pdb import pdb; pdb.set_trace()<esc>
+        autocmd FileType python abbr ipdb from ipdb import set_trace; set_trace()<esc>
+        autocmd FileType python abbr emb from IPython import embed; embed()<esc>
+        autocmd FileType python abbr p_utf8 # -*- coding: utf-8 -*-<esc>o<del><esc>
+        autocmd FileType python abbr p_author __author__ = 'Markus Bayer <markus.bayer@inquant.de>'<CR>__docformat__ = 'plaintext'<CR><del><esc>o<del>
+        abbr vimline # vim: set ft=python ts=4 sw=4 expandtab :<del><esc>
     " }
 
-    " basics
-    " {
+" }}}
 
-        set nocompatible        " Must be first line
-        if !WINDOWS()
-            set shell=/bin/sh
-        endif
+" formatting {{{
 
-    " }
-
-    " windows compatible
-    " {
-
-        " On Windows, also use '.vim' instead of 'vimfiles'; this makes synchronization
-        " across (heterogeneous) systems easier.
-        if WINDOWS()
-          set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
-        endif
-
-    " }
-
-" }
-
-
-" general
-" {
-
-    syntax enable
-    set guicursor+=n-v-c:blinkon0
-    " font size
-    set guifont=Menlo:h15
-    " syntax highlighting
-    syntax on
-    " highlight md as markdown
-    au BufRead,BufNewFile *.md set filetype=markdown
-    " highlight current line
-    set cursorline
-    " show line numbers
-    set nu
-    " Highlight problematic whitespace
-    set list
-    set listchars=tab:›\ ,trail:•,extends:#,nbsp:.
-    " enable mouse usage
-    set mouse=a
-    " hide mouse cursor while typing
     scriptencoding utf-8
-    " move from endofline to startofline
-    "set whichwrap+=<,>,[,]     " ! can cause problems
-    set whichwrap+=h,l
-    " Auto fold code
-    set nofoldenable
+    " use indents of 4 spaces
+    set shiftwidth=4
+    " tabs length is 4 spaces
+    set tabstop=4
+    " tabs are spaces, not tabs
+    set expandtab
+    " delete indents
+    set softtabstop=4
 
     " enable copy-paste from system clipboard
     if has('clipboard')
@@ -282,38 +278,9 @@ endif
         endif
     endif
 
-    " nativ indent detection
-    set autoindent
-    " set smartindent                               " fucks up python comment indents
-    set nosmartindent
-    " activate language detection
-    filetype plugin indent on
+" }}}
 
-    " store the backup files in this location
-    set backupdir=~/.vim/backup
-    set dir=~/.vim/backup//,/var/tmp//,/tmp//,.
-
-    " disable audio bell
-    if has('gui_running')
-        autocmd GUIEnter * set vb t_vb=
-    endif
-
-" }
-
-" Color
-" {
-
-    if has("gui_macvim")
-        colorscheme inkpot
-    else
-        colorscheme neonwave
-
-    endif
-
-" }
-
-" search
-" {
+" search {{{
 
     " highlight search terms
     set hlsearch
@@ -322,26 +289,9 @@ endif
     " case insensitive search
     set ignorecase
 
-" }
+" }}}
 
-
-" formatting
-" {
-
-    " use indents of 4 spaces
-    set shiftwidth=4
-    " tabs length is 4 spaces
-    set tabstop=4
-    " tabs are spaces, not tabs
-    set expandtab
-    " delete indents
-    set softtabstop=4
-
-" }
-
-
-" plugins
-" {
+" plugin settings {{{
 
     " solarized
     " {
@@ -349,8 +299,8 @@ endif
         " Set colorscheme to solarized
         " colorscheme solarized
 
-        " Change the Solarized background to dark or light depending upon the time of 
-        " day (5 refers to 5AM and 17 to 5PM). Change the background only if it is not 
+        " Change the Solarized background to dark or light depending upon the time of
+        " day (5 refers to 5AM and 17 to 5PM). Change the background only if it is not
         " already set to the value we want.
         function! SetSolarizedBackground()
             if strftime("%H") >= 5 && strftime("%H") < 17 
@@ -367,7 +317,7 @@ endif
         " Set background on launch
         " call SetSolarizedBackground()
 
-        " Every time you save a file, call the function to check the time and change 
+        " Every time you save a file, call the function to check the time and change
         " the background (if necessary).
         if has("autocmd")
             " autocmd bufwritepost * call SetSolarizedBackground()
@@ -379,9 +329,11 @@ endif
     " NERDTRee
     " {
 
+        " ctrl ww to toggle
+
         if has('gui_running')
 
-                " set NERDTree size
+            " set NERDTree size
             let NERDTreeWinSize=20
 
             " NERDTree on startup and new tab
@@ -458,37 +410,11 @@ endif
     " }
 
 
-    " Airline
-    " {
-        if !exists('g:airline_symbols')
-            let g:airline_symbols = {}
-        endif
-
-        let g:airline_left_sep = '»'
-        let g:airline_left_sep = ''
-        " let g:airline_left_sep = '▶'
-        let g:airline_right_sep = '«'
-        let g:airline_right_sep = ''
-        " let g:airline_right_sep = '◀'
-        let g:airline_symbols.linenr = '␊'
-        let g:airline_symbols.linenr = '␤'
-        let g:airline_symbols.linenr = '¶'
-        let g:airline_symbols.branch = '⎇'
-        let g:airline_symbols.paste = 'ρ'
-        let g:airline_symbols.paste = 'Þ'
-        let g:airline_symbols.paste = '∥'
-        let g:airline_symbols.whitespace = 'Ξ'
-
-        let g:airline_detect_modified=1
-        let g:airline_theme = 'base16'
-    " }
-
-
     " tabbar
     " {
 
         " Proper Ctags locations
-        let g:tagbar_ctags_bin='/usr/local/bin/ctags'
+        let g:tagbar_ctags_bin='/usr/bin/ctags'
         " Default is 40, seems too wide
         let g:tagbar_width=26
         " Display panel with F8
@@ -559,5 +485,49 @@ endif
         let g:calendar_google_calendar = 1
     " }
 
-" }
+
+    " Airline
+    " {
+        if !exists('g:airline_symbols')
+            let g:airline_symbols = {}
+        endif
+
+        let g:airline_left_sep = '»'
+        let g:airline_left_sep = ''
+        " let g:airline_left_sep = '▶'
+        let g:airline_right_sep = '«'
+        let g:airline_right_sep = ''
+        " let g:airline_right_sep = '◀'
+        let g:airline_symbols.linenr = '␊'
+        let g:airline_symbols.linenr = '␤'
+        let g:airline_symbols.linenr = '¶'
+        let g:airline_symbols.branch = '⎇'
+        let g:airline_symbols.paste = 'ρ'
+        let g:airline_symbols.paste = 'Þ'
+        let g:airline_symbols.paste = '∥'
+        let g:airline_symbols.whitespace = 'Ξ'
+
+        let g:airline_detect_modified=1
+        let g:airline_theme = 'badwolf'
+    " }
+
+    " expand-region
+    " {
+        " map + <Plug>(expand_region_expand)
+        map - <Plug>(expand_region_shrink)
+    " }
+
+    " CtrlP {
+        let g:ctrlp_map = '<C-p>'
+        nnoremap <leader>. :CtrlP<CR>
+        let g:ctrlp_match_window = 'bottom,order:ttb'
+        let g:ctrlp_switch_buffer = 0
+        let g:ctrlp_working_path_mode = 0
+        let g:ctrlp_prompt_mappings = {
+            \ 'AcceptSelection("e")': ['<c-t>'],
+            \ 'AcceptSelection("t")': ['<cr>', '<2-LeftMouse>'],
+            \ }
+    " }
+" }}}
+
 " vim: set ft=zsh ts=4 sw=4 expandtab :

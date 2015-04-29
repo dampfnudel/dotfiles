@@ -290,9 +290,9 @@
 
     # requires: pip install dict.cc.py
     # lookup dict.cc for german words
-    deen () { dict.cc.py de en "$1"; }
+    deen () { /Users/mbayer/Utils/dict.cc.py/dict.cc.py de en "$1"; }
     # lookup dict.cc for english words
-    ende () { dict.cc.py en de "$1"; }
+    ende () { /Users/mbayer/Utils/dict.cc.py/dict.cc.py en de "$1"; }
 
     # copy the current working dir to clipboard
     cpp() {
