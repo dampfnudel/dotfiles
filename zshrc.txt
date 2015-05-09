@@ -151,6 +151,14 @@
 
 # }
 
+# docker
+# {
+    $(boot2docker shellinit 2> /dev/null)
+    export DOCKER_HOST=tcp://192.168.59.103:2376
+    export DOCKER_CERT_PATH=/Users/mbayer/.boot2docker/certs/boot2docker-vm
+    export DOCKER_TLS_VERIFY=1
+# }
+
 # keybindings
 # {
 
@@ -264,6 +272,9 @@
     # ffe: to find a file whose name ends with a given string
     ffe () { /usr/bin/find . -name '*'"$@" ; }
 
+    # fd: find a directory
+    fd () { /usr/bin/find . -type d -name '*'"$@" ; }
+
     # grepfind: to grep through files found by find, e.g. grepf pattern '*.c'
     # note that 'grep -r pattern dir_name' is an alternative if want all files
     grepfind () { find . -type f -name "$2" -print0 | xargs -0 grep "$1" ; }
@@ -295,13 +306,15 @@
     ende () { /Users/mbayer/Utils/dict.cc.py/dict.cc.py en de "$1"; }
 
     # copy the current working dir to clipboard
-    cpp() {
-        pwd | pbcopy
+    cwd() { pwd | pbcopy }
+
+    # count files
+    function count () {
+        for dir in $( find . -type d -print ); do files=$( find $dir -maxdepth 1 -type f | wc -l ); echo "$dir : $files"; done
     }
 
     # extract an archive
     # {
-
         extract () {
             if [ -f $1 ] ; then
                 case $1 in
@@ -321,12 +334,10 @@
                 echo "'$1' is not a valid file"
             fi
         }
-
     # }
 
     # show available color codes
     # {
-
         typeset -Ag FX FG BG
 
         FX=(
@@ -410,6 +421,27 @@
                 echo
             done
         }
+    # }
+
+    # enter = ls && git status
+    # {
+        function do_enter() {
+            if [ -n "$BUFFER" ]; then
+                zle accept-line
+                return 0
+            fi
+            echo
+            ls
+            if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
+                echo
+                echo -e "\e[0;33m--- git status ---\e[0m"
+                git status -sb
+            fi
+            zle reset-prompt
+            return 0
+        }
+        zle -N do_enter
+        bindkey '^m' do_enter
     # }
 # }
 
