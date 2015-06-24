@@ -87,7 +87,7 @@
     source $ZSH/oh-my-zsh.sh
 
     # @mbp {
-        export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
+        export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/mbayer/bin:$PATH"
     # }
 
     export TERM=xterm-256color
@@ -161,15 +161,12 @@
 
 # keybindings
 # {
-
     bindkey '\e[A' history-beginning-search-backward
     bindkey '\e[B' history-beginning-search-forward
-
 # }
 
 # aliases
 # {
-
     alias j='jump'
     alias ls='gls --color=auto'
     alias la="ls -la"
@@ -191,6 +188,7 @@
     alias tvim="mvim --remote-tab-silent"
     alias doch='su -c "$(history -p !-1)"'
     alias wtf='printf "¯\_(ツ)_/¯"'
+    alias trash="rm -rf ~/.Trash/."
     alias printip='ifconfig | grep "inet " | grep -v 127.0.0.1 | cut -d\  -f2'
     alias dirs='dirs -vp'
     # find all .git directories and exec "git pull" on the parent.
@@ -250,11 +248,14 @@
     # mac
     alias show_hidden='defaults write com.apple.Finder AppleShowAllFiles YES && killall Finder'
     alias hide_hidden='defaults write com.apple.Finder AppleShowAllFiles NO && killall Finder'
-
 # }
 
 # functions
 # {
+    # open files from asgard
+    ethervim () {
+        mvim -c "echo :set buftype: \" \"" --remote-tab-silent scp://root@134.119.32.216:4022//"$@"
+    }
 
     # showTimes: show the modification, metadata-change, and access times of a file
     showtimes () { stat -f "%N:   %m %c %a" "$@" ; }
@@ -301,12 +302,18 @@
 
     # requires: pip install dict.cc.py
     # lookup dict.cc for german words
-    deen () { /Users/mbayer/Utils/dict.cc.py/dict.cc.py de en "$1"; }
+    de () { /Users/mbayer/Utils/dict.cc.py/dict.cc.py de en "$1"; }
     # lookup dict.cc for english words
-    ende () { /Users/mbayer/Utils/dict.cc.py/dict.cc.py en de "$1"; }
+    en () { /Users/mbayer/Utils/dict.cc.py/dict.cc.py en de "$1"; }
 
     # copy the current working dir to clipboard
     cwd() { pwd | pbcopy }
+
+    # serve wd
+    serve () {
+        printip
+        python -m SimpleHTTPServer
+    }
 
     # count files
     function count () {
@@ -404,6 +411,19 @@
             killall Finder
         }
     # }
+
+    # show clock
+    # {
+        clock () {
+            while sleep 1;do tput sc;tput cup 0 $(($(tput cols)-29));date;tput rc;done &
+        }
+    # }
+
+    # nyan cat
+    function nyan () { telnet nyancat.dakko.us }
+
+    # starwars
+    function starwars () { telnet towel.blinkenlights.nl }
 
     # mandelbrot
     # {

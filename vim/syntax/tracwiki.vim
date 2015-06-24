@@ -42,6 +42,7 @@ syn region  tracVerb        start="`" end="`"
 
 syn region  tracHead        start="^=\{1,5} " end="\n"
 syn match   tracLine        "^----$"
+syn match   tracLine        "^-*$"
 
 syn region tracItalic       start=+''+ end=+''+ containedin=tracHead contains=tracEscape
 syn region tracBold         start=+'''+ end=+'''+ containedin=tracHead contains=tracEscape
@@ -78,7 +79,7 @@ syn match   tracLinks     `\<\(wiki\|source\|attachment\|milestone\|diff\|log\|r
 " syntax will break.
 syn region  tracMacro       start=+\[\[+ end=+\]\]+
 
-syn match   tracListItem    "^\s*[*]\s\+"
+syn match   tracListItem    "^\s*[*|-]\s\+"
 syn match   tracDefList     "^\s.\+::" 
 
 syn region  tracDisussion   start="^>" end="$"
@@ -86,15 +87,19 @@ syn region  tracDisussion   start="^>" end="$"
 syn match   tracEscape      "!\<\([A-Z][a-z]\+\)\{2,}\>\([#/]\<\([A-Z][a-z]\+\)\{2,}\>\)*"
 
 " The default highlighting.
-  
-hi def link tracLinks        Function
-hi def link tracHead         Type
-hi def link tracLine         Type
-hi def link tracVerb         String
-hi def      tracBold          term=bold cterm=bold gui=bold
-hi def      tracItalic        term=italic cterm=italic gui=italic
-hi def      tracUnderline     term=underline cterm=underline gui=underline
-hi def      tracBoldItalic    term=bold,italic cterm=bold,italic gui=bold,italic
+
+hi def link tracHead         Function
+hi def link tracVerb         Type
+hi def link tracLinks        Special
+hi def link tracLine         Comment
+hi def link tracBold         PreProc
+hi def link tracItalic       PreProc
+hi def link tracUnderline    PreProc
+hi def link tracBoldItalic   PreProc
+" hi def      tracBold          term=bold cterm=bold gui=bold
+" hi def      tracItalic        term=italic cterm=italic gui=italic
+" hi def      tracUnderline     term=underline cterm=underline gui=underline
+" hi def      tracBoldItalic    term=bold,italic cterm=bold,italic gui=bold,italic
 hi def link tracEscape       Special
 hi def link tracStrike       Statement
 hi def link tracSuper        Statement
@@ -102,7 +107,7 @@ hi def link tracSub          Statement
 hi def link tracLink         Function
 hi def link tracRawLink      Function
 hi def link tracPageName     Function
-hi def link tracListItem     Operator
+hi def link tracListItem     Special
 hi def link tracDefList      tracBoldItalic
 hi def link tracMacro        PreProc
 hi def link tracDisussion    Comment

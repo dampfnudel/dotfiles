@@ -11,7 +11,10 @@
 " ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.vimrc
 
 " TODO
-" Sessions
+" append new tabs at the end
+" sublime like tmpfiles
+" braces behavior
+" ctrl-p include last files
 
 " plugins {{{
 
@@ -38,7 +41,7 @@
     Plugin 'sjl/gundo.vim'
     Plugin 'embayer/vim_colorschemes'
     Plugin 'gregsexton/MatchTag'
-    Plugin 'nvie/vim-flake8'                            " pip install pep8
+    Plugin 'nvie/vim-flake8'                            " pip install flake8
     Plugin 'tpope/vim-fugitive'
     Plugin 'Keithbsmiley/swift.vim'
     Plugin 'majutsushi/tagbar'                          " brew install ctags
@@ -50,7 +53,17 @@
     Plugin 'vim-scripts/matrix.vim--Yang'
     Plugin 'terryma/vim-expand-region'
     Plugin 'airblade/vim-gitgutter'
-    Plugin 'manuel-colmenero/vim-simple-session'
+    Plugin 'luochen1990/rainbow'
+    Plugin 'Shougo/neocomplete.vim'
+    " Plugin 'ervandew/supertab'
+    Plugin 'scrooloose/syntastic'
+    Plugin 'Valloric/YouCompleteMe'
+    Plugin 'vim-scripts/mru.vim'
+    Plugin 'jistr/vim-nerdtree-tabs'
+    " Plugin 'manuel-colmenero/vim-simple-session'
+    " Plugin 'xolox/vim-misc'
+    " Plugin 'xolox/vim-session'
+
 
     " plugin examples
     " {
@@ -96,17 +109,17 @@
         set shell=/bin/sh
     endif
 
+    set ssop-=options    " do not store global and local values in a session
+    set ssop-=folds      " do not store folds
+
     " store the backup files in this location
     set backup
     set backupdir=~/.vim/backup
     set dir=~/.vim/backup//,/var/tmp//,/tmp//,.
     set writebackup
 
-    " disable audio bell
-    set noerrorbells
-    set novisualbell
-    set t_vb=
-    autocmd GUIENTER,BufNewFile,BufFilePre,BufRead,BufReadPost set vb t_vb=
+    " wd is always based on the current file
+    set autochdir
 
     " On Windows, also use '.vim' instead of 'vimfiles'; this makes synchronization
     " across (heterogeneous) systems easier.
@@ -149,6 +162,12 @@
     " redraw only when we need to
     set lazyredraw
 
+    " disable audio bell
+    set noerrorbells
+    set novisualbell
+    set t_vb=
+    autocmd GUIENTER,BufNewFile,BufFilePre,BufRead,BufReadPost set vb t_vb=
+
     " nativ indent detection
     set autoindent
     set nosmartindent
@@ -170,8 +189,8 @@
     " Color
     " {
         if has("gui_macvim")
-            colorscheme gruvbox
             set background=dark
+            colorscheme gruvbox
         else
             colorscheme neonwave
         endif
@@ -197,6 +216,9 @@
     " highlight last inserted text
     nnoremap gV `[v`]
 
+    " switch buffers
+    nnoremap <leader>m :ls<CR>:b<Space>
+
     " move to beginning/end of line
     nnoremap B ^
     nnoremap E $
@@ -219,10 +241,16 @@
 
         if has("gui_macvim")
             " tab navigation
+            " in insert mode
+            imap <M-D-Right> <Esc><Esc><Esc>:tabnext<CR>
+            imap <M-D-Left> <Esc><Esc><Esc>:tabprev<CR>
+            " in normal mode
             nnoremap <M-D-Right> :tabnext<CR>
             nnoremap <M-D-Left> :tabprev<CR>
             " Press Ctrl-Tab to switch between open tabs (like browser tabs) to 
             " the right side. Ctrl-Shift-Tab goes the other way.
+            imap <C-Tabt> <Esc><Esc><Esc>:tabnext<CR>
+            imap <C-S-Tab> <Esc><Esc><Esc>:tabprev<CR>
             noremap <C-Tab> :tabnext<CR>
             noremap <C-S-Tab> :tabprev<CR>
 
@@ -238,8 +266,6 @@
             noremap <D-8> :tabn 8<CR>
             noremap <D-9> :tabn 9<CR>
             " Command-0 goes to the last tab
-            " remap <silent>ë :set paste
-            " m`O
             noremap <D-0> :tablast<CR>
         endif
     " }
@@ -309,7 +335,7 @@
         " day (5 refers to 5AM and 17 to 5PM). Change the background only if it is not
         " already set to the value we want.
         function! SetSolarizedBackground()
-            if strftime("%H") >= 5 && strftime("%H") < 17 
+            if strftime("%H") >= 5 && strftime("%H") < 17
                 if &background != 'light'
                     set background=light
                 endif
@@ -335,47 +361,51 @@
     " NERDTRee
     " {
 
+        let g:nerdtree_tabs_open_on_gui_startup=0
         " ctrl ww to toggle
+        map <leader>n <plug>NERDTreeTabsToggle<CR>
 
         if has('gui_running')
 
             " set NERDTree size
             let NERDTreeWinSize=20
-
-            " NERDTree on startup and new tab
-            autocmd vimenter * NERDTree
-            autocmd TabEnter * NERDTree
-
-            " focus filebuffer on startup, new buffer and new tab
-            autocmd vimenter * wincmd l
-            autocmd BufNew * wincmd l
-            autocmd TabEnter * wincmd l
-
-            " close all open buffers on entering a window if the only
-            autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
-
-            " from spf13
             let NERDTreeShowBookmarks=1
             let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
             let NERDTreeChDirMode=0
             let NERDTreeQuitOnOpen=1
             let NERDTreeMouseMode=2
             let NERDTreeShowHidden=1
-            let NERDTreeKeepTreeInNewTab=1
-            let g:nerdtree_tabs_open_on_gui_startup=1
 
-            " Initialize NERDTree as needed {
-            function! NERDTreeInitAsNeeded()
-                redir => bufoutput
-                buffers!
-                redir END
-                let idx = stridx(bufoutput, "NERD_tree")
-                if idx > -a
-                    NERDTreeMirror
-                    NERDTreeFind
-                    wincmd l
-                endif
-            endfunction
+            " always present {
+
+                " let NERDTreeKeepTreeInNewTab=1
+                " NERDTree on startup and new tab
+                " autocmd vimenter * NERDTree
+                " autocmd TabEnter * NERDTree
+
+                " focus filebuffer on startup, new buffer and new tab
+                " autocmd vimenter * wincmd l
+                " autocmd BufNew * wincmd l
+                " autocmd TabEnter * wincmd l
+
+                " close all open buffers on entering a window if the only
+                autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
+
+                " Initialize NERDTree as needed {
+                function! NERDTreeInitAsNeeded()
+                    redir => bufoutput
+                    buffers!
+                    redir END
+                    let idx = stridx(bufoutput, "NERD_tree")
+                    if idx > -a
+                        NERDTreeMirror
+                        NERDTreeFind
+                        wincmd l
+                    endif
+                endfunction
+
+            " }
+
         endif
 
     " }
@@ -420,11 +450,14 @@
     " {
 
         " Proper Ctags locations
-        let g:tagbar_ctags_bin='/usr/bin/ctags'
+        let g:tagbar_ctags_bin='/usr/local/bin/ctags'
+        " jump in when opened
+        let g:tagbar_autofocus = 1
         " Default is 40, seems too wide
         let g:tagbar_width=26
         " Display panel with F8
         nmap <F8> :TagbarToggle<CR>
+        autocmd BufNewFile,BufReadPost *.py let b:tagbar_ignore = 1
 
     " }
 
@@ -433,7 +466,10 @@
         " :SLoad
         " :SSave
         " :SDelete
-        let g:startify_bookmarks = [ '~/.vimrc' ]
+        let g:startify_bookmarks = [
+                \ '~/.vimrc',
+                \ '~/.zshrc'
+                \ ]
         let g:startify_change_to_dir = 1
         let g:startify_change_to_vcs_root = 0
         let g:startify_custom_footer = ''
@@ -469,7 +505,7 @@
         let g:startify_session_autoload = 0
         let g:startify_session_delete_buffers = 0
         let g:startify_session_dir = '~/.vim/session'
-        let g:startify_session_persistence = 0
+        let g:startify_session_persistence = 1
         let g:startify_session_savecmds = []
         let g:startify_session_savevars = [
                \ 'g:startify_session_savevars',
@@ -484,6 +520,7 @@
     " YankRing
     " {
         nnoremap <silent> <F7> :YRShow<CR>
+        let g:yankring_history_dir = '~/.vim/'
     " }
 
     " calendar.vim
@@ -492,12 +529,40 @@
     " }
 
 
+    " expand-region
+    " {
+        " map + <Plug>(expand_region_expand)
+        map - <Plug>(expand_region_shrink)
+    " }
+
+    " CtrlP {
+        let g:ctrlp_map = '<C-p>'
+        nnoremap <leader>. :CtrlP<CR>
+        let g:ctrlp_match_window = 'bottom,order:ttb'
+        let g:ctrlp_switch_buffer = 0
+        let g:ctrlp_working_path_mode = 0
+        let g:ctrlp_prompt_mappings = {
+            \ 'AcceptSelection("e")': ['<c-t>'],
+            \ 'AcceptSelection("t")': ['<cr>', '<2-LeftMouse>'],
+            \ }
+        let g:ctrlp_working_path_mode = 'r'
+    " }
+
+    " Rainbow {
+        let g:rainbow_active = 0 "0 if you want to enable it later via :RainbowToggle
+    " }
+
+    " YouCompleteMe {
+        " disable ycm by default
+        " let g:loaded_youcompleteme = 1
+    " }
+
     " Airline
     " {
         if !exists('g:airline_symbols')
             let g:airline_symbols = {}
         endif
-
+        set laststatus=2
         let g:airline_left_sep = '»'
         let g:airline_left_sep = ''
         " let g:airline_left_sep = '▶'
@@ -517,23 +582,8 @@
         let g:airline_theme = 'badwolf'
     " }
 
-    " expand-region
-    " {
-        " map + <Plug>(expand_region_expand)
-        map - <Plug>(expand_region_shrink)
-    " }
 
-    " CtrlP {
-        let g:ctrlp_map = '<C-p>'
-        nnoremap <leader>. :CtrlP<CR>
-        let g:ctrlp_match_window = 'bottom,order:ttb'
-        let g:ctrlp_switch_buffer = 0
-        let g:ctrlp_working_path_mode = 0
-        let g:ctrlp_prompt_mappings = {
-            \ 'AcceptSelection("e")': ['<c-t>'],
-            \ 'AcceptSelection("t")': ['<cr>', '<2-LeftMouse>'],
-            \ }
-    " }
 " }}}
+
 
 " vim: set ft=zsh ts=4 sw=4 expandtab :
