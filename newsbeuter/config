@@ -1,0 +1,25 @@
+# general
+# osx default browser opens links
+browser open
+refresh-on-startup yes
+auto-reload yes
+download-retries 4
+max-items 999
+reload-threads 4
+
+# vim movement
+bind-key k up
+bind-key j down
+bind-key O open-in-browser-and-mark-read
+
+# display
+article-sort-order date-asc
+feedlist-format "%S%n %11u %t"
+articlelist-format "%D %f %?T?;%-17T; ?%t"
+datetime-format "%d-%m %H:%M"
+# solarized-dark
+color listnormal color244 color234
+color listfocus  color166 color235
+color info       color136 color235
+color background color244 color234
+color article    color244 color234
