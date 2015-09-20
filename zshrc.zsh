@@ -228,8 +228,8 @@
     # }
 
     # files
-    alias zshrc='mvim --remote-tab-silent ~/.zshrc'
-    alias vimrc='mvim --remote-tab-silent ~/.vimrc'
+    alias zshrc='mvim --remote-tab-silent /Users/mbayer/Settings/dotfiles/zshrc.zsh'
+    alias vimrc='mvim --remote-tab-silent /Users/mbayer/Settings/dotfiles/vimrc.vim'
 
     # numFiles: number of (non-hidden) files in current directory
     alias numFiles='echo $(ls -1 | wc -l)'
