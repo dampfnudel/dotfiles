@@ -9,6 +9,7 @@
 # ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.zshrc
 
 # TODO: statusline, select jumpmarks, magic enter, cd ..,
+# iterm2 drag files to cmd
 
 # zsh configs
 # {
@@ -95,7 +96,7 @@
     if [[ -n $SSH_CONNECTION ]]; then
       export EDITOR='vim'
     else
-      export EDITOR='mvim'
+      export EDITOR='/usr/local/Cellar/macvim/7.4-76/bin/mvim'
     fi
 
     export HOME=/Users/mbayer

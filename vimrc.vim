@@ -16,6 +16,13 @@
 " braces behavior
 " ctrl-p include last files
 
+" leader space
+" unite ack tabs
+" unite dropbox
+" unite unite gists
+" unite spotlight
+" unite locate?
+
 " plugins {{{
 
     " vundle
@@ -58,7 +65,7 @@
     " Plugin 'ervandew/supertab'
     Plugin 'scrooloose/syntastic'
     Plugin 'Valloric/YouCompleteMe'
-    Plugin 'vim-scripts/mru.vim'
+    " Plugin 'vim-scripts/mru.vim'
     Plugin 'jistr/vim-nerdtree-tabs'
     " Plugin 'vim-scripts/noerrmsg.vim'
     " Plugin 'manuel-colmenero/vim-simple-session'
@@ -68,6 +75,13 @@
     Plugin 'gorodinskiy/vim-coloresque'
     Plugin 'kien/tabman.vim'
     Plugin 'valloric/MatchTagAlways'
+    Plugin 'Shougo/unite.vim'
+        Plugin 'Shougo/vimproc.vim'                     " make
+        " Plugin 't9md/vim-unite-ack'
+        Plugin 'h1mesuke/unite-outline'
+        Plugin 'Shougo/neomru.vim'
+        " Plugin 'Shougo/unite-session'
+    Plugin 'mileszs/ack.vim'
 
     " plugin examples
     " {
@@ -78,7 +92,7 @@
             " {
                 " The sparkup vim script is in a subdirectory of this repo called vim.
                 " Pass the path to set the runtimepath properly.
-                "Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
+                " Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
             " }
         " }
         " http://vim-scripts.org/vim/scripts.html
@@ -134,6 +148,8 @@
     " extensions
     autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.md set filetype=markdown
     autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.tracwiki set filetype=tracwiki
+    autocmd Filetype html setlocal ts=2 sts=2 sw=2
+    autocmd Filetype htmldjango setlocal ts=2 sts=2 sw=2
 
     " maximal amount of tabs
     set tabpagemax=50
@@ -227,7 +243,8 @@
     nnoremap <Down> <nop>
 
     " leader-key
-    let mapleader=","
+    " let mapleader=","
+    let mapleader = "\<Space>"
 
     " Visual shifting (does not exit Visual mode)
     vnoremap < <gv
@@ -573,14 +590,14 @@
         let g:startify_enable_special = 1
         let g:startify_files_number = 10
         let g:startify_list_order = [
-                \ ['   My most recently used files'],
-                \ 'files',
-                \ ['   My most recently used files in the current directory:'],
-                \ 'dir',
                 \ ['   Sessions:'],
                 \ 'sessions',
                 \ ['   Bookmarks:'],
                 \ 'bookmarks',
+                \ ['   My most recently used files'],
+                \ 'files',
+                \ ['   My most recently used files in the current directory:'],
+                \ 'dir',
                 \ ]
         let g:startify_relative_path = 0
         let g:startify_session_autoload = 0
@@ -611,37 +628,111 @@
 
     " expand-region
     " {
-        " map + <Plug>(expand_region_expand)
+        map + <Plug>(expand_region_expand)
         map - <Plug>(expand_region_shrink)
     " }
 
-    " CtrlP {
-        let g:ctrlp_map = '<C-p>'
-        nnoremap <leader>. :CtrlP<CR>
-        " nnoremap <leader>m :CtrlPMixed<CR>
-        let g:ctrlp_match_window = 'bottom,order:ttb'
-        let g:ctrlp_switch_buffer = 0
-        let g:ctrlp_working_path_mode = 0
-        let g:ctrlp_prompt_mappings = {
-            \ 'AcceptSelection("e")': ['<c-t>'],
-            \ 'AcceptSelection("t")': ['<cr>', '<2-LeftMouse>'],
-            \ }
-        let g:ctrlp_working_path_mode = 'r'
-    " }
+    " " CtrlP {
+    "     let g:ctrlp_map = '<C-p>'
+    "     nnoremap <leader>. :CtrlP<CR>
+    "     " nnoremap <leader>m :CtrlPMixed<CR>
+    "     let g:ctrlp_match_window = 'bottom,order:ttb'
+    "     let g:ctrlp_switch_buffer = 0
+    "     let g:ctrlp_working_path_mode = 0
+    "     let g:ctrlp_prompt_mappings = {
+    "         \ 'AcceptSelection("e")': ['<c-t>'],
+    "         \ 'AcceptSelection("t")': ['<cr>', '<2-LeftMouse>'],
+    "         \ }
+    "     let g:ctrlp_working_path_mode = 'r'
+    " " }
 
     " Rainbow {
         let g:rainbow_active = 0  " 0 if you want to enable it later via :RainbowToggle
     " }
 
-    " ctrlspace {
-        set hidden
-        nnoremap <leader>m :CtrlSpace L<CR>
-    " }
+    " " ctrlspace {
+    "     set hidden
+    "     nnoremap <leader>m :CtrlSpace L<CR>
+    " " }
 
     " MatchTagAlways {
         nnoremap <leader>% :MtaJumpToOtherTag<cr>
     " }
 
-" }}}
+    " Unite {
+        " yank history
+        let g:unite_source_history_yank_enable = 1
+        " let g:unite_source_history_yank_file = ''
+        let g:unite_source_rec_git_command = ['git', 'rev-parse', '--show-toplevel']
 
+        " if executable('ack-grep')
+        "     " Use ack in unite grep source.
+        "     let g:unite_source_rec_async_command = ['ack', '-f', '--nofilter']
+        "     let g:unite_source_grep_command = 'ack-grep'
+        "     let g:unite_source_grep_default_opts =
+        "     \ '-i --no-heading --no-color -k -H'
+        "     let g:unite_source_grep_recursive_opt = ''
+        " endif
+
+	  "\ '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'''
+	if executable('ag')
+	  " Use ag in unite grep source.
+	  let g:unite_source_grep_command = 'ag'
+	  let g:unite_source_grep_default_opts =
+	  \ '-i --vimgrep --hidden --ignore bower_components --ignore ' .
+	  \ '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'''
+	  let g:unite_source_grep_recursive_opt = ''
+	elseif executable('pt')
+	  " Use pt in unite grep source.
+	  " https://github.com/monochromegane/the_platinum_searcher
+	  let g:unite_source_grep_command = 'pt'
+	  let g:unite_source_grep_default_opts = '--nogroup --nocolor'
+	  let g:unite_source_grep_recursive_opt = ''
+	elseif executable('ack-grep')
+	  " Use ack in unite grep source.
+	  let g:unite_source_grep_command = 'ack-grep'
+	  let g:unite_source_grep_default_opts =
+	  \ '-i --no-heading --no-color -k -H'
+	  let g:unite_source_grep_recursive_opt = ''
+	elseif executable('jvgrep')
+	  " For jvgrep.
+	  let g:unite_source_grep_command = 'jvgrep'
+	  let g:unite_source_grep_default_opts =
+	  \ '-i --exclude ''\.(git|svn|hg|bzr)'''
+	  let g:unite_source_grep_recursive_opt = '-R'
+	endif
+
+        " aliases
+        let g:unite_source_alias_aliases = {
+                \       'rb': {
+                \           'source': 'file_rec/async',
+                \           'args': '~/Workspace/regiobot/regiobot/',
+                \       },
+                \       'b' : 'buffer',
+                \   }
+
+        " call unite#filters#matcher_default#use(['matcher_fuzzy'])
+
+        function! GitGrep()
+            :cd `git rev-parse --show-toplevel`
+            :Unite -start-insert -tab grep:.
+        endfunction
+
+        nnoremap <Leader>gg :call GitGrep()<CR>
+        nnoremap <Leader>f :Unite -start-insert -tab file_rec/async<CR>
+        nnoremap <Leader>t :Unite -start-insert tab<CR>
+        nnoremap <Leader>g. :Unite -start-insert -tab grep:.<CR>
+        nnoremap <Leader>tg :Unite -start-insert grep:$buffers<CR>
+        nnoremap <Leader>g :Unite -start-insert -tab file_rec/git<CR>
+        nnoremap <Leader>mr :Unite -start-insert -tab file_mru<CR>
+        nnoremap <Leader>y :Unite -tab history/yank<cr>
+        nnoremap <Leader>h :Unite -tab history/unite<cr>
+        nnoremap <Leader>o :Unite -start-insert outline<cr>
+
+        " imap <buffer> <C-j>   <Plug>(unite_select_next_line)
+        " imap <buffer> <C-k>   <Plug>(unite_select_previous_line)
+
+    " }
+
+" }}}
 " vim: set ft=zsh ts=4 sw=4 expandtab :
