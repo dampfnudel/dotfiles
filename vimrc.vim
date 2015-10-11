@@ -16,15 +16,12 @@
 " braces behavior
 " ctrl-p include last files
 
-" leader space
-" unite ack tabs
 " unite dropbox
 " unite unite gists
 " unite spotlight
 " unite locate?
 
 " plugins {{{
-
     " vundle
     " {
         " :PluginInstall to install
@@ -35,29 +32,28 @@
         call vundle#begin()
         " let Vundle manage Vundle, required
         Plugin 'gmarik/Vundle.vim'
-
     " }
 
     Plugin 'scrooloose/nerdtree'
     Plugin 'bling/vim-airline'
-    Plugin 'kien/ctrlp.vim'
+    " Plugin 'kien/ctrlp.vim'
     Plugin 'vim-scripts/tComment'
     Plugin 'altercation/vim-colors-solarized'
     Plugin 'Lokaltog/vim-easymotion'
-    Plugin 'tpope/vim-surround'
+    " Plugin 'tpope/vim-surround'
     Plugin 'sjl/gundo.vim'
     Plugin 'embayer/vim_colorschemes'
     " Plugin 'gregsexton/MatchTag'
     Plugin 'nvie/vim-flake8'                            " pip install flake8
     Plugin 'tpope/vim-fugitive'
-    Plugin 'Keithbsmiley/swift.vim'
+    " Plugin 'Keithbsmiley/swift.vim'
     Plugin 'majutsushi/tagbar'                          " brew install ctags
     Plugin 'mhinz/vim-startify'
     Plugin 'vim-scripts/YankRing.vim'
     Plugin 'itchyny/screensaver.vim'
     Plugin 'itchyny/thumbnail.vim'
     Plugin 'itchyny/calendar.vim'
-    Plugin 'vim-scripts/matrix.vim--Yang'
+    " Plugin 'vim-scripts/matrix.vim--Yang'
     Plugin 'terryma/vim-expand-region'
     Plugin 'airblade/vim-gitgutter'
     Plugin 'luochen1990/rainbow'
@@ -71,9 +67,9 @@
     " Plugin 'manuel-colmenero/vim-simple-session'
     " Plugin 'xolox/vim-misc'
     " Plugin 'xolox/vim-session'
-    Plugin 'szw/vim-ctrlspace'
+    " Plugin 'szw/vim-ctrlspace'
     Plugin 'gorodinskiy/vim-coloresque'
-    Plugin 'kien/tabman.vim'
+    " Plugin 'kien/tabman.vim'
     Plugin 'valloric/MatchTagAlways'
     Plugin 'Shougo/unite.vim'
         Plugin 'Shougo/vimproc.vim'                     " make
@@ -81,7 +77,8 @@
         Plugin 'h1mesuke/unite-outline'
         Plugin 'Shougo/neomru.vim'
         " Plugin 'Shougo/unite-session'
-    Plugin 'mileszs/ack.vim'
+    " Plugin 'mileszs/ack.vim'
+    Plugin 'kballard/vim-swift'
 
     " plugin examples
     " {
@@ -148,6 +145,7 @@
     " extensions
     autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.md set filetype=markdown
     autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.tracwiki set filetype=tracwiki
+    autocmd Filetype css setlocal ts=2 sts=2 sw=2
     autocmd Filetype html setlocal ts=2 sts=2 sw=2
     autocmd Filetype htmldjango setlocal ts=2 sts=2 sw=2
 
@@ -156,7 +154,6 @@
 " }}}
 
 " ui {{{
-
     " syntax highlighting
     syntax on
     syntax enable
@@ -186,13 +183,13 @@
     set lazyredraw
 
     " disable audio bell
+    if has('gui_running')
+        autocmd GUIEnter * set vb t_vb=
+    endif
     set noerrorbells
     set novisualbell
     set t_vb=
     autocmd GUIENTER,BufNewFile,BufFilePre,BufRead,BufReadPost set vb t_vb=
-    " open every new file in it's own tab
-    " :au BufAdd,BufNewFile * nested tab sball
-    " :au BufAdd,BufNewFile,BufRead * nested tab sball
 
     " nativ indent detection
     set autoindent
@@ -200,19 +197,12 @@
     " activate language detection
     filetype plugin indent on
 
-
-    " disable audio bell
-    if has('gui_running')
-        autocmd GUIEnter * set vb t_vb=
-    endif
-
     " folding
     set foldenable
     set foldmethod=marker
     set foldlevel=0
-    " only in vimrc
 
-    " Color
+    " color
     " {
         if has("gui_macvim")
             set background=dark
@@ -231,10 +221,18 @@
             colorscheme neonwave
         endif
     " }
-
 " }}}
 
 " keymappings / keybindings {{{
+    " leader-key
+    let mapleader = "\<Space>"
+
+    " visually select word under cursor
+    map ä viwdi
+    " visually select line under cursor (without $)
+    map ü ^v$<Left>
+    " clear highlights
+    map ö :nohl<Enter>
 
     " hardmode
     nnoremap <Left> <nop>
@@ -242,20 +240,12 @@
     nnoremap <Up> <nop>
     nnoremap <Down> <nop>
 
-    " leader-key
-    " let mapleader=","
-    let mapleader = "\<Space>"
-
     " Visual shifting (does not exit Visual mode)
     vnoremap < <gv
     vnoremap > >gv
 
     " highlight last inserted text
     nnoremap gV `[v`]
-
-    " switch buffers
-    " nnoremap <leader>m :ls<CR>:b<Space>
-    " maybe better use szw/vim-ctrlspace
 
     " move to beginning/end of line
     nnoremap B ^
@@ -276,19 +266,7 @@
     vnoremap <silent><D-j> :m '>+1<CR>gv=gv
     vnoremap <silent><D-k> :m '<-2<CR>gv=gv
 
-    " visually select word under cursor
-    map ä viwdi
-    " visually select line under cursor (without $)
-    map ü ^v$<Left>
-    " clear highlights
-    map ö :nohl<Enter>
-
-    " Enter inserts a blank line before/after the current line
-    "nmap <S-Enter> O<Esc>j
-    "nmap <CR> o<Esc>k nnoremap <silent><A-k> :set paste<CR>m`O<Esc>``:set nopaste<CR>
-
     " OSX {
-
         if has("gui_macvim")
             " tab navigation
             " in insert mode
@@ -297,8 +275,7 @@
             " in normal mode
             nnoremap <M-D-Right> :tabnext<CR>
             nnoremap <M-D-Left> :tabprev<CR>
-            " Press Ctrl-Tab to switch between open tabs (like browser tabs) to 
-            " the right side. Ctrl-Shift-Tab goes the other way.
+            " Press Ctrl-Tab to switch between open tabs (like browser tabs) to the right side. Ctrl-Shift-Tab goes the other way.
             imap <C-Tabt> <Esc><Esc><Esc>:tabnext<CR>
             imap <C-S-Tab> <Esc><Esc><Esc>:tabprev<CR>
             noremap <C-Tab> :tabnext<CR>
@@ -323,13 +300,11 @@
             noremap <D-0> :tablast<CR>
         endif
     " }
-
 " }}}
 
 " commands {{{
-
     " pretty print json
-    :command Pjson %!python -m json.tool
+    :command PrettyJson %!python -m json.tool
 
     " search and replace german html entities
     :command Umlaute %s/ü/\&uuml;/eg | :%s/ä/\&auml;/eg | :%s/ö/\&ouml;/eg | :%s/ß/\&szlig;/eg | :%s/Ü/\&Uuml;/eg | :%s/Ä/\&Auml;/eg | :%s/Ö/\&Ouml;/eg
@@ -343,11 +318,9 @@
         autocmd FileType python abbr p_author __author__ = "Markus Bayer"<CR><del><esc>o<del>
         abbr vimline # vim: set ft=python ts=4 sw=4 expandtab :<del><esc>
     " }
-
 " }}}
 
 " formatting {{{
-
     scriptencoding utf-8
     " use indents of 4 spaces
     set shiftwidth=4
@@ -366,29 +339,23 @@
             set clipboard=unnamed
         endif
     endif
-
 " }}}
 
 " search {{{
-
     " highlight search terms
     set hlsearch
     " find while typing
     set incsearch
     " case insensitive search
     set ignorecase
-
 " }}}
 
 " plugin settings {{{
-
     " Airline
     " {
         if !exists('g:airline_symbols')
             let g:airline_symbols = {}
         endif
-        " Tabbar
-        " let g:airline#extensions#tabline#enabled = 1
         set laststatus=2
         set noshowmode
         let g:airline_left_sep = '»'
@@ -406,9 +373,9 @@
         let g:airline_symbols.paste = '∥'
         let g:airline_symbols.whitespace = 'Ξ'
 
-        let g:airline_detect_modified=1
+        let g:airline_detect_modified = 1
         if has('gui_running')
-            let g:airline_theme = 'solarized'
+            let g:airline_theme = 'badwolf'
         else
             let g:airline_theme = 'badwolf'
         endif
@@ -421,10 +388,8 @@
         endif
     " }
 
-
     " solarized
     " {
-
         " Set colorscheme to solarized
         " colorscheme solarized
 
@@ -451,20 +416,16 @@
         if has("autocmd")
             " autocmd bufwritepost * call SetSolarizedBackground()
         endif
-
     " }
-
 
     " NERDTRee
     " {
-
         let g:NERDTreeBookmarksFile = "~/.vim/NERDTreeBookmarks"
         let g:nerdtree_tabs_open_on_gui_startup=0
         " ctrl ww to toggle
         map <leader>n <plug>NERDTreeTabsToggle<CR>
 
         if has('gui_running')
-
             " set NERDTree size
             let NERDTreeWinSize=20
             let NERDTreeShowBookmarks=1
@@ -475,7 +436,6 @@
             let NERDTreeShowHidden=1
 
             " always present {
-
                 " let NERDTreeKeepTreeInNewTab=1
                 " NERDTree on startup and new tab
                 " autocmd vimenter * NERDTree
@@ -501,17 +461,12 @@
                         wincmd l
                     endif
                 endfunction
-
             " }
-
         endif
-
     " }
-
 
     " easymotion
     " {
-
         " map forward and backword easymotion to f
         nnoremap f H:call EasyMotion#WB(0, 0)<CR>
         let g:EasyMotion_do_mapping = 0 " Disable default mappings
@@ -533,20 +488,16 @@
         map <Leader>k <Plug>(easymotion-k)
         map <Leader>w <Plug>(easymotion-w)
         map <Leader>W <Plug>(easymotion-W)
-
     " }
 
     " Gundo
     " {
-
         nnoremap <D-ü> :GundoToggle<CR>
-
     " }
 
 
     " tabbar
     " {
-
         " Proper Ctags locations
         let g:tagbar_ctags_bin='/usr/local/bin/ctags'
         " jump in when opened
@@ -556,11 +507,11 @@
         " Display panel with F8
         nmap <F8> :TagbarToggle<CR>
         autocmd BufNewFile,BufReadPost *.py let b:tagbar_ignore = 1
-
     " }
 
     " startify
     " {
+        " Sessions:
         " :SLoad
         " :SSave
         " :SDelete
@@ -614,7 +565,6 @@
         let g:startify_skiplist = []
     " }
 
-
     " YankRing
     " {
         nnoremap <silent> <F7> :YRShow<CR>
@@ -625,35 +575,15 @@
         let g:calendar_google_calendar = 1
     " }
 
-
     " expand-region
     " {
         map + <Plug>(expand_region_expand)
         map - <Plug>(expand_region_shrink)
     " }
 
-    " " CtrlP {
-    "     let g:ctrlp_map = '<C-p>'
-    "     nnoremap <leader>. :CtrlP<CR>
-    "     " nnoremap <leader>m :CtrlPMixed<CR>
-    "     let g:ctrlp_match_window = 'bottom,order:ttb'
-    "     let g:ctrlp_switch_buffer = 0
-    "     let g:ctrlp_working_path_mode = 0
-    "     let g:ctrlp_prompt_mappings = {
-    "         \ 'AcceptSelection("e")': ['<c-t>'],
-    "         \ 'AcceptSelection("t")': ['<cr>', '<2-LeftMouse>'],
-    "         \ }
-    "     let g:ctrlp_working_path_mode = 'r'
-    " " }
-
     " Rainbow {
         let g:rainbow_active = 0  " 0 if you want to enable it later via :RainbowToggle
     " }
-
-    " " ctrlspace {
-    "     set hidden
-    "     nnoremap <leader>m :CtrlSpace L<CR>
-    " " }
 
     " MatchTagAlways {
         nnoremap <leader>% :MtaJumpToOtherTag<cr>
@@ -665,57 +595,29 @@
         " let g:unite_source_history_yank_file = ''
         let g:unite_source_rec_git_command = ['git', 'rev-parse', '--show-toplevel']
 
-        " if executable('ack-grep')
-        "     " Use ack in unite grep source.
-        "     let g:unite_source_rec_async_command = ['ack', '-f', '--nofilter']
-        "     let g:unite_source_grep_command = 'ack-grep'
-        "     let g:unite_source_grep_default_opts =
-        "     \ '-i --no-heading --no-color -k -H'
-        "     let g:unite_source_grep_recursive_opt = ''
-        " endif
-
-	  "\ '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'''
-	if executable('ag')
-	  " Use ag in unite grep source.
-	  let g:unite_source_grep_command = 'ag'
-	  let g:unite_source_grep_default_opts =
-	  \ '-i --vimgrep --hidden --ignore bower_components --ignore ' .
-	  \ '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'''
-	  let g:unite_source_grep_recursive_opt = ''
-	elseif executable('pt')
-	  " Use pt in unite grep source.
-	  " https://github.com/monochromegane/the_platinum_searcher
-	  let g:unite_source_grep_command = 'pt'
-	  let g:unite_source_grep_default_opts = '--nogroup --nocolor'
-	  let g:unite_source_grep_recursive_opt = ''
-	elseif executable('ack-grep')
-	  " Use ack in unite grep source.
-	  let g:unite_source_grep_command = 'ack-grep'
-	  let g:unite_source_grep_default_opts =
-	  \ '-i --no-heading --no-color -k -H'
-	  let g:unite_source_grep_recursive_opt = ''
-	elseif executable('jvgrep')
-	  " For jvgrep.
-	  let g:unite_source_grep_command = 'jvgrep'
-	  let g:unite_source_grep_default_opts =
-	  \ '-i --exclude ''\.(git|svn|hg|bzr)'''
-	  let g:unite_source_grep_recursive_opt = '-R'
-	endif
+        if executable('ag')
+            " Use ag in unite grep source.
+            let g:unite_source_grep_command = 'ag'
+            let g:unite_source_grep_default_opts =
+                \ '-i --vimgrep --hidden --ignore bower_components --ignore ' .
+                \ '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'''
+            let g:unite_source_grep_recursive_opt = ''
+        endif
 
         " aliases
         let g:unite_source_alias_aliases = {
-                \       'rb': {
+                \       'db': {
                 \           'source': 'file_rec/async',
-                \           'args': '~/Workspace/regiobot/regiobot/',
+                \           'args': '~/Dropbox',
                 \       },
                 \       'b' : 'buffer',
                 \   }
 
-        " call unite#filters#matcher_default#use(['matcher_fuzzy'])
-
         function! GitGrep()
+            " grep the git repository the current file belongs to
             :cd `git rev-parse --show-toplevel`
             :Unite -start-insert -tab grep:.
+            :cd -
         endfunction
 
         nnoremap <Leader>gg :call GitGrep()<CR>
@@ -731,8 +633,7 @@
 
         " imap <buffer> <C-j>   <Plug>(unite_select_next_line)
         " imap <buffer> <C-k>   <Plug>(unite_select_previous_line)
-
     " }
-
 " }}}
-" vim: set ft=zsh ts=4 sw=4 expandtab :
+
+" vim: set ft=vim ts=4 sw=4 expandtab :
