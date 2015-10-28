@@ -14,7 +14,7 @@
 " append new tabs at the end
 " sublime like tmpfiles
 " braces behavior
-" ctrl-p include last files
+    " map split functionality
 
 " unite dropbox
 " unite unite gists
@@ -53,7 +53,7 @@
     Plugin 'itchyny/screensaver.vim'
     Plugin 'itchyny/thumbnail.vim'
     Plugin 'itchyny/calendar.vim'
-    " Plugin 'vim-scripts/matrix.vim--Yang'
+    Plugin 'vim-scripts/matrix.vim--Yang'
     Plugin 'terryma/vim-expand-region'
     Plugin 'airblade/vim-gitgutter'
     Plugin 'luochen1990/rainbow'
@@ -76,6 +76,7 @@
         " Plugin 't9md/vim-unite-ack'
         Plugin 'h1mesuke/unite-outline'
         Plugin 'Shougo/neomru.vim'
+        Plugin 'kmnk/vim-unite-giti'
         " Plugin 'Shougo/unite-session'
     " Plugin 'mileszs/ack.vim'
     Plugin 'kballard/vim-swift'
@@ -123,6 +124,10 @@
     if !WINDOWS()
         set shell=/bin/sh
     endif
+
+    " open new splits to the right bottom
+    set splitbelow
+    set splitright
 
     set ssop-=options    " do not store global and local values in a session
     set ssop-=folds      " do not store folds
@@ -235,10 +240,10 @@
     map ö :nohl<Enter>
 
     " hardmode
-    nnoremap <Left> <nop>
-    nnoremap <Right> <nop>
-    nnoremap <Up> <nop>
-    nnoremap <Down> <nop>
+    " nnoremap <Left> <nop>
+    " nnoremap <Right> <nop>
+    " nnoremap <Up> <nop>
+    " nnoremap <Down> <nop>
 
     " Visual shifting (does not exit Visual mode)
     vnoremap < <gv
@@ -252,11 +257,11 @@
     nnoremap E $
 
     " Ctrl-j/k deletes blank line below/above
-    nnoremap <silent><C-j> m`:silent +g/\m^\s*$/d<CR>``:noh<CR>
-    nnoremap <silent><C-k> m`:silent -g/\m^\s*$/d<CR>``:noh<CR>
+    " nnoremap <silent><C-j> m`:silent +g/\m^\s*$/d<CR>``:noh<CR>
+    " nnoremap <silent><C-k> m`:silent -g/\m^\s*$/d<CR>``:noh<CR>
     " Ctrl-j/k inserts blank line below/above
-    nnoremap <silent>º :set paste<CR>m`o<Esc>``:set nopaste<CR>
-    nnoremap <silent>∆ :set paste<CR>m`O<Esc>``:set nopaste<CR>
+    " nnoremap <silent>º :set paste<CR>m`o<Esc>``:set nopaste<CR>
+    " nnoremap <silent>∆ :set paste<CR>m`O<Esc>``:set nopaste<CR>
 
     " move lines with Ctrl-J/K
     nnoremap <silent><D-j> :m .+1<CR>==
@@ -270,20 +275,20 @@
         if has("gui_macvim")
             " tab navigation
             " in insert mode
-            imap <M-D-Right> <Esc><Esc><Esc>:tabnext<CR>
-            imap <M-D-Left> <Esc><Esc><Esc>:tabprev<CR>
+            imap <silent><M-D-Right> <Esc><Esc><Esc>:tabnext<CR>
+            imap <silent><M-D-Left> <Esc><Esc><Esc>:tabprev<CR>
             " in normal mode
-            nnoremap <M-D-Right> :tabnext<CR>
-            nnoremap <M-D-Left> :tabprev<CR>
+            nnoremap <silent><M-D-Right> :tabnext<CR>
+            nnoremap <silent><M-D-Left> :tabprev<CR>
             " Press Ctrl-Tab to switch between open tabs (like browser tabs) to the right side. Ctrl-Shift-Tab goes the other way.
             imap <C-Tabt> <Esc><Esc><Esc>:tabnext<CR>
             imap <C-S-Tab> <Esc><Esc><Esc>:tabprev<CR>
             noremap <C-Tab> :tabnext<CR>
             noremap <C-S-Tab> :tabprev<CR>
             " move the focused tab
-            map <C-H> :execute "tabmove" tabpagenr() - 2 <CR>
+            " map <C-H> :execute "tabmove" tabpagenr() - 2 <CR>
             map <C-S-Left> :execute "tabmove" tabpagenr() - 2 <CR>
-            map <C-L> :execute "tabmove" tabpagenr() +1 <CR>
+            " map <C-L> :execute "tabmove" tabpagenr() +1 <CR>
             map <C-S-Right> :execute "tabmove" tabpagenr() +1 <CR>
 
             " Switch to specific tab numbers with Command-number
@@ -300,6 +305,32 @@
             noremap <D-0> :tablast<CR>
         endif
     " }
+
+    " splits {
+        " navigate between splits
+        nnoremap <Up> <C-W><C-J>
+        nnoremap <Down> <C-W><C-K>
+        nnoremap <Right> <C-W><C-L>
+        nnoremap <Left> <C-W><C-H>
+
+        " max out the height of the current split
+        "ctrl + w _
+
+        " max out the width of the current split
+        "ctrl + w |
+
+        " normalize all split sizes, which is very handy when resizing terminal
+        "ctrl + w =
+
+        " swap top/bottom or left/right split
+        "Ctrl+W R
+
+        " break out current window into a new tabview
+        "Ctrl+W T
+
+        " close every window in the current tabview but the current one
+        "Ctrl+W o
+    " }
 " }}}
 
 " commands {{{
@@ -307,7 +338,7 @@
     :command PrettyJson %!python -m json.tool
 
     " search and replace german html entities
-    :command Umlaute %s/ü/\&uuml;/eg | :%s/ä/\&auml;/eg | :%s/ö/\&ouml;/eg | :%s/ß/\&szlig;/eg | :%s/Ü/\&Uuml;/eg | :%s/Ä/\&Auml;/eg | :%s/Ö/\&Ouml;/eg
+    :command Umlaute %s/ü/\&uuml;/eg | :%s/ä/\&auml;/eg | :%s/ö/\&ouml;/eg | :%s/ß/\&szlig;/eg | :%s/Ü/\&Uuml;/eg | :%s/Ä/\&Auml;/eg | :%s/Ö/\&Ouml;/egI
 
     " abbrevations
     " {
@@ -592,8 +623,11 @@
     " Unite {
         " yank history
         let g:unite_source_history_yank_enable = 1
-        " let g:unite_source_history_yank_file = ''
+        let g:unite_source_history_yank_file = '/Users/mbayer/.vim/unite_yank_history.txt'
+        let g:neomru#file_mru_path = '/Users/mbayer/.vim/unite_mru_files.txt'
+
         let g:unite_source_rec_git_command = ['git', 'rev-parse', '--show-toplevel']
+        " let g:unite_source_rec_max_cache_files = 250000
 
         if executable('ag')
             " Use ag in unite grep source.
@@ -620,20 +654,33 @@
             :cd -
         endfunction
 
+        function! GitFind()
+            " find files within the files git repository
+            :cd `git rev-parse --show-toplevel`
+            :Unite -start-insert -tab file_rec/async
+            :cd -
+        endfunction
+
         nnoremap <Leader>gg :call GitGrep()<CR>
+        nnoremap <Leader>g :call GitFind()<CR>
+        " nnoremap <Leader>g :Unite -start-insert -tab file_rec/git<CR>
         nnoremap <Leader>f :Unite -start-insert -tab file_rec/async<CR>
         nnoremap <Leader>t :Unite -start-insert tab<CR>
         nnoremap <Leader>g. :Unite -start-insert -tab grep:.<CR>
-        nnoremap <Leader>tg :Unite -start-insert grep:$buffers<CR>
-        nnoremap <Leader>g :Unite -start-insert -tab file_rec/git<CR>
+        nnoremap <Leader>tg :Unite -start-insert -tab grep:$buffers<CR>
         nnoremap <Leader>mr :Unite -start-insert -tab file_mru<CR>
         nnoremap <Leader>y :Unite -tab history/yank<cr>
-        nnoremap <Leader>h :Unite -tab history/unite<cr>
-        nnoremap <Leader>o :Unite -start-insert outline<cr>
+        nnoremap <Leader>h :Unite -tab -unique history/unite<cr>
+        nnoremap <Leader>o :Unite -start-insert -preview outline<cr>
+
+        map <buffer> <C-1> <Plug>(unite_redraw)
 
         " imap <buffer> <C-j>   <Plug>(unite_select_next_line)
         " imap <buffer> <C-k>   <Plug>(unite_select_previous_line)
     " }
-" }}}
 
+    " Matrix {
+        nnoremap <Leader>ss :Matrix<CR>
+    " }
+" }}}
 " vim: set ft=vim ts=4 sw=4 expandtab :
