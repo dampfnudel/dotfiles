@@ -14,7 +14,10 @@
 " append new tabs at the end
 " sublime like tmpfiles
 " braces behavior
-    " map split functionality
+" map split functionality
+" carry comments to next line for js
+" searchlist
+" You can also use g; and g, to move backward and forward in your edit locations.
 
 " unite dropbox
 " unite unite gists
@@ -125,6 +128,9 @@
         set shell=/bin/sh
     endif
 
+    " remove dot from keywords to asterisk search for eg app in app.config
+    setlocal isk-=.
+
     " open new splits to the right bottom
     set splitbelow
     set splitright
@@ -148,6 +154,8 @@
     endif
 
     " extensions
+    " do not carry comments over to the next line
+    autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
     autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.md set filetype=markdown
     autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.tracwiki set filetype=tracwiki
     autocmd Filetype css setlocal ts=2 sts=2 sw=2
@@ -333,7 +341,29 @@
     " }
 " }}}
 
-" commands {{{
+" functions and commands {{{
+    " jumps
+    function! GotoJump()
+      jumps
+      let j = input("Please select your jump: ")
+      if j != ''
+        let pattern = '\v\c^\+'
+        if j =~ pattern
+          let j = substitute(j, pattern, '', 'g')
+          execute "normal " . j . "\<c-i>"
+        else
+          execute "normal " . j . "\<c-o>"
+        endif
+      endif
+    endfunction
+
+    " open rc-files
+    :command Vimrc tabedit ~/.vimrc
+    :command Zshrc tabedit ~/.zshrc
+
+    " source vimrc
+    :command Svimrc source $MYVIMRC
+
     " pretty print json
     :command PrettyJson %!python -m json.tool
 
@@ -515,10 +545,10 @@
         let g:EasyMotion_smartcase = 1
 
         " JK motions: Line motions
-        map <Leader>j <Plug>(easymotion-j)
-        map <Leader>k <Plug>(easymotion-k)
-        map <Leader>w <Plug>(easymotion-w)
-        map <Leader>W <Plug>(easymotion-W)
+        " map <Leader>j <Plug>(easymotion-j)
+        " map <Leader>k <Plug>(easymotion-k)
+        " map <Leader>w <Plug>(easymotion-w)
+        " map <Leader>W <Plug>(easymotion-W)
     " }
 
     " Gundo
@@ -672,6 +702,8 @@
         nnoremap <Leader>y :Unite -tab history/yank<cr>
         nnoremap <Leader>h :Unite -tab -unique history/unite<cr>
         nnoremap <Leader>o :Unite -start-insert -preview outline<cr>
+        nnoremap <Leader>j :Unite jump<cr>
+        nnoremap <Leader>c :Unite change<cr>
 
         map <buffer> <C-1> <Plug>(unite_redraw)
 
