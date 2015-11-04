@@ -331,6 +331,16 @@
         python -m SimpleHTTPServer
     }
 
+    # eject All Mountable Volumes
+    eject () {
+        osascript -e 'tell application "Finder" to eject (every disk whose ejectable is true)'
+    }
+
+    # Change Working Directory to Finder Path
+    cdf() {
+        cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')"
+    }
+
     # count files
     function count () {
         for dir in $( find . -type d -print ); do files=$( find $dir -maxdepth 1 -type f | wc -l ); echo "$dir : $files"; done
