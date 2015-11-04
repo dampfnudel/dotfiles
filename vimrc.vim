@@ -1,3 +1,5 @@
+" vim: set ft=vim ts=4 sw=4 expandtab :
+
 "        ▄█    █▄   ▄█    ▄▄▄▄███▄▄▄▄      ▄████████  ▄████████
 "       ███    ███ ███  ▄██▀▀▀███▀▀▀██▄   ███    ███ ███    ███
 "       ███    ███ ███▌ ███   ███   ███   ███    ███ ███    █▀
@@ -28,257 +30,6 @@
 " unite spotlight
 " unite locate?
 " unite open in vsplit
-
-" functions and commands {{{
-
-    " move current tab into the specified direction.
-    " @param direction -1 for left, 1 for right.
-    silent function! TabMove(direction)
-        " get number of tab pages
-        let ntp = tabpagenr("$")
-        if ntp > 1
-            " get number of current tab page
-            let tpnr = tabpagenr()
-
-            " move left
-            if a:direction < 1
-                if tpnr == 1
-                    let index = ntp
-                else
-                    let index=((tpnr-1+ntp-1)%ntp)
-                endif
-            " move right
-            else
-                if ntp == tpnr
-                    let index = 0
-                else
-                    let index=(tpnr%ntp)+1
-                endif
-            endif
-
-            " move tab page.
-            execute "tabmove ".index
-        endif
-    endfunction
-
-    " toggle wasd movement
-    let wasd_on = 0
-    function! ToggleWasd()
-        if g:wasd_on
-            nunmap w
-            nunmap a
-            nunmap s
-            nunmap d
-            nunmap e
-            let g:wasd_on = 0
-        else
-            noremap e d
-            noremap w k
-            noremap a h
-            noremap s j
-            noremap d l
-            let g:wasd_on = 1
-        endif
-    endfunction
-
-    " presentation mode
-    let g:fontsize = 4    " medium (1 = xx-small, 7 = xx-large)
-    function! SetFontsize()
-        if g:fontsize == 1
-            set guifont=Hack:h9
-        elseif g:fontsize == 2
-            set guifont=Hack:h11
-        elseif g:fontsize == 3
-            set guifont=Hack:h13
-        elseif g:fontsize == 4
-            set guifont=Hack:h15
-        elseif g:fontsize == 5
-            set guifont=Hack:h17
-        elseif g:fontsize == 6
-            set guifont=Hack:h19
-        elseif g:fontsize == 7
-            set guifont=Hack:h21
-        endif
-    endfunction
-
-    function! IncreaseFontsize()
-        if g:fontsize < 8
-            let g:fontsize+=1
-            call SetFontsize()
-        endif
-    endfunction
-
-    function! DecreaseFontsize()
-        if g:fontsize > 0
-            let g:fontsize-=1
-            call SetFontsize()
-        endif
-    endfunction
-
-    function! NormalFontsize()
-        let g:fontsize = 4
-        call SetFontsize()
-    endfunction
-
-    " print the answer to anything
-    function! Answer()
-        " TODO fix bug #42
-        execute "normal! G"
-        r~/.vim/templates/json
-        execute "normal! G"
-        r~/.vim/templates/json
-        execute "normal! G"
-        r~/.vim/templates/json
-        execute "normal! G"
-    endfunction
-
-    silent function! OSX()
-        return has('macunix')
-    endfunction
-    silent function! LINUX()
-        return has('unix') && !has('macunix') && !has('win32unix')
-    endfunction
-    silent function! WINDOWS()
-        return  (has('win16') || has('win32') || has('win64'))
-    endfunction
-
-    " open rc-files
-    :command Vimrc tabedit ~/.vimrc
-    :command Zshrc tabedit ~/.zshrc
-
-    " source vimrc
-    :command Svimrc source $MYVIMRC
-
-    " pretty print json
-    :command PrettyJson %!python -m json.tool
-
-    " search and replace german html entities
-    :command Umlaute %s/ü/\&uuml;/eg | :%s/ä/\&auml;/eg | :%s/ö/\&ouml;/eg | :%s/ß/\&szlig;/eg | :%s/Ü/\&Uuml;/eg | :%s/Ä/\&Auml;/eg | :%s/Ö/\&Ouml;/egI
-
-    " abbrevations
-    " {
-        autocmd FileType python abbr pdb import pdb; pdb.set_trace()<esc>
-        autocmd FileType python abbr ipdb from ipdb import set_trace; set_trace()<esc>
-        autocmd FileType python abbr emb from IPython import embed; embed()<esc>
-        autocmd FileType python abbr p_utf8 # -*- coding: utf-8 -*-<esc>o<del><esc>
-        autocmd FileType python abbr p_author __author__ = "Markus Bayer"<CR><del><esc>o<del>
-        abbr vimline # vim: set ft=python ts=4 sw=4 expandtab :<del><esc>
-    " }
-" }}}
-
-" keymappings / keybindings {{{
-    " increase / decrease fontsize
-    map <D-+> :call IncreaseFontsize()<CR>
-    map <D--> :call DecreaseFontsize()<CR>
-    map <D-0> :call NormalFontsize()<CR>
-
-    """"""""""""""""""""""""""""""""""""""""""""""""
-
-    """"""""""""""""""""""""""""""""""""""""""""""""
-
-    " leader-key
-    let mapleader = "\<Space>"
-
-    " yank filepath
-    map <Leader>yp :let @*=expand('%:p')<CR>
-
-    " re-call last cmd
-    noremap <Leader>pc @:<CR>
-
-    " delete word under cursor
-    map ä viwdi
-    " visually select line under cursor (without $)
-    map ü ^v$<Left>
-    " clear highlights
-    map ö :nohl<Enter>
-
-    " Visual shifting (does not exit Visual mode)
-    vnoremap < <gv
-    vnoremap > >gv
-
-    " highlight last inserted text
-    nnoremap gV `[v`]
-
-    " move to beginning/end of line
-    nnoremap B ^
-    nnoremap E $
-
-    " Ctrl-j/k deletes blank line below/above
-    " nnoremap <silent><C-j> m`:silent +g/\m^\s*$/d<CR>``:noh<CR>
-    " nnoremap <silent><C-k> m`:silent -g/\m^\s*$/d<CR>``:noh<CR>
-    " Ctrl-j/k inserts blank line below/above
-    " nnoremap <silent>º :set paste<CR>m`o<Esc>``:set nopaste<CR>
-    " nnoremap <silent>∆ :set paste<CR>m`O<Esc>``:set nopaste<CR>
-
-    " move lines with Ctrl-J/K
-    nnoremap <silent><D-j> :m .+1<CR>==
-    nnoremap <silent><D-k> :m .-2<CR>==
-    inoremap <silent><D-j> <Esc>:m .+1<CR>==gi
-    inoremap <silent><D-k> <Esc>:m .-2<CR>==gi
-    vnoremap <silent><D-j> :m '>+1<CR>gv=gv
-    vnoremap <silent><D-k> :m '<-2<CR>gv=gv
-
-    " OSX {
-        if has("gui_macvim")
-            " tab navigation
-            " in insert mode
-            imap <silent><M-D-Right> <Esc><Esc><Esc>:tabnext<CR>
-            imap <silent><M-D-Left> <Esc><Esc><Esc>:tabprev<CR>
-            " in normal mode
-            nnoremap <silent><M-D-Right> :tabnext<CR>
-            nnoremap <silent><M-D-Left> :tabprev<CR>
-            " Press Ctrl-Tab to switch between open tabs (like browser tabs) to the right side. Ctrl-Shift-Tab goes the other way.
-            imap <C-Tabt> <Esc><Esc><Esc>:tabnext<CR>
-            imap <C-S-Tab> <Esc><Esc><Esc>:tabprev<CR>
-            noremap <C-Tab> :tabnext<CR>
-            noremap <C-S-Tab> :tabprev<CR>
-            " move the focused tab
-            " map <C-H> :execute "tabmove" tabpagenr() - 2 <CR>
-            map <C-S-Left> :execute "tabmove" tabpagenr() - 2 <CR>
-            " map <C-L> :execute "tabmove" tabpagenr() +1 <CR>
-            map <C-S-Right> :execute "tabmove" tabpagenr() +1 <CR>
-
-            " Switch to specific tab numbers with Command-number
-            noremap <D-1> :tabn 1<CR>
-            noremap <D-2> :tabn 2<CR>
-            noremap <D-3> :tabn 3<CR>
-            noremap <D-4> :tabn 4<CR>
-            noremap <D-5> :tabn 5<CR>
-            noremap <D-6> :tabn 6<CR>
-            noremap <D-7> :tabn 7<CR>
-            noremap <D-8> :tabn 8<CR>
-            noremap <D-9> :tabn 9<CR>
-            " Command-0 goes to the last tab
-            " noremap <D-0> :tablast<CR>
-        endif
-    " }
-
-    " splits {
-        " navigate between splits
-        nnoremap <Up> <C-W><C-J>
-        nnoremap <Down> <C-W><C-K>
-        nnoremap <Right> <C-W><C-L>
-        nnoremap <Left> <C-W><C-H>
-
-        " max out the height of the current split
-        "ctrl + w _
-
-        " max out the width of the current split
-        "ctrl + w |
-
-        " normalize all split sizes, which is very handy when resizing terminal
-        "ctrl + w =
-
-        " swap top/bottom or left/right split
-        "Ctrl+W R
-
-        " break out current window into a new tabview
-        "Ctrl+W T
-
-        " close every window in the current tabview but the current one
-        "Ctrl+W o
-    " }
-" }}}
 
 " plugins {{{
     " vundle
@@ -368,15 +119,308 @@
 
 " }}}
 
+" functions and commands {{{
+
+    " move current tab into the specified direction.
+    " @param direction -1 for left, 1 for right.
+    silent function! TabMove(direction)
+        " get number of tab pages
+        let ntp = tabpagenr("$")
+        if ntp > 1
+            " get number of current tab page
+            let tpnr = tabpagenr()
+
+            " move left
+            if a:direction < 1
+                if tpnr == 1
+                    let index = ntp
+                else
+                    let index=((tpnr-1+ntp-1)%ntp)
+                endif
+            " move right
+            else
+                if ntp == tpnr
+                    let index = 0
+                else
+                    let index=(tpnr%ntp)+1
+                endif
+            endif
+
+            " move tab page.
+            execute "tabmove ".index
+        endif
+    endfunction
+
+    " toggle wasd movement
+    let wasd_on = 0
+    function! ToggleWasd()
+        if g:wasd_on
+            nunmap w
+            nunmap a
+            nunmap s
+            nunmap d
+            nunmap e
+            let g:wasd_on = 0
+        else
+            noremap e d
+            noremap w k
+            noremap a h
+            noremap s j
+            noremap d l
+            let g:wasd_on = 1
+        endif
+    endfunction
+
+    " presentation mode
+    let g:fontsize = 4    " medium (1 = xx-small, 7 = xx-large)
+    silent function! SetFontsize()
+        if g:fontsize == 1
+            set guifont=Hack:h9
+        elseif g:fontsize == 2
+            set guifont=Hack:h11
+        elseif g:fontsize == 3
+            set guifont=Hack:h13
+        elseif g:fontsize == 4
+            set guifont=Hack:h15
+        elseif g:fontsize == 5
+            set guifont=Hack:h17
+        elseif g:fontsize == 6
+            set guifont=Hack:h19
+        elseif g:fontsize == 7
+            set guifont=Hack:h21
+        endif
+    endfunction
+
+    silent function! IncreaseFontsize()
+        if g:fontsize < 8
+            let g:fontsize+=1
+            call SetFontsize()
+        endif
+    endfunction
+
+    silent function! DecreaseFontsize()
+        if g:fontsize > 0
+            let g:fontsize-=1
+            call SetFontsize()
+        endif
+    endfunction
+
+    silent function! NormalizeFontsize()
+        let g:fontsize = 4
+        call SetFontsize()
+    endfunction
+
+    " print the answer to anything
+    function! Answer()
+        " TODO fix bug #42
+        execute "normal! G"
+        r~/.vim/templates/json
+        execute "normal! G"
+        r~/.vim/templates/json
+        execute "normal! G"
+        r~/.vim/templates/json
+        execute "normal! G"
+    endfunction
+
+    silent function! OSX()
+        return has('macunix')
+    endfunction
+    silent function! LINUX()
+        return has('unix') && !has('macunix') && !has('win32unix')
+    endfunction
+    silent function! WINDOWS()
+        return  (has('win16') || has('win32') || has('win64'))
+    endfunction
+
+    " open rc-files
+    :command Vimrc tabedit ~/.vimrc
+    :command Zshrc tabedit ~/.zshrc
+
+    " source vimrc
+    :command Svimrc source $MYVIMRC
+
+    " pretty print json
+    :command PrettyJson %!python -m json.tool
+
+    " search and replace german html entities
+    :command Umlaute %s/ü/\&uuml;/eg | :%s/ä/\&auml;/eg | :%s/ö/\&ouml;/eg | :%s/ß/\&szlig;/eg | :%s/Ü/\&Uuml;/eg | :%s/Ä/\&Auml;/eg | :%s/Ö/\&Ouml;/egI
+
+    " abbrevations
+    " {
+        autocmd FileType python abbr pdb import pdb; pdb.set_trace()<esc>
+        autocmd FileType python abbr ipdb from ipdb import set_trace; set_trace()<esc>
+        autocmd FileType python abbr emb from IPython import embed; embed()<esc>
+        autocmd FileType python abbr p_utf8 # -*- coding: utf-8 -*-<esc>o<del><esc>
+        autocmd FileType python abbr p_author __author__ = "Markus Bayer"<CR><del><esc>o<del>
+        abbr vimline # vim: set ft=python ts=4 sw=4 expandtab :<del><esc>
+    " }
+" }}}
+
+" keymappings / keybindings {{{
+
+    " move in text {
+        " move to beginning/end of line
+        nnoremap B ^
+        nnoremap E $
+
+        " step in wrapped lines
+        nnoremap <silent>j gj
+        nnoremap <silent>k gk
+
+        " navigate between splits
+        nnoremap <Up> <C-W><C-J>
+        nnoremap <Down> <C-W><C-K>
+        nnoremap <Right> <C-W><C-L>
+        nnoremap <Left> <C-W><C-H>
+    "}
+
+    " edit text {
+        " Visual shifting (does not exit Visual mode)
+        vnoremap < <gv
+        vnoremap > >gv
+        " highlight last inserted text
+        nnoremap gV `[v`]
+
+        " move lines with Ctrl-J/K
+        nnoremap <silent><D-j> :m .+1<CR>==
+        inoremap <silent><D-j> <Esc>:m .+1<CR>==gi
+        nnoremap <silent><D-k> :m .-2<CR>==
+        inoremap <silent><D-k> <Esc>:m .-2<CR>==gi
+        vnoremap <silent><D-k> :m '<-2<CR>gv=gv
+        vnoremap <silent><D-j> :m '>+1<CR>gv=gv
+
+        " Ctrl-j/k deletes blank line below/above
+        " nnoremap <silent><C-j> m`:silent +g/\m^\s*$/d<CR>``:noh<CR>
+        " nnoremap <silent><C-k> m`:silent -g/\m^\s*$/d<CR>``:noh<CR>
+        " Ctrl-j/k inserts blank line below/above
+        " nnoremap <silent>º :set paste<CR>m`o<Esc>``:set nopaste<CR>
+        " nnoremap <silent>∆ :set paste<CR>m`O<Esc>``:set nopaste<CR>
+
+        " delete word under cursor
+        map ä viwdi
+    "}
+
+    " tab navigation {
+        if has("gui_macvim")
+            " in insert mode
+            imap <silent><M-D-Right> <Esc><Esc><Esc> :tabnext<CR>
+            imap <silent><M-D-Left> <Esc><Esc><Esc> :tabprev<CR>
+            " in normal mode
+            nnoremap <silent><M-D-Right> :tabnext<CR>
+            nnoremap <silent><M-D-Left> :tabprev<CR>
+            " press Ctrl-Tab to switch between open tabs (like browser tabs) to the right side. Ctrl-Shift-Tab goes the other way.
+            imap <C-Tabt> <Esc><Esc><Esc>:tabnext<CR>
+            imap <C-S-Tab> <Esc><Esc><Esc>:tabprev<CR>
+            noremap <C-Tab> :tabnext<CR>
+            noremap <C-S-Tab> :tabprev<CR>
+
+            " jump to the first/last tab
+            noremap <S-M-D-Right> :tabfirst<CR>
+            noremap <S-M-D-Left> :tablast<CR>
+
+            " Switch to specific tab numbers with Command-number
+            noremap <D-1> :tabn 1<CR>
+            noremap <D-2> :tabn 2<CR>
+            noremap <D-3> :tabn 3<CR>
+            noremap <D-4> :tabn 4<CR>
+            noremap <D-5> :tabn 5<CR>
+            noremap <D-6> :tabn 6<CR>
+            noremap <D-7> :tabn 7<CR>
+            noremap <D-8> :tabn 8<CR>
+            noremap <D-9> :tabn 9<CR>
+            " command-0 goes to the last tab
+            " noremap <D-0> :tablast<CR>
+
+            " move the focused tab
+            map <C-S-Right> :call TabMove(1)<CR>
+            map <C-S-Left> :call TabMove(-1)<CR>
+
+        endif
+    " }
+
+    " increase / decrease fontsize
+    map <D-+> :call IncreaseFontsize()<CR>
+    map <D--> :call DecreaseFontsize()<CR>
+    map <D-0> :call NormalizeFontsize()<CR>
+
+    " leader-key
+    let mapleader = "\<Space>"
+
+    " yank filepath
+    noremap <Leader>yp :let @*=expand('%:p')<CR>
+
+    " re-call last cmd
+    noremap <Leader>pc @:<CR>
+
+    " visually select line under cursor (without $)
+    map ü ^v$<Left>
+
+    " clear highlights
+    map ö :nohl<Enter>
+
+    " splits {
+        " max out the height of the current split
+        "ctrl + w _
+
+        " max out the width of the current split
+        "ctrl + w |
+
+        " normalize all split sizes, which is very handy when resizing terminal
+        "ctrl + w =
+
+        " swap top/bottom or left/right split
+        "Ctrl+W R
+
+        " break out current window into a new tabview
+        "Ctrl+W T
+
+        " close every window in the current tabview but the current one
+        "Ctrl+W o
+    " }
+
+" }}}
+
 " general {{{
 
-    set nocompatible        " Must be first line
+    " search {
+        " highlight search terms
+        set hlsearch
+        " find while typing
+        set incsearch
+        " case insensitive search
+        set ignorecase
+        " remove dot from keywords to asterisk search for eg app in app.config
+        setlocal isk-=.
+    " }
+
+    " formatting {{{
+        scriptencoding utf-8
+        " use indents of 4 spaces
+        set shiftwidth=4
+        " tabs length is 4 spaces
+        set tabstop=4
+        " tabs are spaces, not tabs
+        set expandtab
+        " delete indents
+        set softtabstop=4
+
+        " enable copy-paste from system clipboard
+        if has('clipboard')
+            if LINUX()   " On Linux use + register for copy-paste
+                set clipboard=unnamedplus
+            else         " On mac and Windows, use * register for copy-paste
+                set clipboard=unnamed
+            endif
+        endif
+    " }}}
+
+    set nocompatible
     if !WINDOWS()
         set shell=/bin/sh
     endif
 
-    " remove dot from keywords to asterisk search for eg app in app.config
-    setlocal isk-=.
+    " maximal amount of tabs
+    set tabpagemax=50
 
     " open new splits to the right bottom
     set splitbelow
@@ -400,17 +444,15 @@
       set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
     endif
 
-    " extensions
-    " do not carry comments over to the next line
-    autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
-    autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.md set filetype=markdown
-    autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.tracwiki set filetype=tracwiki
-    autocmd Filetype css setlocal ts=2 sts=2 sw=2
-    autocmd Filetype html setlocal ts=2 sts=2 sw=2
-    autocmd Filetype htmldjango setlocal ts=2 sts=2 sw=2
-
-    " maximal amount of tabs
-    set tabpagemax=50
+    " extensions {
+        " do not carry comments over to the next line
+        autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+        autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.md set filetype=markdown
+        autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.tracwiki set filetype=tracwiki
+        autocmd Filetype css setlocal ts=2 sts=2 sw=2
+        autocmd Filetype html setlocal ts=2 sts=2 sw=2
+        autocmd Filetype htmldjango setlocal ts=2 sts=2 sw=2
+    " }
 " }}}
 
 " ui {{{
@@ -434,8 +476,6 @@
     " enable mouse usage
     set mouse=a
     " hide mouse cursor while typing
-    " move from endofline to startofline
-    "set whichwrap+=<,>,[,]     " ! can cause problems
     set whichwrap+=h,l
     set foldmethod=indent   "fold based on indent
     set foldnestmax=10      "deepest fold is 10 levels
@@ -466,8 +506,7 @@
     set foldmethod=marker
     set foldlevel=0
 
-    " color
-    " {
+    " color {
         if has("gui_macvim")
             set background=dark
             " colorscheme solarized
@@ -485,36 +524,6 @@
             colorscheme neonwave
         endif
     " }
-" }}}
-
-" formatting {{{
-    scriptencoding utf-8
-    " use indents of 4 spaces
-    set shiftwidth=4
-    " tabs length is 4 spaces
-    set tabstop=4
-    " tabs are spaces, not tabs
-    set expandtab
-    " delete indents
-    set softtabstop=4
-
-    " enable copy-paste from system clipboard
-    if has('clipboard')
-        if LINUX()   " On Linux use + register for copy-paste
-            set clipboard=unnamedplus
-        else         " On mac and Windows, use * register for copy-paste
-            set clipboard=unnamed
-        endif
-    endif
-" }}}
-
-" search {{{
-    " highlight search terms
-    set hlsearch
-    " find while typing
-    set incsearch
-    " case insensitive search
-    set ignorecase
 " }}}
 
 " plugin settings {{{
@@ -821,4 +830,3 @@
         nnoremap <Leader>ss :Matrix<CR>
     " }
 " }}}
-" vim: set ft=vim ts=4 sw=4 expandtab :
