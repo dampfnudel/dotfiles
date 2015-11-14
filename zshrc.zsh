@@ -346,6 +346,13 @@
         for dir in $( find . -type d -print ); do files=$( find $dir -maxdepth 1 -type f | wc -l ); echo "$dir : $files"; done
     }
 
+    # calculator
+    = () {
+        calc="${@//p/+}"
+        calc="${calc//x/*}"
+        echo "$(($calc))"
+    }
+
     # zipf: to create a ZIP archive of a file or folder
     zipf () { zip -r "$1".zip "$1" ; }
 
