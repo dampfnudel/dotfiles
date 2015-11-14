@@ -91,6 +91,7 @@
     " Plugin 'mileszs/ack.vim'
     Plugin 'kballard/vim-swift'
     Plugin 'danro/rename.vim'
+    Plugin 'tpope/vim-surround'
 
     " plugin examples
     " {
@@ -171,42 +172,45 @@
         endif
     endfunction
 
-    " presentation mode
-    let g:fontsize = 4    " medium (1 = xx-small, 7 = xx-large)
+    let s:fontsize = 0              " medium (-3 = xx-small, 3 = xx-large)
     silent function! SetFontsize()
-        if g:fontsize == 1
+        if s:fontsize == -3
             set guifont=Hack:h9
-        elseif g:fontsize == 2
+        elseif s:fontsize == -2
             set guifont=Hack:h11
-        elseif g:fontsize == 3
+        elseif s:fontsize == -1
             set guifont=Hack:h13
-        elseif g:fontsize == 4
+        elseif s:fontsize == 0
             set guifont=Hack:h15
-        elseif g:fontsize == 5
+        elseif s:fontsize == 1
             set guifont=Hack:h17
-        elseif g:fontsize == 6
+        elseif s:fontsize == 2
             set guifont=Hack:h19
-        elseif g:fontsize == 7
+        elseif s:fontsize == 3
             set guifont=Hack:h21
+        elseif s:fontsize == 4
+            set guifont=Hack:h23
+        elseif s:fontsize == 5
+            set guifont=Hack:h25
         endif
     endfunction
 
     silent function! IncreaseFontsize()
-        if g:fontsize < 8
-            let g:fontsize+=1
+        if s:fontsize < 6
+            let s:fontsize+=1
             call SetFontsize()
         endif
     endfunction
 
     silent function! DecreaseFontsize()
-        if g:fontsize > 0
-            let g:fontsize-=1
+        if s:fontsize > -4
+            let s:fontsize-=1
             call SetFontsize()
         endif
     endfunction
 
     silent function! NormalizeFontsize()
-        let g:fontsize = 4
+        let s:fontsize = 0
         call SetFontsize()
     endfunction
 
@@ -239,6 +243,8 @@
     " source vimrc
     :command Svimrc source $MYVIMRC
 
+    " remove // comment lines
+    :command NoComment g/^\s*\/\//d
     " pretty print json
     :command PrettyJson %!python -m json.tool
 
@@ -356,7 +362,7 @@
     map ü ^v$<Left>
 
     " clear highlights
-    map ö :nohl<Enter>
+    map <silent> ö :nohl<Enter>
 
     " splits {
         " max out the height of the current split
@@ -452,6 +458,9 @@
         autocmd Filetype css setlocal ts=2 sts=2 sw=2
         autocmd Filetype html setlocal ts=2 sts=2 sw=2
         autocmd Filetype htmldjango setlocal ts=2 sts=2 sw=2
+        " set colorscheme for filetype
+        autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.json colorscheme badwolf
+        autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.markdown colorscheme badwolf
     " }
 " }}}
 
@@ -650,11 +659,11 @@
         " Bi-directional find motion
         " Jump to anywhere you want with minimal keystrokes, with just one key binding.
         " `s{char}{label}`
-        nmap s <Plug>(easymotion-s)
+        " nmap s <Plug>(easymotion-s)
         " or
         " `s{char}{char}{label}`
         " Need one more keystroke, but on average, it may be more comfortable.
-        nmap s <Plug>(easymotion-s2)
+        " nmap s <Plug>(easymotion-s2)
 
         " Turn on case sensitive feature
         let g:EasyMotion_smartcase = 1
@@ -829,4 +838,21 @@
     " Matrix {
         nnoremap <Leader>ss :Matrix<CR>
     " }
+
+    " Syntastic {
+        set statusline+=%#warningmsg#
+        set statusline+=%{SyntasticStatuslineFlag()}
+        set statusline+=%*
+
+        let g:syntastic_always_populate_loc_list = 1
+        let g:syntastic_auto_loc_list = 1
+        let g:syntastic_check_on_open = 1
+        let g:syntastic_check_on_wq = 0
+    " }
+
+    " Surround {
+        nnoremap <Leader>s" cs"'
+        nnoremap <Leader>s{ cs]{
+    "}
+
 " }}}
