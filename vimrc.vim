@@ -12,6 +12,11 @@
 
 " ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.vimrc
 
+" Dependencies
+" pip install flake8
+" brew install ctags
+" cd ~/.vim/bundle/vimproc.vim && make
+
 " TODO
 " append new tabs at the end
 " sublime like tmpfiles
@@ -605,7 +610,7 @@
 
     " NERDTRee
     " {
-        let g:NERDTreeBookmarksFile = "~/.vim/NERDTreeBookmarks"
+        let g:NERDTreeBookmarksFile = resolve(expand("~/.vim/NERDTreeBookmarks"))
         let g:nerdtree_tabs_open_on_gui_startup=0
         " ctrl ww to toggle
         map <leader>n <plug>NERDTreeTabsToggle<CR>
@@ -777,8 +782,8 @@
     " Unite {
         " yank history
         let g:unite_source_history_yank_enable = 1
-        let g:unite_source_history_yank_file = '/Users/mbayer/.vim/unite_yank_history.txt'
-        let g:neomru#file_mru_path = '/Users/mbayer/.vim/unite_mru_files.txt'
+        let g:unite_source_history_yank_file = resolve(expand('~/.vim/unite_yank_history.txt'))
+        let g:neomru#file_mru_path = resolve(expand('~/.vim/unite_mru_files.txt'))
 
         let g:unite_source_rec_git_command = ['git', 'rev-parse', '--show-toplevel']
         " let g:unite_source_rec_max_cache_files = 250000
@@ -846,6 +851,7 @@
 
         let g:syntastic_always_populate_loc_list = 1
         let g:syntastic_auto_loc_list = 1
+        let syntastic_loc_list_height = 5
         let g:syntastic_check_on_open = 1
         let g:syntastic_check_on_wq = 0
     " }
