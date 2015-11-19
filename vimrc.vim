@@ -16,6 +16,7 @@
 " pip install flake8
 " brew install ctags
 " cd ~/.vim/bundle/vimproc.vim && make
+" hack font
 
 " TODO
 " append new tabs at the end
@@ -658,7 +659,7 @@
     " easymotion
     " {
         " map forward and backword easymotion to f
-        nnoremap f H:call EasyMotion#WB(0, 0)<CR>
+        nnoremap <Leader><Leader>f H:call EasyMotion#WB(0, 0)<CR>
         let g:EasyMotion_do_mapping = 0 " Disable default mappings
 
         " Bi-directional find motion
@@ -682,7 +683,7 @@
 
     " Gundo
     " {
-        nnoremap <D-ü> :GundoToggle<CR>
+        nnoremap <Leader>gu :GundoToggle<CR>
     " }
 
 
@@ -857,8 +858,17 @@
     " }
 
     " Surround {
-        nnoremap <Leader>s" cs"'
-        nnoremap <Leader>s{ cs]{
+        vmap <Leader>s" <S-S>"
+        vmap <Leader>s' <S-S>'
+        vmap <Leader>s( <S-S>)
+        vmap <Leader>s[ <S-S>]
+        vmap <Leader>s{ <S-S>{
+        " combine with expand-region
+        map <Leader>" <Plug>(expand_region_expand)<S-S>"
+        map <Leader>' <Plug>(expand_region_expand)<S-S>'
+        map <Leader>( <Plug>(expand_region_expand)<S-S>)
+        map <Leader>{ <Plug>(expand_region_expand)<S-S>{
+        map <Leader>[ <Plug>(expand_region_expand)<S-S>]
     "}
 
 " }}}
