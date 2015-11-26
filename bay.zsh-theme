@@ -166,19 +166,19 @@ function echo_git_time_since_commit() {
 function echo_virtualenv_name {
     virtualenv_name=$(basename "$VIRTUAL_ENV")
     if [[ "$virtualenv_name" != "" ]]; then
-            echo "[ $c_virtual_env$virtualenv_name$rc ]"
+            echo "[ 🐍 $c_virtual_env$virtualenv_name$rc ]"
         fi
     }
 
 function echo_time() {
     # show sun or moon
     if [[ $(date +%H) > 17 || $(date +%H) < 07 ]]; then
-        local dok="☾"
+        local don="🌙 " # moon
     else
-        local dok="☀"
+        local don="🌞 " # sun
     fi
 
-    echo $c_time$dok $(date +%H:%M:%S)
+    echo $c_time$don $(date +%H:%M:%S)
 }
 
 function echo_cmds() {
@@ -233,7 +233,7 @@ function echo_host() {
 function echo_user_host() {
     local user="$c_user_host%n$rc"
     local host="$c_user_host%m$rc"
-    local privs="($c_privs%#% $rc)"
+    local privs="($c_privs%#$rc)"
 
     echo "[ $user$privs$host ]"
 }
@@ -252,52 +252,60 @@ function echo_token() {
     local weekday=$(date +"%A")
 
     local token="λ"
+    # local token="⭐️" # star
+    # local token="🎃" # pumpkin
+    # local token="🌪 " # tornado
+    # local token="👾" # space invader
+    # local token="💡" # light bulb
+    # local token="🚀" # rocket
+    # local token="⚙" # gear
+    # local token="☢" # atomic
+    # local token="🐉 " # dragon
+    # local token="👑" # crown
+    # local token="👺" # devil
+    # local token="🤖" # robot
 
     case "$weekday" in
         "Montag")
-            local token="☹"
+            local token="🐘 💨 😑" # monday
             ;;
         "Dienstag")
-            local token="༄༅"
+            local token="🚀" # rocket
             ;;
         "Mittwoch")
-            local token="☮"
-            # local token="⚛"
+            local token="☠" # skull and bones
             ;;
         "Donnerstag")
-            local token="☯"
-            # local token="∞"
-            # local token="☘"
-            # local token="♡"
+            local token="💣" # bomb
             ;;
         "Freitag")
-            local token="♕"
+            local token="🍺" # beer
             ;;
         "Samstag")
-            local token="λ"
+            local token="⚡️" # flash
             ;;
         "Sonntag")
-            local token="✱"
+            local token="⚔" # swords
             ;;
     esac
 
-    echo "%(?,$c_token$token$rc,%{%B%F{red}%}☠$rc)"
+    echo "%(?,$c_token$token $rc,%{%B%F{red}%}💩 $rc)"
 }
 
 function echo_top_left_corner() {
-    echo "╔══"
+    echo "╭━━"
 }
 
 function echo_top_right_corner() {
-    echo "══╗"
+    echo "━━╮"
 }
 
 function echo_bottom_left_corner() {
-    echo "╚══════⫸"
+    echo "╰━━━━━━⫸"
 }
 
 function echo_bottom_right_corner() {
-    echo "════╝"
+    echo "━━━━╯"
 }
 
 # function echo_bits() {
@@ -384,7 +392,7 @@ function echo_infoline() {
         i_len=$#topline
         i_filler=$(($COLUMNS - $i_width + $i_len*3 + $arrangement))
 
-        infoline="$top_left_corner_part$user_host_part$pwd_part${(l:$i_filler::═:)}$top_right_corner_part\n╠══$virtualenv_name_part$(git_prompt_info)$(git_prompt_status)$(echo_git_time_since_commit)"
+        infoline="$top_left_corner_part$user_host_part$pwd_part${(l:$i_filler::─:)}$top_right_corner_part\n┣──$virtualenv_name_part$(git_prompt_info)$(git_prompt_status)$(echo_git_time_since_commit)"
 
         arrangement=-3
         topline=()
@@ -407,9 +415,9 @@ function echo_infoline() {
         i_len=$#topline
         i_filler=$(($COLUMNS - $i_width + $i_len*3 + $arrangement - 2))
 
-        echo "$infoline${(l:$i_filler:: :)}║"
+        echo "$infoline${(l:$i_filler:: :)}┃"
     else
-        echo "$infoline${(l:$i_filler::═:)}$top_right_corner_part"
+        echo "$infoline${(l:$i_filler::━:)}$top_right_corner_part"
     fi
 
     firstline="$infoline$top_right_corner_part"
