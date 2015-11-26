@@ -10,6 +10,9 @@
 
 # TODO: statusline, select jumpmarks, magic enter, cd ..,
 # iterm2 drag files to cmd
+# autocompletion
+# entertain me
+
 
 # zsh configs
 # {
@@ -501,6 +504,13 @@
             eval ${songs[$1]}
         }
     # }
+
+    # set alarm clock
+    alarm() {
+        echo "alarm in ""$1""m"
+        sleep "$(($1 * 60))" && sing_song 2
+        # sleep "$(($1 * 60))" && mp3blaster ~/Music/gong.mp3
+    }
 
     # enter = ls && git status
     # {
