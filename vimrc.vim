@@ -19,6 +19,7 @@
 " hack font
 
 " TODO
+" param autocomplete
 " append new tabs at the end
 " sublime like tmpfiles
 " braces behavior
@@ -249,6 +250,9 @@
     " source vimrc
     :command Svimrc source $MYVIMRC
 
+    " close all location lists
+    :command CLl windo if &buftype == "quickfix" || &buftype == "locationlist" | lclose | endif
+
     " remove // comment lines
     :command NoComment g/^\s*\/\//d
     " pretty print json
@@ -256,6 +260,9 @@
 
     " search and replace german html entities
     :command Umlaute %s/ü/\&uuml;/eg | :%s/ä/\&auml;/eg | :%s/ö/\&ouml;/eg | :%s/ß/\&szlig;/eg | :%s/Ü/\&Uuml;/eg | :%s/Ä/\&Auml;/eg | :%s/Ö/\&Ouml;/egI
+
+    " search for the highlighted word with a quickfix list
+    :command GREP :execute 'vimgrep '.expand('<cword>').' '.expand('%') | :copen | :cc
 
     " abbrevations
     " {
@@ -271,6 +278,9 @@
 " keymappings / keybindings {{{
 
     " move in text {
+        " last/previous insert
+        nnoremap <M-Down> g;
+        nnoremap <M-Up> g,
         " move to beginning/end of line
         nnoremap B ^
         nnoremap E $
@@ -280,8 +290,8 @@
         nnoremap <silent>k gk
 
         " navigate between splits
-        nnoremap <Up> <C-W><C-J>
-        nnoremap <Down> <C-W><C-K>
+        nnoremap <Up> <C-W><C-K>
+        nnoremap <Down> <C-W><C-J>
         nnoremap <Right> <C-W><C-L>
         nnoremap <Left> <C-W><C-H>
     "}
@@ -401,11 +411,13 @@
         set incsearch
         " case insensitive search
         set ignorecase
+        " If the search pattern contains upper case characters, override ignorecase option.
+        set smartcase
         " remove dot from keywords to asterisk search for eg app in app.config
         setlocal isk-=.
     " }
 
-    " formatting {{{
+    " formatting {
         scriptencoding utf-8
         " use indents of 4 spaces
         set shiftwidth=4
@@ -424,12 +436,15 @@
                 set clipboard=unnamed
             endif
         endif
-    " }}}
+    " }
 
     set nocompatible
     if !WINDOWS()
         set shell=/bin/sh
     endif
+
+    " encryption-algorithm for files
+    set cm=blowfish2
 
     " maximal amount of tabs
     set tabpagemax=50
@@ -524,17 +539,24 @@
     " color {
         if has("gui_macvim")
             set background=dark
+
+            " colorscheme badwolf
+            " colorscheme wolfpack
+            " colorscheme dracula
+            colorscheme Spacedust
+            " colorscheme inkpot
             " colorscheme solarized
-            colorscheme molokai
+            " colorscheme molokai
             " colorscheme gruvbox
+
             " colorscheme facebook
             " colorscheme material-theme
-            " colorschme pencil
+            " colorscheme pencil
             " colorscheme kalisi
             " colorscheme hemisu
             " colorscheme seoul256
-            " colorscheme nuclide
             " colorscheme herald
+            " colorscheme VIvid
         else
             colorscheme neonwave
         endif
