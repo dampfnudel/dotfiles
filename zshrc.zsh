@@ -12,6 +12,7 @@
 # iterm2 drag files to cmd
 # autocompletion
 # entertain me
+# open, opens file bms
 
 
 # zsh configs
@@ -68,7 +69,7 @@
     ZSH_THEME="bay"
     # ZSH_THEME="random"
     # ZSH_THEME="pure"
-    CASE_SENSITIVE="true"
+    CASE_SENSITIVE="false"
     COMPLETION_WAITING_DOTS="false"
 
     plugins=(gradle osx brew git git-flow python pip fabric zsh-syntax-highlighting zsh-substring-search zshmarks)
@@ -105,6 +106,10 @@
     export HOME=/Users/mbayer
     export LANG=de_DE.UTF-8
     export LC_ALL=de_DE.UTF-8
+
+
+    # <Space> before command prevent the command from being pushed to zsh_history
+    setopt HIST_IGNORE_SPACE
 # }
 
 
@@ -262,6 +267,29 @@
     # open files from asgard
     ethervim () {
         mvim -c "echo :set buftype: \" \"" --remote-tab-silent scp://root@134.119.32.216:4022//"$@"
+    }
+
+    # start vim with python 2 venv then switch back
+    pvim () {
+        venv="${VIRTUAL_ENV##*/}"
+        if [[ $venv != "" ]]
+        then
+            workon python2.7.5
+            mvim
+            workon $venv
+        else
+            mvim
+        fi
+    }
+
+    # open a url
+    function op () {
+        typeset -A mapping
+        mapping=(
+            google https://www.google.de/
+            spotify https://play.spotify.com/collection/songs
+        )
+        open $mapping[$@]
     }
 
     # showTimes: show the modification, metadata-change, and access times of a file
