@@ -26,15 +26,35 @@
 # disable the default virtualenv info
 export VIRTUAL_ENV_DISABLE_PROMPT=yes
 # activated theme
-local theme="monokai"
-local theme="solarized"
-local theme="inkpot"
+# local theme="inkpot"
+# local theme="solarized"
+# local theme="monokai"
+local theme="dracula"
 
 # colors
 local rc="%{$reset_color%}"
 
 # set the colors according to the theme
 case "$theme" in
+    "dracula")
+        local dracula_violet="141"
+        local dracula_cyan="117"
+        local dracula_white="231"
+        local dracula_orange="215"
+        local dracula_magenta="212"
+        local dracula_yellow="228"
+        local dracula_red="203"
+        local dracula_green="84"
+
+        local c_user_host="%{%B%F{$dracula_magenta}%}"
+        local c_privs="%{%B%F{$dracula_orange}%}"
+        local c_pwd="%{%B%F{$dracula_green}%}"
+        local c_virtual_env="%{%B%F{$dracula_red}%}"
+        local c_git="%{%B%F{$dracula_violet}%}"
+        local c_token="%{%B%F{$dracula_orange}%}"
+        local c_time="%{%B%F{$dracula_cyan}%}"
+        local c_cmds="%{%B%F{$dracula_yellow}%}"
+        ;;
     "inkpot")
         local inkpot_violet="105"
         local inkpot_cyan="117"
@@ -301,7 +321,7 @@ function echo_top_right_corner() {
 }
 
 function echo_bottom_left_corner() {
-    echo "╰━━━━━━⫸"
+    echo "╰━━━━━ ❯"
 }
 
 function echo_bottom_right_corner() {
