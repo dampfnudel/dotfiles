@@ -444,7 +444,9 @@
     endif
 
     " encryption-algorithm for files
-    set cm=blowfish2
+    if has("gui_macvim")
+        set cm=blowfish2
+    endif
 
     " maximal amount of tabs
     set tabpagemax=50
