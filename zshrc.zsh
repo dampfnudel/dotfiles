@@ -11,8 +11,6 @@
 # TODO: statusline, select jumpmarks, magic enter, cd ..,
 # iterm2 drag files to cmd
 # autocompletion
-# entertain me
-# open, opens file bms
 
 
 # zsh configs
@@ -260,13 +258,27 @@
 
 # functions
 # {
+    # backup the current directory
+    bu () {
+        alias bu='tar -czf "../$(basename $(pwd))_$(date +%d%m%y-%H-%M-%S).tar.gz" .'
+        dname=$(basename $(pwd))
+        buname=$dname""_$(date +%d%m%y-%H-%M-%S).tar.gz
+        cd ..
+        tar -czf "$buname" "$dname/"
+        echo "-> ../$buname"
+        cd -  >/dev/null 2>&1
+    }
+
     # show the git log as json
     git_log_json () {
         git log --pretty=format:'{%n  "commit": "%H",%n  "abbreviated_commit": "%h",%n  "tree": "%T",%n  "abbreviated_tree": "%t",%n  "parent": "%P",%n  "abbreviated_parent": "%p",%n  "refs": "%D",%n  "encoding": "%e",%n  "subject": "%s",%n  "sanitized_subject_line": "%f",%n  "body": "%b",%n  "commit_notes": "%N",%n  "verification_flag": "%G?",%n  "signer": "%GS",%n  "signer_key": "%GK",%n  "author": {%n    "name": "%aN",%n    "email": "%aE",%n    "date": "%aD"%n  },%n  "commiter": {%n    "name": "%cN",%n    "email": "%cE",%n    "date": "%cD"%n  }%n},'
     }
     # open files from asgard
-    ethervim () {
-        mvim -c "echo :set buftype: \" \"" --remote-tab-silent scp://root@134.119.32.216:4022//"$@"
+    asgard_open () {
+        mvim -c "echo :set buftype: \" \"" --remote-tab-silent scp://asgard//"$@"
+    }
+    tx_open () {
+        mvim -c "echo :set buftype: \" \"" --remote-tab-silent scp://ssh-371980-daal@demo.termxplorer.com:22//"$@"
     }
 
     # start vim with python 2 venv then switch back
