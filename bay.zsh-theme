@@ -46,13 +46,13 @@ case "$theme" in
         local dracula_red="203"
         local dracula_green="84"
 
-        local c_user_host="%{%B%F{$dracula_magenta}%}"
-        local c_privs="%{%B%F{$dracula_orange}%}"
+        local c_user_host="%{%B%F{$dracula_red}%}"
+        local c_privs="%{%B%F{$dracula_cyan}%}"
         local c_pwd="%{%B%F{$dracula_green}%}"
-        local c_virtual_env="%{%B%F{$dracula_red}%}"
+        local c_virtual_env="%{%B%F{$dracula_magenta}%}"
         local c_git="%{%B%F{$dracula_violet}%}"
-        local c_token="%{%B%F{$dracula_orange}%}"
-        local c_time="%{%B%F{$dracula_cyan}%}"
+        local c_token="%{%B%F{$dracula_white}%}"
+        local c_time="%{%B%F{$dracula_orange}%}"
         local c_cmds="%{%B%F{$dracula_yellow}%}"
         ;;
     "inkpot")
@@ -302,14 +302,14 @@ function echo_token() {
             local token="🍺" # beer
             ;;
         "Samstag")
-            local token="⚡️" # flash
+            local token="🎃" # pumpkin
             ;;
         "Sonntag")
-            local token="⚔" # swords
+            local token="🍌" # banana
             ;;
     esac
 
-    echo "%(?,$c_token$token $rc,%{%B%F{red}%}💩 $rc)"
+    echo "%(?,$token $rc,%{%B%F{red}%}💩 $rc)"
 }
 
 function echo_top_left_corner() {
@@ -317,15 +317,19 @@ function echo_top_left_corner() {
 }
 
 function echo_top_right_corner() {
-    echo "━━╮"
+    echo "━━━╮"
 }
 
 function echo_bottom_left_corner() {
-    echo "╰━━━━━ ❯"
+    echo "╰━━["
+}
+
+function echo_prompt_char() {
+    echo "]━━ $c_token❯ $rc"
 }
 
 function echo_bottom_right_corner() {
-    echo "━━━━╯"
+    echo "━━━╯"
 }
 
 # function echo_bits() {
@@ -446,7 +450,7 @@ function echo_infoline() {
 # assemble the prompt
 PROMPT=$'
 $(echo_infoline)
-$(echo_bottom_left_corner) $(echo_token) '
+$(echo_bottom_left_corner) $(echo_token) $(echo_prompt_char)'
 
 RPROMPT='[ $(echo_time) $(echo_battery) $(echo_cmds) ]$(echo_bottom_right_corner)'
 
