@@ -197,6 +197,7 @@
     alias trash="rm -rf ~/.Trash/."
     alias printip='ifconfig | grep "inet " | grep -v 127.0.0.1 | cut -d\  -f2'
     alias dirs='dirs -vp'
+    alias pony='fortune | ponysay'
     # find all .git directories and exec "git pull" on the parent.
     alias gprec='find . -name .git -exec sh -c "cd \"{}\"/../ && pwd && git pull" \;'
     alias git_ignore_del='git ls-files --deleted -z | git update-index --assume-unchanged -z --stdin'
@@ -276,9 +277,6 @@
     # open files from asgard
     asgard_open () {
         mvim -c "echo :set buftype: \" \"" --remote-tab-silent scp://asgard//"$@"
-    }
-    tx_open () {
-        mvim -c "echo :set buftype: \" \"" --remote-tab-silent scp://ssh-371980-daal@demo.termxplorer.com:22//"$@"
     }
 
     # start vim with python 2 venv then switch back
