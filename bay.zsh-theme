@@ -317,7 +317,7 @@ function echo_top_left_corner() {
 }
 
 function echo_top_right_corner() {
-    echo "━━━╮"
+    echo "━━╮"
 }
 
 function echo_bottom_left_corner() {
@@ -329,7 +329,7 @@ function echo_prompt_char() {
 }
 
 function echo_bottom_right_corner() {
-    echo "━━━╯"
+    echo "━━╯"
 }
 
 # function echo_bits() {
@@ -416,7 +416,7 @@ function echo_infoline() {
         i_len=$#topline
         i_filler=$(($COLUMNS - $i_width + $i_len*3 + $arrangement))
 
-        infoline="$top_left_corner_part$user_host_part$pwd_part${(l:$i_filler::─:)}$top_right_corner_part\n┣──$virtualenv_name_part$(git_prompt_info)$(git_prompt_status)$(echo_git_time_since_commit)"
+        infoline="$top_left_corner_part$user_host_part$pwd_part${(l:$i_filler::━:)}$top_right_corner_part\n┣─━$virtualenv_name_part$(git_prompt_info)$(git_prompt_status)$(echo_git_time_since_commit)"
 
         arrangement=-3
         topline=()
