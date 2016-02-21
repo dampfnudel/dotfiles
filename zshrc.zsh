@@ -170,6 +170,14 @@
     bindkey '\e[B' history-beginning-search-forward
 # }
 
+# named directories
+# {
+    hash -d dev=~/Workspace
+    hash -d mom=~/Workspace/moment
+    hash -d rg=~/Workspace/regiobot
+    hash -d til=~/Workspace/til
+# }
+
 # aliases
 # {
     alias j='jump'
@@ -259,16 +267,36 @@
 
 # functions
 # {
+
+    # regiobot
+    # {
+        # init regiobot docker
+        rg_init () {
+            cd ~/Workspace/regiobot/regiobot/
+            docker-machine stop regiobot
+            docker-machine start regiobot
+            eval "$(docker-machine env regiobot)"
+            make up
+        }
+        # open a bash session in the regiobot docker
+        rg_shell () {
+            eval "$(docker-machine env regiobot)"
+            docker exec -it $(docker ps | awk '{ if ($2 == "regiobot_django") print $1 }') /bin/bash
+        }
+    # }
+
     # backup the current directory
-    bu () {
-        alias bu='tar -czf "../$(basename $(pwd))_$(date +%d%m%y-%H-%M-%S).tar.gz" .'
-        dname=$(basename $(pwd))
-        buname=$dname""_$(date +%d%m%y-%H-%M-%S).tar.gz
-        cd ..
-        tar -czf "$buname" "$dname/"
-        echo "-> ../$buname"
-        cd -  >/dev/null 2>&1
-    }
+    # {
+        bu () {
+            alias bu='tar -czf "../$(basename $(pwd))_$(date +%d%m%y-%H-%M-%S).tar.gz" .'
+            dname=$(basename $(pwd))
+            buname=$dname""_$(date +%d%m%y-%H-%M-%S).tar.gz
+            cd ..
+            tar -czf "$buname" "$dname/"
+            echo "-> ../$buname"
+            cd -  >/dev/null 2>&1
+        }
+    # }
 
     # show the git log as json
     git_log_json () {
@@ -338,7 +366,7 @@
     grepfind () { find . -type f -name "$2" -print0 | xargs -0 grep "$1" ; }
 
     # locatemd: to search for a file using Spotlight's metadata
-    function finder { mdfind "kMDItemDisplayName == '$@'wc"; }
+    finder () { mdfind "kMDItemDisplayName == '$@'wc"; }
 
     # finderComment: show the SpotLight comment for a file
     findercomment () { mdls "$1" | grep kMDItemFinderComment ; }
@@ -346,13 +374,13 @@
     # locaterecent: to search for files created since yesterday using Spotlight
     # This is an illustration of using $time in a query
     # See: http://developer.apple.com/documentation/Carbon/Conceptual/SpotlightQuery/index.html
-    function findrecent { mdfind 'kMDItemFSCreationDate >= $time.yesterday'; }
+    findrecent () { mdfind 'kMDItemFSCreationDate >= $time.yesterday'; }
 
     # list_all_apps: list all applications on the system
-    list_all_apps() { mdfind 'kMDItemContentTypeTree == "com.apple.application"c' ; }
+    list_all_apps () { mdfind 'kMDItemContentTypeTree == "com.apple.application"c' ; }
 
     # find_larger: find files larger than a certain size (in bytes)
-    find_larger() { find . -type f -size +${1}c ; }
+    find_larger () { find . -type f -size +${1}c ; }
 
     # findword: search for a word in the Unix word list
     findword () { /usr/bin/grep ^"$@"$ /usr/share/dict/words ; }
@@ -364,7 +392,7 @@
     en () { /Users/mbayer/Utils/dict.cc.py/dict.cc.py en de "$1"; }
 
     # copy the current working dir to clipboard
-    cwd() { pwd | pbcopy }
+    cwd () { pwd | pbcopy }
 
     # serve wd
     serve () {
@@ -378,12 +406,12 @@
     }
 
     # Change Working Directory to Finder Path
-    cdf() {
+    cdf () {
         cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')"
     }
 
     # count files
-    function count () {
+    count () {
         for dir in $( find . -type d -print ); do files=$( find $dir -maxdepth 1 -type f | wc -l ); echo "$dir : $files"; done
     }
 
@@ -441,14 +469,14 @@
         ZSH_SPECTRUM_TEXT=${ZSH_SPECTRUM_TEXT:-Arma virumque cano Troiae qui primus ab oris}
 
         # Show all 256 colors with color number
-        function spectrum_ls() {
+        spectrum_ls () {
           for code in {000..255}; do
             print -P -- "$code: %F{$code}$ZSH_SPECTRUM_TEXT%f"
           done
         }
 
         # Show all 256 colors where the background is set to specific color
-        function spectrum_bls() {
+        spectrum_bls () {
           for code in {000..255}; do
             print -P -- "$BG[$code]$code: $ZSH_SPECTRUM_TEXT %{$reset_color%}"
           done
@@ -473,9 +501,16 @@
 
     # cd to git root
     # {
-    cdg () {
-        cd `git rev-parse --show-toplevel`
-    }
+        cdg () {
+            cd `git rev-parse --show-toplevel`
+        }
+    # }
+
+    # git push -u origin {BRANCH_NAME}
+    # {
+        git_push_branch () {
+            git push -u origin "$(git branch --no-color | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')"
+        }
     # }
 
     # toggle show/hide hidden files in finder
@@ -544,7 +579,7 @@
     # }
 
     # set alarm clock
-    alarm() {
+    alarm () {
         echo "alarm in ""$1""m"
         sleep "$(($1 * 60))" && sing_song 2
         # sleep "$(($1 * 60))" && mp3blaster ~/Music/gong.mp3
@@ -615,7 +650,7 @@
 # [[ -n "${key[Down]}"     ]]  && bindkey  "${key[Down]}"     down-line-or-history
 # [[ -n "${key[Left]}"     ]]  && bindkey  "${key[Left]}"     backward-char
 # [[ -n "${key[Right]}"    ]]  && bindkey  "${key[Right]}"    forward-char
-# [[ -n "${key[PageUp]}"   ]]  && bindkey  "${key[PageUp]}"   beginning-of-buffer-or-history
+# [[ -n " ${key[PageUp]}"   ]]  && bindkey  "${key[PageUp]}"   beginning-of-buffer-or-history
 # [[ -n "${key[PageDown]}" ]]  && bindkey  "${key[PageDown]}" end-of-buffer-or-history
 #
 # # Finally, make sure the terminal is in application mode, when zle is
