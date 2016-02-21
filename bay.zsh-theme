@@ -198,7 +198,8 @@ function echo_time() {
         local don="🌞 " # sun
     fi
 
-    echo $c_time$don $(date +%H:%M:%S)
+    echo $c_time$don $(date +%s)
+    # echo $c_time$don $(date +%H:%M:%S)
 }
 
 function echo_cmds() {
