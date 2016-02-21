@@ -476,6 +476,7 @@
     " extensions {
         " do not carry comments over to the next line
         autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+        autocmd FileType * setlocal isk-=.
         autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.md set filetype=markdown
         autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.tracwiki set filetype=tracwiki
         autocmd Filetype css setlocal ts=2 sts=2 sw=2
