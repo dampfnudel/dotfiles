@@ -99,6 +99,7 @@
       export EDITOR='vim'
     else
       export EDITOR='/usr/local/Cellar/macvim/7.4-76/bin/mvim'
+      export EDITOR_TAB=${EDITOR}' --remote-tab-silent'
     fi
 
     export HOME=/Users/mbayer
@@ -506,6 +507,13 @@
         }
     # }
 
+    # list git tree
+    # {
+        git_tree () {
+            (git ls-tree -r --name-only HEAD || find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//) 2> /dev/null
+        }
+    # }
+
     # git push -u origin {BRANCH_NAME}
     # {
         git_push_branch () {
@@ -688,6 +696,39 @@
 # bindkey '^[[1;3A'      cdParentKey
 # bindkey '^[[1;3D'      cdUndoKey
 
+# fzf {
+
+export FZF_DEFAULT_COMMAND='
+    (git ls-files $(git rev-parse --show-toplevel) ||
+        find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
+        sed s/^..//) 2> /dev/null'
+
+    # fzf open
+    # fe [FUZZY PATTERN] - Open the selected file with the default editor
+    #   - Bypass fuzzy finder if there's only one match (--select-1)
+    #   - Exit if there's no match (--exit-0)
+    # you can press
+    #   - CTRL-O to open with `open` command,
+    #   - CTRL-E or Enter key to open with the $EDITOR
+    fo () {
+      local out file key
+      out=$(fzf --query="$1" --exit-0 --select-1 --exit-0 --cycle --expect=ctrl-o,ctrl-e)
+      key=$(head -1 <<< "$out")
+      file=$(head -2 <<< "$out" | tail -1)
+      if [ -n "$file" ]; then
+        [ "$key" = ctrl-o ] && open "$file" || eval ${EDITOR_TAB} "$file"
+      fi
+    }
+
+    # fzf cd - cd to selected directory
+    fcd () {
+      local dir
+      dir=$(find ${1:-*} -path '*/\.*' -prune \
+                      -o -type d -print 2> /dev/null | fzf +m) &&
+      cd "$dir"
+    }
+
+# }
 
 # plugins {
     # qfc
