@@ -207,6 +207,7 @@
     alias printip='ifconfig | grep "inet " | grep -v 127.0.0.1 | cut -d\  -f2'
     alias dirs='dirs -vp'
     alias pony='fortune | ponysay'
+    alias ag='ag --path-to-agignore ~/.agignore'
     # find all .git directories and exec "git pull" on the parent.
     alias gprec='find . -name .git -exec sh -c "cd \"{}\"/../ && pwd && git pull" \;'
     alias git_ignore_del='git ls-files --deleted -z | git update-index --assume-unchanged -z --stdin'
@@ -723,7 +724,14 @@ export FZF_DEFAULT_COMMAND='
     # fzf cd - cd to selected directory
     fcd () {
       local dir
-      dir=$(find ${1:-*} -path '*/\.*' -prune \
+      dir=$(find ${1:-*} -path '/*/\.*' -prune \
+                      -o -type d -print 2> /dev/null | fzf +m) &&
+      cd "$dir"
+    }
+
+    fgcd () {
+      local dir
+      dir=$(find ${1:-*} -path $(echo $HOME)'/*/\.*' -prune \
                       -o -type d -print 2> /dev/null | fzf +m) &&
       cd "$dir"
     }
@@ -733,6 +741,10 @@ export FZF_DEFAULT_COMMAND='
 # plugins {
     # qfc
     # [[ -s "$HOME/.zsh/plugins/qfc/bin/qfc.sh" ]] && source "$HOME/.zsh/plugins/qfc/bin/qfc.sh"
+
+    # fzf
+    source ~/.oh-my-zsh/custom/plugins/fzf/completion.zsh
+    source ~/.oh-my-zsh/custom/plugins/fzf/key-bindings.zsh
 
     # Load zsh-syntax-highlighting.
     source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
