@@ -53,11 +53,11 @@
 
     Plugin 'scrooloose/nerdtree'
     Plugin 'bling/vim-airline'
+        Plugin 'vim-airline/vim-airline-themes'
     " Plugin 'kien/ctrlp.vim'
     Plugin 'vim-scripts/tComment'
     Plugin 'altercation/vim-colors-solarized'
     Plugin 'Lokaltog/vim-easymotion'
-    " Plugin 'tpope/vim-surround'
     Plugin 'sjl/gundo.vim'
     Plugin 'embayer/vim_colorschemes'
     " Plugin 'gregsexton/MatchTag'
@@ -99,6 +99,7 @@
     Plugin 'kballard/vim-swift'
     Plugin 'danro/rename.vim'
     Plugin 'tpope/vim-surround'
+    Plugin 'ctrlpvim/ctrlp.vim'
 
     " plugin examples
     " {
@@ -683,9 +684,14 @@
 
     " easymotion
     " {
-        " map forward and backword easymotion to f
-        nnoremap <Leader><Leader>f H:call EasyMotion#WB(0, 0)<CR>
+        " nnoremap f H:call EasyMotion#WB(0, 0)<CR>
         let g:EasyMotion_do_mapping = 0 " Disable default mappings
+        " map forward and backword easymotion to f
+        nmap f <Plug>(easymotion-overwin-f)
+        nmap F <Plug>(easymotion-sl)
+        map <Leader>j <Plug>(easymotion-j)
+        map <Leader>k <Plug>(easymotion-k)
+
 
         " Bi-directional find motion
         " Jump to anywhere you want with minimal keystrokes, with just one key binding.
@@ -722,7 +728,7 @@
         let g:tagbar_width=26
         " Display panel with F8
         nmap <F8> :TagbarToggle<CR>
-        autocmd BufNewFile,BufReadPost *.py let b:tagbar_ignore = 1
+        " autocmd BufNewFile,BufReadPost *.py let b:tagbar_ignore = 1
     " }
 
     " startify
@@ -755,7 +761,7 @@
         let g:startify_custom_indices = []
         let g:startify_disable_at_vimenter = 0
         let g:startify_enable_special = 1
-        let g:startify_files_number = 10
+        let g:startify_files_number = 30
         let g:startify_list_order = [
                 \ ['   Sessions:'],
                 \ 'sessions',
@@ -812,11 +818,16 @@
         let g:neomru#file_mru_path = resolve(expand('~/.vim/unite_mru_files.txt'))
 
         let g:unite_source_rec_git_command = ['git', 'rev-parse', '--show-toplevel']
+        " let g:unite_source_rec_git_command = ['git', 'ls-tree', '-r', '--name-only', 'HEAD']
         " let g:unite_source_rec_max_cache_files = 250000
+        let g:unite_source_file_rec_max_cache_files = 0
+        call unite#custom#source('file_mru,file_rec,file_rec/async,grepocate',
+                    \ 'max_candidates', 0)
 
         if executable('ag')
             " Use ag in unite grep source.
-            let g:unite_source_grep_command = 'ag'
+            " let g:unite_source_grep_command = 'ag'
+            let g:unite_source_rec_async_command= ['ag', '--nocolor', '--nogroup', '--hidden', '-g', '""']
             let g:unite_source_grep_default_opts =
                 \ '-i --vimgrep --hidden --ignore bower_components --ignore ' .
                 \ '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'''
@@ -857,10 +868,10 @@
         nnoremap <Leader>y :Unite -tab history/yank<cr>
         nnoremap <Leader>h :Unite -tab -unique history/unite<cr>
         nnoremap <Leader>o :Unite -start-insert -preview outline<cr>
-        nnoremap <Leader>j :Unite jump<cr>
+        nnoremap <Leader>jl :Unite jump<cr>
         nnoremap <Leader>c :Unite change<cr>
 
-        map <buffer> <C-1> <Plug>(unite_redraw)
+        " map <buffer> <C-1> <Plug>(unite_redraw)     " <C-l>
 
         " imap <buffer> <C-j>   <Plug>(unite_select_next_line)
         " imap <buffer> <C-k>   <Plug>(unite_select_previous_line)
@@ -883,17 +894,17 @@
     " }
 
     " Surround {
-        vmap <Leader>s" <S-S>"
-        vmap <Leader>s' <S-S>'
-        vmap <Leader>s( <S-S>)
-        vmap <Leader>s[ <S-S>]
-        vmap <Leader>s{ <S-S>{
+        vmap <silent><Leader>s" <S-S>"
+        vmap <silent><Leader>s' <S-S>'
+        vmap <silent><Leader>s( <S-S>)
+        vmap <silent><Leader>s[ <S-S>]
+        vmap <silent><Leader>s{ <S-S>{
         " combine with expand-region
-        map <Leader>" <Plug>(expand_region_expand)<S-S>"
-        map <Leader>' <Plug>(expand_region_expand)<S-S>'
-        map <Leader>( <Plug>(expand_region_expand)<S-S>)
-        map <Leader>{ <Plug>(expand_region_expand)<S-S>{
-        map <Leader>[ <Plug>(expand_region_expand)<S-S>]
+        map <silent><Leader>" <Plug>(expand_region_expand)<S-S>"
+        map <silent><Leader>' <Plug>(expand_region_expand)<S-S>'
+        map <silent><Leader>( <Plug>(expand_region_expand)<S-S>)
+        map <silent><Leader>{ <Plug>(expand_region_expand)<S-S>{
+        map <silent><Leader>[ <Plug>(expand_region_expand)<S-S>]
     "}
 
 " }}}
