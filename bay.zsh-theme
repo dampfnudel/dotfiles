@@ -29,7 +29,7 @@ export VIRTUAL_ENV_DISABLE_PROMPT=yes
 # local theme="inkpot"
 # local theme="solarized"
 # local theme="monokai"
-local theme="dracula"
+ local theme="dracula"
 
 # colors
 local rc="%{$reset_color%}"
@@ -47,9 +47,9 @@ case "$theme" in
         local dracula_green="84"
 
         local c_user_host="%{%B%F{$dracula_red}%}"
-        local c_privs="%{%B%F{$dracula_cyan}%}"
+        local c_privs="%{%B%F{$dracula_magenta}%}"
         local c_pwd="%{%B%F{$dracula_green}%}"
-        local c_virtual_env="%{%B%F{$dracula_magenta}%}"
+        local c_virtual_env="%{%B%F{$dracula_cyan}%}"
         local c_git="%{%B%F{$dracula_violet}%}"
         local c_token="%{%B%F{$dracula_white}%}"
         local c_time="%{%B%F{$dracula_orange}%}"

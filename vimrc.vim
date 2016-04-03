@@ -19,6 +19,9 @@
 " hack font
 
 " TODO
+" servername
+" vim tabs
+" virtual lines?
 " param autocomplete
 " append new tabs at the end
 " sublime like tmpfiles
@@ -94,12 +97,14 @@
         Plugin 'h1mesuke/unite-outline'
         Plugin 'Shougo/neomru.vim'
         Plugin 'kmnk/vim-unite-giti'
+        Plugin 'Shougo/neoyank.vim'
         " Plugin 'Shougo/unite-session'
     " Plugin 'mileszs/ack.vim'
     Plugin 'kballard/vim-swift'
     Plugin 'danro/rename.vim'
     Plugin 'tpope/vim-surround'
     Plugin 'ctrlpvim/ctrlp.vim'
+    Plugin 'junegunn/vim-journal'
 
     " plugin examples
     " {
@@ -596,6 +601,9 @@
         else
             let g:airline_theme = 'badwolf'
         endif
+
+        " total linenr/total lines
+        let g:airline_section_z = "%3p%% %{g:airline_symbols.linenr}%#__accent_bold#%4l%#__restore__#/%L:%3v"
     " }
 
     " YouCompleteMe {
@@ -684,10 +692,11 @@
 
     " easymotion
     " {
-        " nnoremap f H:call EasyMotion#WB(0, 0)<CR>
         let g:EasyMotion_do_mapping = 0 " Disable default mappings
+        let g:EasyMotion_keys = 'asdghklqwertyuiopzxcvbnmfj'
         " map forward and backword easymotion to f
-        nmap f <Plug>(easymotion-overwin-f)
+        nnoremap f H:call EasyMotion#WB(0, 0)<CR>
+        " nmap f <Plug>(easymotion-overwin-f)
         nmap F <Plug>(easymotion-sl)
         map <Leader>j <Plug>(easymotion-j)
         map <Leader>k <Plug>(easymotion-k)

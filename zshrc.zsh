@@ -9,6 +9,8 @@
 # ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.zshrc
 
 # TODO: statusline, select jumpmarks, magic enter, cd ..,
+# color scheme env vars
+
 # iterm2 drag files to cmd
 # autocompletion
 
@@ -64,9 +66,9 @@
 # {
 
     ZSH=$HOME/.oh-my-zsh
-    ZSH_THEME="bay"
+    # ZSH_THEME="bay"
     # ZSH_THEME="random"
-    # ZSH_THEME="pure"
+    ZSH_THEME="pure"
     CASE_SENSITIVE="false"
     COMPLETION_WAITING_DOTS="false"
 
@@ -200,6 +202,7 @@
     alias zfg="./bin/instance fg;stty sane"
     alias zfb="./bin/buildout -v"
     alias mvim='/usr/local/Cellar/macvim/7.4-76/bin/mvim'
+    alias vim='/usr/local/bin/vim'
     alias tvim="mvim --remote-tab-silent"
     alias doch='su -c "$(history -p !-1)"'
     alias wtf='printf "¯\_(ツ)_/¯"'
