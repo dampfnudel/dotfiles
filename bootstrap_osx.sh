@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# custom {
+    # Screenshot directory
+    mkdir -p ~/Pictures/Screenshots
+    defaults write com.apple.screencapture location ~/Pictures/Screenshots
+# }
+
 
 # Disable the sound effects on boot
 sudo nvram SystemAudioVolume=" "
