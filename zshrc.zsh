@@ -13,6 +13,7 @@
 
 # iterm2 drag files to cmd
 # autocompletion
+# cd .. && ls; cd d && ls
 
 
 # zsh configs
@@ -94,13 +95,12 @@
     # @mbp {
         export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/mbayer/bin:$PATH"
     # }
-
     export TERM=xterm-256color
 
     if [[ -n $SSH_CONNECTION ]]; then
       export EDITOR='vim'
     else
-      export EDITOR='/usr/local/Cellar/macvim/7.4-76/bin/mvim'
+      export EDITOR='/usr/local/Cellar/macvim/7.4-99/bin/mvim'
       export EDITOR_TAB=${EDITOR}' --remote-tab-silent'
     fi
 
@@ -201,7 +201,7 @@
     alias df='df -h'
     alias zfg="./bin/instance fg;stty sane"
     alias zfb="./bin/buildout -v"
-    alias mvim='/usr/local/Cellar/macvim/7.4-76/bin/mvim'
+    alias mvim='/usr/local/Cellar/macvim/7.4-99/bin/mvim'
     alias vim='/usr/local/bin/vim'
     alias tvim="mvim --remote-tab-silent"
     alias doch='su -c "$(history -p !-1)"'
