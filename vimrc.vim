@@ -22,18 +22,25 @@
 " servername
 " vim tabs
 " virtual lines?
-" param autocomplete
+" param autocomplete!
 " append new tabs at the end
 " sublime like tmpfiles
 " braces behavior
 " map split functionality
 " carry comments to next line for js
+" { -> }
 " searchlist
 " You can also use g; and g, to move backward and forward in your edit locations.
 " show line numbers of *# occurrences
 " easy motion keybindings
 " markdown preview
+" boilerplate
 " g
+" rezepte
+" emacs
+" - org mode
+" - smart search replace
+" autocomplete md... with dicts
 
 " unite dropbox
 " unite unite gists
@@ -105,6 +112,8 @@
     Plugin 'tpope/vim-surround'
     Plugin 'ctrlpvim/ctrlp.vim'
     Plugin 'junegunn/vim-journal'
+    Plugin 'godlygeek/csapprox'
+    Plugin 'davidhalter/jedi-vim'
 
     " plugin examples
     " {
@@ -249,8 +258,14 @@
         return  (has('win16') || has('win32') || has('win64'))
     endfunction
 
+    silent function! ExportMapping()
+        :redir! > ~/Settings/dotfiles/vim_mappings.txt
+        :silent verbose map
+        :redir END
+    endfunction
+
     " open rc-files
-    :command Vimrc tabedit ~/.vimrc
+    :command Vimrc :tabedit ~/.vimrc<CR>
     :command Zshrc tabedit ~/.zshrc
 
     " source vimrc
@@ -450,9 +465,7 @@
     endif
 
     " encryption-algorithm for files
-    if has("gui_macvim")
-        set cm=blowfish2
-    endif
+    set cm=blowfish2
 
     " maximal amount of tabs
     set tabpagemax=50
@@ -481,16 +494,30 @@
 
     " extensions {
         " do not carry comments over to the next line
-        autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
-        autocmd FileType * setlocal isk-=.
-        autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.md set filetype=markdown
-        autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.tracwiki set filetype=tracwiki
+        autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o |
+                    \ setlocal isk-=.
+
         autocmd Filetype css setlocal ts=2 sts=2 sw=2
         autocmd Filetype html setlocal ts=2 sts=2 sw=2
         autocmd Filetype htmldjango setlocal ts=2 sts=2 sw=2
-        " set colorscheme for filetype
+
         autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.json colorscheme badwolf
-        autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.markdown colorscheme badwolf
+
+        function! SetPlaintextOptions()
+            NeoCompleteEnable
+            colorscheme badwolf
+        endfunction
+
+        autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.md
+                    \ set filetype=markdown |
+                    \ call SetPlaintextOptions()
+        autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.markdown call SetPlaintextOptions()
+        autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.journal
+                    \ setfiletype journal |
+                    \ call SetPlaintextOptions()
+        autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.tracwiki
+                    \ set filetype=tracwiki |
+                    \ call SetPlaintextOptions()
     " }
 " }}}
 
@@ -503,6 +530,9 @@
 
     " no blinking cursor
     set guicursor+=n-v-c:blinkon0
+    let &t_SI = "\<Esc>]50;CursorShape=1\x7"
+    let &t_SR = "\<Esc>]50;CursorShape=2\x7"
+    let &t_EI = "\<Esc>]50;CursorShape=0\x7"
 
     " show line numbers
     set nu
@@ -527,11 +557,11 @@
 
     " disable audio bell
     if has('gui_running')
-        autocmd GUIEnter * set vb t_vb=
+        autocmd! GUIEnter * set vb t_vb=
     endif
     set noerrorbells
     set novisualbell
-    set t_vb=
+    set vb t_vb=
     autocmd GUIENTER,BufNewFile,BufFilePre,BufRead,BufReadPost set vb t_vb=
 
     " nativ indent detection
@@ -567,7 +597,9 @@
             " colorscheme herald
             " colorscheme VIvid
         else
-            colorscheme neonwave
+            " colorscheme neonwave
+            set background=dark
+            colorscheme gruvbox
         endif
     " }
 " }}}
@@ -602,15 +634,20 @@
             let g:airline_theme = 'badwolf'
         endif
 
+        let g:airline#extensions#tagbar#enabled = 1
+
         " total linenr/total lines
         let g:airline_section_z = "%3p%% %{g:airline_symbols.linenr}%#__accent_bold#%4l%#__restore__#/%L:%3v"
     " }
 
     " YouCompleteMe {
-        " disable ycm by default in terminal vim
-        if !has('gui_running')
-            let g:loaded_youcompleteme = 1
-        endif
+        let g:ycm_always_populate_location_list = 1
+        let g:ycm_min_num_of_chars_for_completion = 99
+
+        nnoremap <Leader>yg :YcmCompleter GoTo<CR>
+        nnoremap <Leader>yd :YcmCompleter GoToDeclaration<CR>
+        nnoremap <Leader>yr :YcmCompleter GoToReferences<CR>
+        nnoremap <Leader>yD :YcmCompleter GetDoc<CR>
     " }
 
     " solarized
@@ -860,7 +897,7 @@
         endfunction
 
         function! GitFind()
-            " find files within the files git repository
+            " find files within the git repository
             :cd `git rev-parse --show-toplevel`
             :Unite -start-insert -tab file_rec/async
             :cd -
@@ -886,8 +923,8 @@
         " imap <buffer> <C-k>   <Plug>(unite_select_previous_line)
     " }
 
-    " Matrix {
-        nnoremap <Leader>ss :Matrix<CR>
+    " ScreenSaver {
+        nnoremap <Leader>ss :ScreenSaver largeclock<CR>
     " }
 
     " Syntastic {
@@ -914,6 +951,10 @@
         map <silent><Leader>( <Plug>(expand_region_expand)<S-S>)
         map <silent><Leader>{ <Plug>(expand_region_expand)<S-S>{
         map <silent><Leader>[ <Plug>(expand_region_expand)<S-S>]
+    "}
+
+    " CSApprox {
+        let g:CSApprox_attr_map = { 'bold' : 'bold', 'italic' : '', 'sp' : '' }
     "}
 
 " }}}
