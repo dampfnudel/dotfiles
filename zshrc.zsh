@@ -25,6 +25,8 @@
 # link bin to scripts
 # zshmarks to hashes
 # o j
+# init script
+# prezto fzf_marks
 
 
 # zsh configs
@@ -74,6 +76,35 @@
 
 # }
 
+# antigen {
+    source $HOME/.oh-my-zsh/custom/plugins/antigen/antigen.zsh
+
+    # load the oh-my-zsh's library.
+    antigen use oh-my-zsh
+
+    # bundles from the default repo (robbyrussell's oh-my-zsh).
+    antigen bundle osx
+    antigen bundle brew
+    antigen bundle git
+    antigen bundle python
+    antigen bundle pip
+    antigen bundle docker
+    antigen bundle jsontools
+    antigen bundle urltools
+    antigen bundle web-search
+
+    # additional bundles
+    antigen bundle zsh-users/zsh-syntax-highlighting
+    antigen bundle zsh-users/zsh-autosuggestions
+    antigen bundle zsh-users/zsh-completions
+    antigen bundle zsh-users/zsh-history-substring-search
+
+    antigen bundle jocelynmallon/zshmarks
+
+    # Tell antigen that you're done.
+    antigen apply
+# }
+
 # oh-my-zsh configs
 # {
 
@@ -85,21 +116,22 @@
     COMPLETION_WAITING_DOTS="false"
 
     # plugins {
-        plugins=(osx
-            brew
-            git
-            python
-            pip
-            zsh-syntax-highlighting
-            zsh-substring-search
-            zshmarks
-            pure
-            docker
-            jsontools
-            urltools
-            web-search
-            zsh-completions
-            zsh-history-substring-search)
+        plugins=(impure)
+        # plugins=(osx
+        #     brew
+        #     git
+        #     python
+        #     pip
+        #     zshmarks
+        #     pure
+        #     docker
+        #     jsontools
+        #     urltools
+        #     web-search
+        #     zsh-completions
+        #     zsh-syntax-highlighting
+        #     zsh-history-substring-search
+        #     zsh-substring-search)
 
         # init completion
         autoload -U compinit && compinit
@@ -746,6 +778,10 @@
 # fzf {
     source ~/.oh-my-zsh/custom/plugins/fzf/completion.zsh
     source ~/.oh-my-zsh/custom/plugins/fzf/key-bindings.zsh
+
+    fzf_filter() {
+        vim $(fc -e -|fzf)
+    }
 
     # fzf bms {
         alias fm='. fm'
