@@ -14,6 +14,17 @@
 # iterm2 drag files to cmd
 # autocompletion
 # cd .. && ls; cd d && ls
+# globbing
+# global aliases
+# http://www.wunderline.rocks/
+# hashes
+# fzf bookmarks
+# sampson-chen/sack
+# aafire
+# fix paths with $HOME
+# link bin to scripts
+# zshmarks to hashes
+# o j
 
 
 # zsh configs
@@ -28,7 +39,7 @@
     # colored dirs
     alias dircolors='gdircolors'
     # @mbp {
-        eval `dircolors /Users/mbayer/Settings/colors/monobay.256dark`
+        eval `dircolors /Users/mbayer/Settings/dotfiles/monobay.256dark`
     # }
     # @imb {
         # eval `dircolors utilities/dircolors-monobay/monobay.256dark`
@@ -37,6 +48,7 @@
     # unset mailcheck, spellcheck
     unset MAILCHECK
     unsetopt correct_all
+    setopt correct
 
     # enable dirstack
     # use:
@@ -62,18 +74,44 @@
 
 # }
 
-
 # oh-my-zsh configs
 # {
 
     ZSH=$HOME/.oh-my-zsh
     # ZSH_THEME="bay"
+    ZSH_THEME="impure"
     # ZSH_THEME="random"
-    ZSH_THEME="pure"
     CASE_SENSITIVE="false"
     COMPLETION_WAITING_DOTS="false"
 
-    plugins=(gradle osx brew git git-flow python pip fabric zsh-syntax-highlighting zsh-substring-search zshmarks)
+    # plugins {
+        plugins=(osx
+            brew
+            git
+            python
+            pip
+            zsh-syntax-highlighting
+            zsh-substring-search
+            zshmarks
+            pure
+            docker
+            jsontools
+            urltools
+            web-search
+            zsh-completions
+            zsh-history-substring-search)
+
+        # init completion
+        autoload -U compinit && compinit
+
+        # zshmarks bookmarks folder
+        export BOOKMARKS_FILE=~/.zsh/zshmarks
+
+        # bind UP and DOWN arrow keys to history-substring-search
+        zmodload zsh/terminfo
+        bindkey "$terminfo[kcuu1]" history-substring-search-up
+        bindkey "$terminfo[kcud1]" history-substring-search-down
+    # }
 
 # }
 
@@ -107,7 +145,6 @@
     export HOME=/Users/mbayer
     export LANG=de_DE.UTF-8
     export LC_ALL=de_DE.UTF-8
-
 
     # <Space> before command prevent the command from being pushed to zsh_history
     setopt HIST_IGNORE_SPACE
@@ -167,18 +204,68 @@
     export DOCKER_TLS_VERIFY=1
 # }
 
-# keybindings
-# {
-    bindkey '\e[A' history-beginning-search-backward
-    bindkey '\e[B' history-beginning-search-forward
-# }
-
-# named directories
+# hashes / named directories
 # {
     hash -d dev=~/Workspace
-    hash -d mom=~/Workspace/moment
-    hash -d rg=~/Workspace/regiobot
+    hash -d bay=~/Workspace/bay
+    hash -d fzf_marks=~/Workspace/fzf_marks
+    hash -d gists=~/Workspace/gists
+    hash -d hackedHN=~/Workspace/hackedHN
+    hash -d moment=~/Workspace/moment
+    hash -d jason=~/Workspace/moment/jason
+    hash -d pure=~/Workspace/pure
+    hash -d regiobot=~/Workspace/regiobot
+    hash -d rg=~/Workspace/regiobot/regiobot
+    hash -d intersport=~/Workspace/regiobot/regiobot/intersport
+    hash -d scripts=~/Workspace/scripts
+    hash -d termxplorer=~/Workspace/termxplorer
+    hash -d tx=~/Workspace/termxplorer/docker
     hash -d til=~/Workspace/til
+    hash -d dotfiles=~/Settings/dotfiles
+    hash -d colors=~/Settings/colors
+    hash -d oh-my-zsh=~/.oh-my-zsh
+    hash -d oh-my-zsh-custom=~/.oh-my-zsh/custom
+    hash -d bin=~/bin
+    hash -d desktop=~/Desktop
+    hash -d documents=~/Documents
+    hash -d firma=~/Documents/firma
+    hash -d plan=~/Documents/plan
+    hash -d downloads=~/Downloads
+    hash -d dropbox=~/Dropbox
+    hash -d pictures=~/Pictures
+    hash -d library=~/Library
+    hash -d settings=~/Settings
+    hash -d trash=~/.Trash
+    hash -d intenso32=/Volumes/INGOT32/
+
+    # files
+    hash -d rg_ctrl=~/Workspace/regiobot/regiobot/web/regiobot/static/regiobot/js/regiobot_ctrl.js
+    hash -d zshrc=~/.zshrc
+    hash -d vimrc=~/.vimrc
+    hash -d zsh_cheatsheet=~/Workspace/gists/zsh_cheatsheet/zsh.md
+    hash -d vim_cheatsheet=~/Workspace/gists/vim_cheatsheet/vim.md
+# }
+
+# keybindings / keymappings
+# {
+    # vi mode
+    # bindkey -v
+
+    bindkey -e
+    export WORDCHARS=''                                 # do not jump over whole POSIX path
+    bindkey 'å' accept-and-hold                         # alt a
+    bindkey '^[^[[D' backward-word                      # alt <arrow-left>
+    bindkey '^[^[[C' forward-word                       # alt <arrow-right>
+    bindkey '^[^H' backward-kill-word                   # cmd <del>
+    bindkey '^A' beginning-of-line                      # cmd <arrow-left>
+    bindkey '^E' end-of-line                            # cmd <arrow-right>
+    bindkey '^[^[[B' kill-whole-line                    # cmd <down-arrow>
+    bindkey '^X' delete-char                            # ctrl x
+    bindkey '^W' delete-word                            # ctrl w
+    bindkey -s '^[^[[A' 'cd ..\n'                       # alt <arrow-up>
+    bindkey -s '^L' 'ls -laH\n'                         # ctr l
+    bindkey '^[[A' history-beginning-search-backward    # <arrow-up>
+    bindkey '^[[B' history-beginning-search-forward     # <arrow-down>
 # }
 
 # aliases
@@ -206,7 +293,7 @@
     alias tvim="mvim --remote-tab-silent"
     alias doch='su -c "$(history -p !-1)"'
     alias wtf='printf "¯\_(ツ)_/¯"'
-    alias trash="rm -rf ~/.Trash/."
+    alias empty_trash="rm -rf ~/.Trash/."
     alias printip='ifconfig | grep "inet " | grep -v 127.0.0.1 | cut -d\  -f2'
     alias dirs='dirs -vp'
     alias pony='fortune | ponysay'
@@ -214,6 +301,9 @@
     # find all .git directories and exec "git pull" on the parent.
     alias gprec='find . -name .git -exec sh -c "cd \"{}\"/../ && pwd && git pull" \;'
     alias git_ignore_del='git ls-files --deleted -z | git update-index --assume-unchanged -z --stdin'
+    alias gh='git config --get remote.origin.url'
+    alias wttr='curl http://wttr.in'
+    alias moon='curl http://wttr.in/Moon'
 
     # Directory navigation aliases
     alias ..='cd ..'
@@ -252,8 +342,10 @@
     alias zshrc='mvim --remote-tab-silent /Users/mbayer/Settings/dotfiles/zshrc.zsh'
     alias vimrc='mvim --remote-tab-silent /Users/mbayer/Settings/dotfiles/vimrc.vim'
 
+    alias s='source ~/.zshrc'
+
     # numFiles: number of (non-hidden) files in current directory
-    alias numFiles='echo $(ls -1 | wc -l)'
+    alias num_files='echo $(ls -1 | wc -l)'
 
     alias fix_win="/usr/bin/perl -i -pe's/\r$//'"
 
@@ -268,11 +360,17 @@
     # mac
     alias show_hidden='defaults write com.apple.Finder AppleShowAllFiles YES && killall Finder'
     alias hide_hidden='defaults write com.apple.Finder AppleShowAllFiles NO && killall Finder'
+
+    # tools
+    alias yt3='cd $HOME/Downloads; youtube-dl --verbose --extract-audio --audio-format mp3 '
 # }
 
 # functions
 # {
 
+    bookmarks_to_hashes () {
+        cat zshmarks | awk '(FS = "|") && (NF) { gsub(/\$HOME/, "~", $1); print "hash -d " $2 "=" $1 }'
+    }
     # regiobot
     # {
         # init regiobot docker
@@ -287,6 +385,12 @@
         rg_shell () {
             eval "$(docker-machine env regiobot)"
             docker exec -it $(docker ps | awk '{ if ($2 == "regiobot_django") print $1 }') /bin/bash
+        }
+    # }
+
+    # move to trash
+        trash () {
+            mv "$@" $HOME/.Trash/.
         }
     # }
 
@@ -392,6 +496,7 @@
 
     # requires: pip install dict.cc.py
     # lookup dict.cc for german words
+    # TODO use pip
     de () { /Users/mbayer/Utils/dict.cc.py/dict.cc.py de en "$1"; }
     # lookup dict.cc for english words
     en () { /Users/mbayer/Utils/dict.cc.py/dict.cc.py en de "$1"; }
@@ -474,6 +579,7 @@
         ZSH_SPECTRUM_TEXT=${ZSH_SPECTRUM_TEXT:-Arma virumque cano Troiae qui primus ab oris}
 
         # Show all 256 colors with color number
+        # TODO bold
         spectrum_ls () {
           for code in {000..255}; do
             print -P -- "$code: %F{$code}$ZSH_SPECTRUM_TEXT%f"
@@ -527,7 +633,7 @@
 
     # toggle show/hide hidden files in finder
     # {
-        hidden_finder () {
+        toggle_hidden () {
             isVisible=$(defaults read com.apple.finder AppleShowAllFiles)
 
             # toggle visibility based on variables value
@@ -637,75 +743,35 @@
     # }
 # }
 
-# # create a zkbd compatible hash;
-# # to add other keys to this hash, see: man 5 terminfo
-# typeset -A key
-#
-# key[Home]=${terminfo[khome]}
-#
-# key[End]=${terminfo[kend]}
-# key[Insert]=${terminfo[kich1]}
-# key[Delete]=${terminfo[kdch1]}
-# key[Up]=${terminfo[kcuu1]}
-# key[Down]=${terminfo[kcud1]}
-# key[Left]=${terminfo[kcub1]}
-# key[Right]=${terminfo[kcuf1]}
-# key[PageUp]=${terminfo[kpp]}
-# key[PageDown]=${terminfo[knp]}
-#
-# # setup key accordingly
-# [[ -n "${key[Home]}"     ]]  && bindkey  "${key[Home]}"     beginning-of-line
-# [[ -n "${key[End]}"      ]]  && bindkey  "${key[End]}"      end-of-line
-# [[ -n "${key[Insert]}"   ]]  && bindkey  "${key[Insert]}"   overwrite-mode
-# [[ -n "${key[Delete]}"   ]]  && bindkey  "${key[Delete]}"   delete-char
-# [[ -n "${key[Up]}"       ]]  && bindkey  "${key[Up]}"       up-line-or-history
-# [[ -n "${key[Down]}"     ]]  && bindkey  "${key[Down]}"     down-line-or-history
-# [[ -n "${key[Left]}"     ]]  && bindkey  "${key[Left]}"     backward-char
-# [[ -n "${key[Right]}"    ]]  && bindkey  "${key[Right]}"    forward-char
-# [[ -n " ${key[PageUp]}"   ]]  && bindkey  "${key[PageUp]}"   beginning-of-buffer-or-history
-# [[ -n "${key[PageDown]}" ]]  && bindkey  "${key[PageDown]}" end-of-buffer-or-history
-#
-# # Finally, make sure the terminal is in application mode, when zle is
-# # active. Only then are the values from $terminfo valid.
-# if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
-#     function zle-line-init () {
-#         printf '%s' "${terminfo[smkx]}"
-#     }
-#     function zle-line-finish () {
-#         printf '%s' "${terminfo[rmkx]}"
-#     }
-#     zle -N zle-line-init
-#     zle -N zle-line-finish
-# fi
-#
-#
-# cdUndoKey() {
-#   popd      > /dev/null
-#   zle       reset-prompt
-#   echo
-#   ls
-#   echo
-# }
-#
-# cdParentKey() {
-#   pushd .. > /dev/null
-#   zle      reset-prompt
-#   echo
-#   ls
-#   echo
-# }
-#
-# zle -N                 cdParentKey
-# zle -N                 cdUndoKey
-# bindkey '^[[1;3A'      cdParentKey
-# bindkey '^[[1;3D'      cdUndoKey
-
 # fzf {
+    source ~/.oh-my-zsh/custom/plugins/fzf/completion.zsh
+    source ~/.oh-my-zsh/custom/plugins/fzf/key-bindings.zsh
 
-export FZF_DEFAULT_COMMAND='
-    (git ls-files $(git rev-parse --show-toplevel) ||
-        find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
-        sed s/^..//) 2> /dev/null'
+    # fzf bms {
+        alias fm='. fm'
+        FZF_MARKS_DIRMARKS=~/.fzf_dirmarks
+        FZF_MARKS_FILEMARKS=~/.fzf_filemarks
+        FZF_MARKS_TEXT_ACTION=${EDITOR_TAB}
+        FZF_MARKS_FILE_ACTION='open'
+        FZF_MARKS_DIR_ACTION='cd'
+        # alias do_cd='cd $1'
+        # do_cd() {
+        #     cd "$1"
+        # }
+    # }
+
+
+            # ag -g "" --path-to-agignore ~/.agignore'
+    export FZF_DEFAULT_COMMAND='
+        (git ls-files $(git rev-parse --show-toplevel) ||
+            find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
+            sed s/^..//) 2> /dev/null'
+
+    # Feed the output of ag into fzf
+    alias fzf_ag='ag -g "" | fzf'
+
+    # To apply the command to CTRL-T as well
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
     # fzf open
     # fe [FUZZY PATTERN] - Open the selected file with the default editor
@@ -745,19 +811,11 @@ export FZF_DEFAULT_COMMAND='
     # qfc
     # [[ -s "$HOME/.zsh/plugins/qfc/bin/qfc.sh" ]] && source "$HOME/.zsh/plugins/qfc/bin/qfc.sh"
 
-    # fzf
-    source ~/.oh-my-zsh/custom/plugins/fzf/completion.zsh
-    source ~/.oh-my-zsh/custom/plugins/fzf/key-bindings.zsh
-
     # Load zsh-syntax-highlighting.
-    source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+    # source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
     # Load zsh-substring-search
-    source ~/.zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
-    # bind UP and DOWN arrow keys
-    zmodload zsh/terminfo
-    bindkey "$terminfo[kcuu1]" history-substring-search-up
-    bindkey "$terminfo[kcud1]" history-substring-search-down
+    # source ~/.zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
 
     # Load zsh-autosuggestions.
     # source ~/.zsh/plugins/zsh-autosuggestions/autosuggestions.zsh
@@ -768,9 +826,6 @@ export FZF_DEFAULT_COMMAND='
     # }
     # zle -N zle-line-init
 
-    # zshmarks bookmarks folder
-    # export BOOKMARKS_FILE="/Users/mbayer/.oh-my-zsh/custom/plugins/zshmarks/.bookmarks"
-    export BOOKMARKS_FILE=~/.zsh/zshmarks
 # }
 
 # vim: set ft=zsh ts=4 sw=4 expandtab :
