@@ -48,6 +48,12 @@
 " unite locate?
 " unite open in vsplit
 
+" git
+
+" jedi
+
+" UNITE!
+
 " plugins {{{
     " vundle
     " {
@@ -143,6 +149,20 @@
 " }}}
 
 " functions and commands {{{
+
+    " visually select text then press ~ to convert the text to
+    " UPPER CASE, then to lower case, then to Title Case. Keep pressing ~ until you get the case you want
+    function! TwiddleCase(str)
+      if a:str ==# toupper(a:str)
+        let result = tolower(a:str)
+      elseif a:str ==# tolower(a:str)
+        let result = substitute(a:str,'\(\<\w\+\>\)', '\u\1', 'g')
+      else
+        let result = toupper(a:str)
+      endif
+      return result
+    endfunction
+    vnoremap ~ y:call setreg('', TwiddleCase(@"), getregtype(''))<CR>gv""Pgv
 
     " move current tab into the specified direction.
     " @param direction -1 for left, 1 for right.
@@ -269,7 +289,7 @@
     :command Zshrc tabedit ~/.zshrc
 
     " source vimrc
-    :command Svimrc source $MYVIMRC
+    :command S source $MYVIMRC
 
     " close all location lists
     :command CLl windo if &buftype == "quickfix" || &buftype == "locationlist" | lclose | endif
@@ -501,7 +521,7 @@
         autocmd Filetype html setlocal ts=2 sts=2 sw=2
         autocmd Filetype htmldjango setlocal ts=2 sts=2 sw=2
 
-        autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.json colorscheme badwolf
+        " autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.json colorscheme badwolf
 
         function! SetPlaintextOptions()
             NeoCompleteEnable
@@ -641,8 +661,9 @@
     " }
 
     " YouCompleteMe {
-        let g:ycm_always_populate_location_list = 1
-        let g:ycm_min_num_of_chars_for_completion = 99
+        " let g:ycm_always_populate_location_list = 1
+        " let g:ycm_min_num_of_chars_for_completion = 99
+        let g:ycm_python_binary_path = '/Users/mbayer/Workspace/Envs/python2.7.5/bin/python'
 
         nnoremap <Leader>yg :YcmCompleter GoTo<CR>
         nnoremap <Leader>yd :YcmCompleter GoToDeclaration<CR>
@@ -858,6 +879,7 @@
     " }
 
     " Unite {
+        let g:unite_prompt='» '
         " yank history
         let g:unite_source_history_yank_enable = 1
         let g:unite_source_history_yank_file = resolve(expand('~/.vim/unite_yank_history.txt'))
@@ -891,6 +913,7 @@
 
         function! GitGrep()
             " grep the git repository the current file belongs to
+            " -path?
             :cd `git rev-parse --show-toplevel`
             :Unite -start-insert -tab grep:.
             :cd -
@@ -898,8 +921,9 @@
 
         function! GitFind()
             " find files within the git repository
+            " -path?
             :cd `git rev-parse --show-toplevel`
-            :Unite -start-insert -tab file_rec/async
+            :Unite -start-insert -tab file_rec/async -force-redraw
             :cd -
         endfunction
 
