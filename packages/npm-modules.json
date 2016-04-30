@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "bower": {
+      "version": "1.5.2",
+      "from": "bower@*",
+      "resolved": "https://registry.npmjs.org/bower/-/bower-1.5.2.tgz"
+    },
+    "how2": {
+      "version": "1.0.4",
+      "from": "how2@*",
+      "resolved": "https://registry.npmjs.org/how2/-/how2-1.0.4.tgz"
+    },
+    "jshint": {
+      "version": "2.8.0",
+      "from": "jshint@*",
+      "resolved": "https://registry.npmjs.org/jshint/-/jshint-2.8.0.tgz"
+    },
+    "npm": {
+      "version": "2.7.4"
+    }
+  }
+}
