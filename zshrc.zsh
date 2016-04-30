@@ -41,7 +41,7 @@
     # colored dirs
     alias dircolors='gdircolors'
     # @mbp {
-        eval `dircolors /Users/mbayer/Settings/dotfiles/monobay.256dark`
+        eval `dircolors $HOME/Settings/dotfiles/monobay.256dark`
     # }
     # @imb {
         # eval `dircolors utilities/dircolors-monobay/monobay.256dark`
@@ -163,7 +163,7 @@
     source $ZSH/oh-my-zsh.sh
 
     # @mbp {
-        export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/mbayer/bin:$PATH"
+        export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/bin:$PATH"
     # }
     export TERM=xterm-256color
 
@@ -206,13 +206,13 @@
         source /usr/local/bin/virtualenvwrapper.sh
 
         # fix the new tab = virtual_env dir bug
-        if [[ "$PWD" == "/Users/mbayer/Workspace/Envs" ]]; then
+        if [[ "$PWD" == "$HOME/Workspace/Envs" ]]; then
             cd - > /dev/null
         fi
         # set default virtual_env
         if [[ $(basename "$VIRTUAL_ENV") == "" ]]
         then
-            local virtualenv_default_path="/Users/mbayer/Workspace/Envs/python2.7.5/bin/activate"
+            local virtualenv_default_path="$HOME/Workspace/Envs/python2.7.5/bin/activate"
             if [[ -f "$virtualenv_default_path" ]]; then
                 source "$virtualenv_default_path"
             fi
@@ -232,7 +232,7 @@
 # {
     $(boot2docker shellinit 2> /dev/null)
     export DOCKER_HOST=tcp://192.168.59.103:2376
-    export DOCKER_CERT_PATH=/Users/mbayer/.boot2docker/certs/boot2docker-vm
+    export DOCKER_CERT_PATH=$HOME/.boot2docker/certs/boot2docker-vm
     export DOCKER_TLS_VERIFY=1
 # }
 
@@ -349,30 +349,30 @@
 
     # Services
     # @mbp {
-        alias etb='cd /Users/mbayer/Workspace/eventicker/eventicker-rdbms && ./bin/buildout -c develop.cfg && cd -'
-        alias etp='/Users/mbayer/Workspace/eventicker/eventicker-postgres/bin/supervisord && cd -'
-        alias etd='/Users/mbayer/Workspace/eventicker/eventicker-rdbms/bin/start_django && cd -'
-        alias ete='/Users/mbayer/Workspace/eventicker/elasticsearch-1.0.0/bin/elasticsearch && cd -'
-        alias etf='/Users/mbayer/Workspace/etfetcher/bin/celery -A etfetcher.worker.tasks worker -P eventlet --loglevel=warning -c 1 --hostname=markus.bayer@inquant.de && cd -'
-        alias etff='/Users/mbayer/Workspace/etfetcher/bin/flask_server && cd -'
-        alias etfwp='/Users/mbayer/Workspace/etfetcher/bin/worker_fetch_events_place && cd -'
-        alias dlt='/Users/mbayer/Workspace/doclistgenerator/buildout/bin/start_trac; tty sane'
+        alias etb='cd $HOME/Workspace/eventicker/eventicker-rdbms && ./bin/buildout -c develop.cfg && cd -'
+        alias etp='$HOME/Workspace/eventicker/eventicker-postgres/bin/supervisord && cd -'
+        alias etd='$HOME/Workspace/eventicker/eventicker-rdbms/bin/start_django && cd -'
+        alias ete='$HOME/Workspace/eventicker/elasticsearch-1.0.0/bin/elasticsearch && cd -'
+        alias etf='$HOME/Workspace/etfetcher/bin/celery -A etfetcher.worker.tasks worker -P eventlet --loglevel=warning -c 1 --hostname=markus.bayer@inquant.de && cd -'
+        alias etff='$HOME/Workspace/etfetcher/bin/flask_server && cd -'
+        alias etfwp='$HOME/Workspace/etfetcher/bin/worker_fetch_events_place && cd -'
+        alias dlt='$HOME/Workspace/doclistgenerator/buildout/bin/start_trac; tty sane'
     # }
     # @imb {
-        # alias etb='cd /Users/mbayer/Develop/eventicker/eventicker-rdbms && ./bin/buildout -c develop.cfg && cd -'
-        # alias etp='/Users/mbayer/Develop/eventicker/eventicker-postgres/bin/supervisord && cd -'
-        # alias etd='/Users/mbayer/Develop/eventicker/eventicker-rdbms/bin/start_django && cd -'
-        # alias ete='/Users/mbayer/Develop/elasticsearch-1.0.0/bin/elasticsearch && cd -'
-        # alias etf='/Users/mbayer/Develop/etfetcher/bin/celery -A etfetcher.worker.tasks worker -P eventlet --loglevel=warning -c 1 --hostname=markus.bayer@inquant.de && cd -'
-        # alias etff='/Users/mbayer/Develop/etfetcher/bin/flask_server && cd -'
-        # alias etfwp='/Users/mbayer/Develop/etfetcher/bin/worker_fetch_events_place && cd -'
+        # alias etb='cd $HOME/Develop/eventicker/eventicker-rdbms && ./bin/buildout -c develop.cfg && cd -'
+        # alias etp='$HOME/Develop/eventicker/eventicker-postgres/bin/supervisord && cd -'
+        # alias etd='$HOME/Develop/eventicker/eventicker-rdbms/bin/start_django && cd -'
+        # alias ete='$HOME/Develop/elasticsearch-1.0.0/bin/elasticsearch && cd -'
+        # alias etf='$HOME/Develop/etfetcher/bin/celery -A etfetcher.worker.tasks worker -P eventlet --loglevel=warning -c 1 --hostname=markus.bayer@inquant.de && cd -'
+        # alias etff='$HOME/Develop/etfetcher/bin/flask_server && cd -'
+        # alias etfwp='$HOME/Develop/etfetcher/bin/worker_fetch_events_place && cd -'
         # alias va='cd ~/Develop/termxplorer && vagrant up && cd -'
         # alias vassh='cd ~/Develop/termxplorer && vagrant ssh && cd -'
     # }
 
     # files
-    alias zshrc='mvim --remote-tab-silent /Users/mbayer/Settings/dotfiles/zshrc.zsh'
-    alias vimrc='mvim --remote-tab-silent /Users/mbayer/Settings/dotfiles/vimrc.vim'
+    alias zshrc='mvim --remote-tab-silent $HOME/Settings/dotfiles/zshrc.zsh'
+    alias vimrc='mvim --remote-tab-silent $HOME/Settings/dotfiles/vimrc.vim'
 
     alias s='source ~/.zshrc'
 
@@ -529,9 +529,9 @@
     # requires: pip install dict.cc.py
     # lookup dict.cc for german words
     # TODO use pip
-    de () { /Users/mbayer/Utils/dict.cc.py/dict.cc.py de en "$1"; }
+    de () { $HOME/Utils/dict.cc.py/dict.cc.py de en "$1"; }
     # lookup dict.cc for english words
-    en () { /Users/mbayer/Utils/dict.cc.py/dict.cc.py en de "$1"; }
+    en () { $HOME/Utils/dict.cc.py/dict.cc.py en de "$1"; }
 
     # copy the current working dir to clipboard
     cwd () { pwd | pbcopy }
