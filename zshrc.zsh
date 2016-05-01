@@ -82,7 +82,7 @@
         export TERM=xterm-256color
 
         if [[ -n $SSH_CONNECTION ]]; then
-          export EDITOR='vim'
+          export EDITOR='/usr/local/bin/vim'
         else
           export EDITOR='/usr/local/Cellar/macvim/7.4-99/bin/mvim'
           export EDITOR_TAB=${EDITOR}' --remote-tab-silent'
@@ -277,51 +277,71 @@
     # bindkey "$terminfo[kcud1]" history-substring-search-down
 
     # widgets
-        # tab completion for commands (input from last command)
-        _prev_result () {
-            hstring=$(eval `fc -l -n -1`)
-            set -A hlist ${(@s/
+        # tab completion for the output of the previous command {
+            _prev_result () {
+                hstring=$(eval `fc -l -n -1`)
+                set -A hlist ${(@s/
 /)hstring}
-            compadd - ${hlist}
-        }
+                compadd - ${hlist}
+            }
 
-        zle -C prev-comp menu-complete _prev_result
-        # usage
-        # $ find . -name "settings.py.*"
-        # $ vim <Escape>e<Tab>
-        bindkey '\ee' prev-comp
+            zle -C prev-comp menu-complete _prev_result
+            # usage
+            # $ find . -name "settings.py.*"
+            # $ vim <Escape>e<Tab>
+            bindkey '\ee' prev-comp
+        # }
 
-        # tab completion for commands (input from last command)
-        _git_status_files () {
-            files=$(git status --porcelain | awk '{print $2 }')
-            set -A flist ${(@s/
+        # tab completion for git status files {
+            _git_status_files () {
+                files=$(git status --porcelain | awk '{print $2 }')
+                set -A flist ${(@s/
 /)files}
-            compadd - ${flist}
-        }
+                compadd - ${flist}
+            }
 
-        zle -C git-files menu-complete _git_status_files
-        # usage
-        # $ git add <Escape>g<Tab>
-        bindkey '\eg' git-files
+            zle -C git-files menu-complete _git_status_files
+            # usage
+            # $ git add <Escape>g<Tab>
+            bindkey '\eg' git-files
+        # }
 
-        # magic enter = ls && git status
-        function do_enter() {
-            if [ -n "$BUFFER" ]; then
-                zle accept-line
-                return 0
-            fi
-            echo
-            ls
-            if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
+        # fzf filter for the output of the previous command {
+            fzf_filter_prev () {
+                selection=$(fc -e - | fzf)
+                if [[ -a $selection ]]
+                then
+                    echo "smart_open $selection"
+                    smart_open $selection
+                fi
+            }
+
+            zle -N fzf_filter_prev
+            # usage
+            # $ ls
+            # $ <Escape>f
+            bindkey -s '\ef' 'fzf_filter_prev\n'
+        # }
+
+        # magic enter = ls && git status {
+            do_enter () {
+                if [ -n "$BUFFER" ]; then
+                    zle accept-line
+                    return 0
+                fi
                 echo
-                echo -e "\e[0;33m--- git status ---\e[0m"
-                git status -sb
-            fi
-            zle reset-prompt
-            return 0
-        }
-        zle -N do_enter
-        bindkey '^m' do_enter
+                ls
+                if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
+                    echo
+                    echo -e "\e[0;33m--- git status ---\e[0m"
+                    git status -sb
+                fi
+                zle reset-prompt
+                return 0
+            }
+            zle -N do_enter
+            bindkey '^m' do_enter
+        # }
     # }
 
     bindkey -e
@@ -361,9 +381,10 @@
     alias yt3='cd $HOME/Downloads; youtube-dl --verbose --extract-audio --audio-format mp3 '
 
         # vim {
-            alias mvim='/usr/local/Cellar/macvim/7.4-99/bin/mvim'
-            alias vim='/usr/local/bin/vim'
-            alias tvim="mvim --remote-tab-silent"
+            alias mvim=${EDITOR}
+            alias cvim='/usr/local/bin/vim'
+            alias tvim=${EDITOR_TAB}
+            alias vim=${EDITOR_TAB}
         # }
 
         # git {
@@ -476,10 +497,6 @@
         findword () { /usr/bin/grep ^"$@"$ /usr/share/dict/words ; }
 
         # fzf {
-            fzf_filter() {
-                vim $(fc -e -|fzf)
-            }
-
             # fzf open
             # fe [FUZZY PATTERN] - Open the selected file with the default editor
             #   - Bypass fuzzy finder if there's only one match (--select-1)
@@ -515,6 +532,14 @@
     # }}}
 
     # vim {{{
+        smart_open () {
+            if [[ $(file "$1" | awk '{print $NF}') == 'text' ]]; then
+                eval ${EDITOR_TAB} "$1"
+            else
+                open "$1"
+            fi
+        }
+
         # open files from asgard
         asgard_open () {
             mvim -c "echo :set buftype: \" \"" --remote-tab-silent scp://asgard//"$@"
@@ -644,9 +669,9 @@
 
         # osx {
             # say
-            function lol() { say -v Hysterical 'hahahahahahaha oh really?' }
+            lol () { say -v Hysterical 'hahahahahahaha oh really?' }
 
-            function sing_song() {
+            sing_song () {
                 songs=(
                     "say -v Pipe Organ Dum dum dee dum dum dum dum dee Dum dum dee dum dum dum dum dee dum dee dum dum dum de dum dum dum dee dum dee dum dum dee dummmmmmmmmmmmmmmmm" \
                     "say -v Cellos di di di di di di di di di di di di di di di di di di di di di di di di di di" \
@@ -724,7 +749,7 @@
             }
 
             # open a url
-            function op () {
+            op () {
                 typeset -A mapping
                 mapping=(
                     google https://www.google.de/
@@ -772,13 +797,13 @@
 
         # fun {
             # nyan cat
-            function nyan () { telnet nyancat.dakko.us }
+            nyan () { telnet nyancat.dakko.us }
 
             # starwars
-            function starwars () { telnet towel.blinkenlights.nl }
+            starwars () { telnet towel.blinkenlights.nl }
 
             # mandelbrot
-            function mandelbrot () {
+            mandelbrot () {
                local lines columns colour a b p q i pnew
                ((columns=COLUMNS-1, lines=LINES-1, colour=0))
                for ((b=-1.5; b<=1.5; b+=3.0/lines)) do
