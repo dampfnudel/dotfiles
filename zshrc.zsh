@@ -22,12 +22,18 @@
     # fzf bookmarks
     # sampson-chen/sack
     # aafire
-    # fix paths with $HOME
+    # substitutions
+        # home
+        # projects
+        # editor
+        # oh-my-zsh
+        # dotfiles
     # link bin to scripts
     # zshmarks to hashes
     # o j
     # init script
-    # prezto fzf_marks
+        # fzf keybindings, completions
+    # antigen fzf_marks, impure
 # }}}
 
 # zsh configs {{{
@@ -87,39 +93,38 @@
         export LC_ALL=de_DE.UTF-8
     # }
 
-    # colored dirs
+    # gnu dircolors
     alias dircolors='gdircolors'
     eval `dircolors /Users/mbayer/Settings/dotfiles/monobay.256dark`
-
 # }}}
 
 # antigen {{{
-    source $HOME/.oh-my-zsh/custom/plugins/antigen/antigen.zsh
-
-    # load the oh-my-zsh's library.
-    antigen use oh-my-zsh
-
-    # bundles from the default repo (robbyrussell's oh-my-zsh).
-    antigen bundle osx
-    antigen bundle brew
-    antigen bundle git
-    antigen bundle python
-    antigen bundle pip
-    antigen bundle docker
-    antigen bundle jsontools
-    antigen bundle urltools
-    antigen bundle web-search
-
-    # additional bundles
-    antigen bundle zsh-users/zsh-syntax-highlighting
-    antigen bundle zsh-users/zsh-autosuggestions
-    antigen bundle zsh-users/zsh-completions
-    antigen bundle zsh-users/zsh-history-substring-search
-
-    antigen bundle jocelynmallon/zshmarks
-
-    # Tell antigen that you're done.
-    antigen apply
+    # source $HOME/.oh-my-zsh/custom/plugins/antigen/antigen.zsh
+    #
+    # # load the oh-my-zsh's library.
+    # antigen use oh-my-zsh
+    #
+    # # bundles from the default repo (robbyrussell's oh-my-zsh).
+    # antigen bundle osx
+    # antigen bundle brew
+    # antigen bundle git
+    # antigen bundle python
+    # antigen bundle pip
+    # antigen bundle docker
+    # antigen bundle jsontools
+    # antigen bundle urltools
+    # antigen bundle web-search
+    #
+    # # additional bundles
+    # antigen bundle zsh-users/zsh-syntax-highlighting
+    # antigen bundle zsh-users/zsh-autosuggestions
+    # antigen bundle zsh-users/zsh-completions
+    # antigen bundle zsh-users/zsh-history-substring-search
+    #
+    # antigen bundle jocelynmallon/zshmarks
+    #
+    # # Tell antigen that you're done.
+    # antigen apply
 # }}}
 
 # oh-my-zsh configs {{{
@@ -132,11 +137,25 @@
     CASE_SENSITIVE="false"
     COMPLETION_WAITING_DOTS="false"
 
-    plugins=(impure)
+    plugins=(
+        osx
+        brew
+        git
+        python
+        pip
+        zshmarks
+        pure
+        docker
+        jsontools
+        urltools
+        web-search
+        zsh-completions
+        zsh-syntax-highlighting
+        zsh-history-substring-search
+        impure)
 
     source $ZSH/oh-my-zsh.sh
 # }}}
-
 
 # python {{{
     path=(
@@ -244,9 +263,8 @@
 
 # aliases {{{
     # list {
-        alias j='jump'
         alias ls='gls --color=auto'
-        alias ll="ls -lah"
+        alias ll='ls -lah'
         alias lss='ls -lahS'                # sort by size
         alias lt='ls -latr'                 # sort by date
         # numFiles: number of (non-hidden) files in current directory
@@ -257,15 +275,16 @@
     alias ag='ag --path-to-agignore ~/.agignore'
     alias grep='grep --color'
     alias df='df -h'
+    alias j='jump'
     alias pony='fortune | ponysay'
     alias wttr='curl http://wttr.in'
     alias moon='curl http://wttr.in/Moon'
     alias yt3='cd $HOME/Downloads; youtube-dl --verbose --extract-audio --audio-format mp3 '
 
         # vim {
-        alias mvim='/usr/local/Cellar/macvim/7.4-99/bin/mvim'
-        alias vim='/usr/local/bin/vim'
-        alias tvim="mvim --remote-tab-silent"
+            alias mvim='/usr/local/Cellar/macvim/7.4-99/bin/mvim'
+            alias vim='/usr/local/bin/vim'
+            alias tvim="mvim --remote-tab-silent"
         # }
 
         # git {
@@ -354,6 +373,11 @@
             cd -  >/dev/null 2>&1
         }
     # }
+
+    # pull all repositories under $pwd
+    git_pull_rec () {
+        find . -type d -depth 1 -exec git --git-dir={}/.git --work-tree=$PWD/{} pull origin master \;
+    }
 
     # show the git log as json
     git_log_json () {
