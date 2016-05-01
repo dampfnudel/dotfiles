@@ -277,6 +277,13 @@
     # bindkey "$terminfo[kcud1]" history-substring-search-down
 
     # widgets
+    # _last_command_args() {
+    #     last_command=$history[$[HISTCMD-1]]
+    #     last_command_array=("${(s/ /)last_command}") 
+    #     _sep_parts last_command_array
+    # }
+    # zstyle ':completion:*' completer _last_command_args _complete
+
         # tab completion for the output of the previous command {
             _prev_result () {
                 hstring=$(eval `fc -l -n -1`)
@@ -311,7 +318,6 @@
                 selection=$(fc -e - | fzf)
                 if [[ -a $selection ]]
                 then
-                    echo "smart_open $selection"
                     smart_open $selection
                 fi
             }
@@ -533,10 +539,43 @@
 
     # vim {{{
         smart_open () {
-            if [[ $(file "$1" | awk '{print $NF}') == 'text' ]]; then
-                eval ${EDITOR_TAB} "$1"
+            # escape spaces
+            filename=${(q)1}
+
+            cmd=""
+            cmd_dir="cd $filename"
+            cmd_text="${EDITOR_TAB} $filename"
+            cmd_arbitrary="open $filename"
+
+            # if directory
+            if [[ -d "$filename" ]]; then
+                cmd=$cmd_dir
             else
-                open "$1"
+                # $1 == file
+
+                # special case handling
+                file_extension="${filename##*.}"
+                file_exceptions=(csv)
+                for i in "${file_exceptions[@]}"
+                do
+                    if [[ "$i" == $file_extension ]]; then
+                        cmd=$cmd_arbitrary
+                    fi
+                done
+
+                # if meta information is text
+                if [[ $(file "$filename" | awk '{print $NF}') == 'text' ]]; then
+                    cmd=$cmd_text
+                else
+                    # fallback
+                    cmd=$cmd_arbitrary
+                fi
+            fi
+
+            if [[ $cmd != '' ]]; then
+                echo ${cmd} && eval ${cmd}
+            else
+                echo "nothing to do here"
             fi
         }
 
@@ -780,7 +819,6 @@
             ZSH_SPECTRUM_TEXT=${ZSH_SPECTRUM_TEXT:-Arma virumque cano Troiae qui primus ab oris}
 
             # Show all 256 colors with color number
-            # TODO bold
             spectrum_ls () {
               for code in {000..255}; do
                 print -P -- "$code: %F{$code}$ZSH_SPECTRUM_TEXT%f"
@@ -793,6 +831,8 @@
                 print -P -- "$BG[$code]$code: $ZSH_SPECTRUM_TEXT %{$reset_color%}"
               done
             }
+
+            # TODO bold
         # }
 
         # fun {
