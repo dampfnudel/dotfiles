@@ -276,21 +276,35 @@
     # bindkey "$terminfo[kcuu1]" history-substring-search-up
     # bindkey "$terminfo[kcud1]" history-substring-search-down
 
-    # tab completion for commands (input from last command)
-    _prev-result () {
-        hstring=$(eval `fc -l -n -1`)
-        set -A hlist ${(@s/
+    # widgets
+        # tab completion for commands (input from last command)
+        _prev_result () {
+            hstring=$(eval `fc -l -n -1`)
+            set -A hlist ${(@s/
 /)hstring}
-        compadd - ${hlist}
-    }
+            compadd - ${hlist}
+        }
 
-        zle -C prev-comp menu-complete _prev-result
-        # use with <esc>e:
-        # find . -name "settings.py.*"
-        # vim <Esc>e<Tab>
+        zle -C prev-comp menu-complete _prev_result
+        # usage
+        # $ find . -name "settings.py.*"
+        # $ vim <Escape>e<Tab>
         bindkey '\ee' prev-comp
 
-    # magic enter = ls && git status {
+        # tab completion for commands (input from last command)
+        _git_status_files () {
+            files=$(git status --porcelain | awk '{print $2 }')
+            set -A flist ${(@s/
+/)files}
+            compadd - ${flist}
+        }
+
+        zle -C git-files menu-complete _git_status_files
+        # usage
+        # $ git add <Escape>g<Tab>
+        bindkey '\eg' git-files
+
+        # magic enter = ls && git status
         function do_enter() {
             if [ -n "$BUFFER" ]; then
                 zle accept-line
@@ -521,23 +535,14 @@
     # }}}
 
     # git {{{
-        # git status file list
-        git_status_files () {
-            git status --porcelain | awk '{print $2 }'
-        }
-        # pull all repositories under $pwd
-        # git_pull_rec () {
-        #     /usr/bin/find . -type d -depth 1 -exec git --git-dir={}/.git --work-tree=$PWD/{} pull origin master \;
-        # }
-
-        # show the git log as json
-        git_log_json () {
-            git log --pretty=format:'{%n  "commit": "%H",%n  "abbreviated_commit": "%h",%n  "tree": "%T",%n  "abbreviated_tree": "%t",%n  "parent": "%P",%n  "abbreviated_parent": "%p",%n  "refs": "%D",%n  "encoding": "%e",%n  "subject": "%s",%n  "sanitized_subject_line": "%f",%n  "body": "%b",%n  "commit_notes": "%N",%n  "verification_flag": "%G?",%n  "signer": "%GS",%n  "signer_key": "%GK",%n  "author": {%n    "name": "%aN",%n    "email": "%aE",%n    "date": "%aD"%n  },%n  "commiter": {%n    "name": "%cN",%n    "email": "%cE",%n    "date": "%cD"%n  }%n},'
-        }
-
         # cd to git root
         cdg () {
             cd `git rev-parse --show-toplevel`
+        }
+
+        # git status file list
+        git_status_files () {
+            git status --porcelain | awk '{print $2 }'
         }
 
         # list git tree
@@ -545,9 +550,20 @@
             (git ls-tree -r --name-only HEAD || /usr/bin/find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//) 2> /dev/null
         }
 
+
+        # pull all repositories under $pwd
+        # git_pull_rec () {
+        #     /usr/bin/find . -type d -depth 1 -exec git --git-dir={}/.git --work-tree=$PWD/{} pull origin master \;
+        # }
+
         # git push -u origin {BRANCH_NAME}
         git_push_branch () {
             git push -u origin "$(git branch --no-color | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')"
+        }
+
+        # show the git log as json
+        git_log_json () {
+            git log --pretty=format:'{%n  "commit": "%H",%n  "abbreviated_commit": "%h",%n  "tree": "%T",%n  "abbreviated_tree": "%t",%n  "parent": "%P",%n  "abbreviated_parent": "%p",%n  "refs": "%D",%n  "encoding": "%e",%n  "subject": "%s",%n  "sanitized_subject_line": "%f",%n  "body": "%b",%n  "commit_notes": "%N",%n  "verification_flag": "%G?",%n  "signer": "%GS",%n  "signer_key": "%GK",%n  "author": {%n    "name": "%aN",%n    "email": "%aE",%n    "date": "%aD"%n  },%n  "commiter": {%n    "name": "%cN",%n    "email": "%cE",%n    "date": "%cD"%n  }%n},'
         }
     # }}}
 
