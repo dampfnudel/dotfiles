@@ -157,6 +157,38 @@
     source $ZSH/oh-my-zsh.sh
 # }}}
 
+# plugins-settings {{{
+    # fortune ponies {
+        fortune | ponysay
+    # }
+
+    # fzf {
+        source ~/.oh-my-zsh/custom/plugins/fzf/completion.zsh
+        source ~/.oh-my-zsh/custom/plugins/fzf/key-bindings.zsh
+
+                # ag -g "" --path-to-agignore ~/.agignore'
+        export FZF_DEFAULT_COMMAND='
+            (git ls-files $(git rev-parse --show-toplevel) ||
+                /user/bin/find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
+                sed s/^..//) 2> /dev/null'
+
+        # Feed the output of ag into fzf
+        alias fzf_ag='ag -g "" | fzf'
+
+        # To apply the command to CTRL-T as well
+        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+        # fzf bms {
+            alias fm='. fm'
+            FZF_MARKS_DIRMARKS=~/.fzf_dirmarks
+            FZF_MARKS_FILEMARKS=~/.fzf_filemarks
+            FZF_MARKS_TEXT_ACTION=${EDITOR_TAB}
+            FZF_MARKS_FILE_ACTION='open'
+            FZF_MARKS_DIR_ACTION='cd'
+        # }
+    # }
+# }}}
+
 # python {{{
     path=(
         $path
@@ -244,6 +276,40 @@
     # bindkey "$terminfo[kcuu1]" history-substring-search-up
     # bindkey "$terminfo[kcud1]" history-substring-search-down
 
+    # tab completion for commands (input from last command)
+    _prev-result () {
+        hstring=$(eval `fc -l -n -1`)
+        set -A hlist ${(@s/
+/)hstring}
+        compadd - ${hlist}
+    }
+
+        zle -C prev-comp menu-complete _prev-result
+        # use with <esc>e:
+        # find . -name "settings.py.*"
+        # vim <Esc>e<Tab>
+        bindkey '\ee' prev-comp
+
+    # magic enter = ls && git status {
+        function do_enter() {
+            if [ -n "$BUFFER" ]; then
+                zle accept-line
+                return 0
+            fi
+            echo
+            ls
+            if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
+                echo
+                echo -e "\e[0;33m--- git status ---\e[0m"
+                git status -sb
+            fi
+            zle reset-prompt
+            return 0
+        }
+        zle -N do_enter
+        bindkey '^m' do_enter
+    # }
+
     bindkey -e
     export WORDCHARS=''                                 # do not jump over whole POSIX path
     bindkey 'å' accept-and-hold                         # alt a
@@ -265,17 +331,16 @@
     # list {
         alias ls='gls --color=auto'
         alias ll='ls -lah'
-        alias lss='ls -lahS'                # sort by size
-        alias lt='ls -latr'                 # sort by date
+        alias ls_size='ls -lahS'                # sort by size
+        alias ls_date='ls -latr'                 # sort by date
         # numFiles: number of (non-hidden) files in current directory
-        alias num_files='echo $(ls -1 | wc -l)'
+        alias ls_count='echo $(ls -1 | wc -l)'
     # }
 
     # tools {
     alias ag='ag --path-to-agignore ~/.agignore'
     alias grep='grep --color'
     alias df='df -h'
-    alias j='jump'
     alias pony='fortune | ponysay'
     alias wttr='curl http://wttr.in'
     alias moon='curl http://wttr.in/Moon'
@@ -289,24 +354,24 @@
 
         # git {
             # find all .git directories and exec "git pull" on the parent.
-            alias gprec='find . -name .git -exec sh -c "cd \"{}\"/../ && pwd && git pull" \;'
+            alias git_pull_rec='find . -name .git -exec sh -c "cd \"{}\"/../ && pwd && git pull" \;'
             alias git_ignore_del='git ls-files --deleted -z | git update-index --assume-unchanged -z --stdin'
-            alias gh='git config --get remote.origin.url'
+            alias g_remote_url='git config --get remote.origin.url'
         # }
     # }
 
     # actions {
         alias s='source ~/.zshrc'
-        alias doch='su -c "$(history -p !-1)"'
+        alias i_am_root='su -c "$(history -p !-1)"'
         alias printip='ifconfig | grep "inet " | grep -v 127.0.0.1 | cut -d\  -f2'
         alias dirs='dirs -vp'
         # substitute windows linebreak with unix linebreak
-        alias fix_win="/usr/bin/perl -i -pe's/\r$//'"
+        alias fix_linebreaks="/usr/bin/perl -i -pe's/\r$//'"
 
         # osx {
-            alias show_hidden='defaults write com.apple.Finder AppleShowAllFiles YES && killall Finder'
-            alias hide_hidden='defaults write com.apple.Finder AppleShowAllFiles NO && killall Finder'
-            alias empty_trash="rm -rf ~/.Trash/."
+            alias osx_show_hidden='defaults write com.apple.Finder AppleShowAllFiles YES && killall Finder'
+            alias osx_hide_hidden='defaults write com.apple.Finder AppleShowAllFiles NO && killall Finder'
+            alias osx_empty_trash="rm -rf ~/.Trash/."
         # }
 
         # cleanup {
@@ -335,34 +400,181 @@
 # }}}
 
 # functions {{{
-    bookmarks_to_hashes () {
-        cat zshmarks | awk '(FS = "|") && (NF) { gsub(/\$HOME/, "~", $1); print "hash -d " $2 "=" $1 }'
-    }
-    # regiobot {
-        # init regiobot docker
-        rg_init () {
-            cd ~/Workspace/regiobot/regiobot/
-            docker-machine stop regiobot
-            docker-machine start regiobot
-            eval "$(docker-machine env regiobot)"
-            make up
+    # list {{{
+        # count files
+        count () {
+            for dir in $( /usr/bin/find . -type d -print );
+            do
+                files=$( /usr/bin/find $dir -maxdepth 1 -type f | wc -l )
+                echo "$dir : $files"
+            done
         }
 
-        # open a bash session in the regiobot docker
-        rg_shell () {
-            eval "$(docker-machine env regiobot)"
-            docker exec -it $(docker ps | awk '{ if ($2 == "regiobot_django") print $1 }') /bin/bash
-        }
-    # }
+        # showTimes: show the modification, metadata-change, and access times of a file
+        showtimes () { stat -f "%N:   %m %c %a" "$@" ; }
 
-    # move to trash
-        trash () {
-            mv "$@" $HOME/.Trash/.
-        }
-    # }
+        # ff:  to find a file under the current directory
+        ff () { /usr/bin/find . -name "$@" ; }
 
-    # backup the current directory
-    # {
+        # ffs: to find a file whose name starts with a given string
+        ffs () { /usr/bin/find . -name "$@"'*' ; }
+
+        # ffe: to find a file whose name ends with a given string
+        ffe () { /usr/bin/find . -name '*'"$@" ; }
+
+        # fd: find a directory
+        fd () { /usr/bin/find . -type d -name '*'"$@" ; }
+
+        # ffg:  to find a file under the current git directory
+        ffg () { /usr/bin/find `git rev-parse --show-toplevel` -name "$@" ; }
+
+        # ffsg: to find a file whose name starts with a given string within the current git dir
+        ffsg () { /usr/bin/find `git rev-parse --show-toplevel` -name "$@"'*' ; }
+
+        # ffeg: to find a file whose name ends with a given string within the current git dir
+        ffeg () { /usr/bin/find `git rev-parse --show-toplevel` -name '*'"$@" ; }
+
+        # fdg: find a directory within the current git dir
+        fdg () { /usr/bin/find `git rev-parse --show-toplevel` -type d -name '*'"$@" ; }
+
+        # ag within the git dir
+        agg () { /usr/local/bin/ag "$@" `git rev-parse --show-toplevel` ; }
+        gagg () { agg "$@" ; }
+
+        # locatemd: to search for a file using Spotlight's metadata
+        finder () { mdfind "kMDItemDisplayName == '$@'wc"; }
+
+        # finderComment: show the SpotLight comment for a file
+        findercomment () { mdls "$1" | grep kMDItemFinderComment ; }
+
+        # locaterecent: to search for files created since yesterday using Spotlight
+        # this is an illustration of using $time in a query
+        # see: http://developer.apple.com/documentation/Carbon/Conceptual/SpotlightQuery/index.html
+        findrecent () { mdfind 'kMDItemFSCreationDate >= $time.yesterday'; }
+
+        # list_all_apps: list all applications on the system
+        list_all_apps () { mdfind 'kMDItemContentTypeTree == "com.apple.application"c' ; }
+
+        # find_larger: find files larger than a certain size (in bytes)
+        find_larger () { /usr/bin/find . -type f -size +${1}c ; }
+
+        # findword: search for a word in the Unix word list
+        findword () { /usr/bin/grep ^"$@"$ /usr/share/dict/words ; }
+
+        # fzf {
+            fzf_filter() {
+                vim $(fc -e -|fzf)
+            }
+
+            # fzf open
+            # fe [FUZZY PATTERN] - Open the selected file with the default editor
+            #   - Bypass fuzzy finder if there's only one match (--select-1)
+            #   - Exit if there's no match (--exit-0)
+            # you can press
+            #   - CTRL-O to open with `open` command,
+            #   - CTRL-E or Enter key to open with the $EDITOR
+            fo () {
+              local out file key
+              out=$(fzf --query="$1" --exit-0 --select-1 --exit-0 --cycle --expect=ctrl-o,ctrl-e)
+              key=$(head -1 <<< "$out")
+              file=$(head -2 <<< "$out" | tail -1)
+              if [ -n "$file" ]; then
+                [ "$key" = ctrl-o ] && open "$file" || eval ${EDITOR_TAB} "$file"
+              fi
+            }
+
+            # fzf cd - cd to selected directory
+            fcd () {
+              local dir
+              dir=$(/usr/bin/find ${1:-*} -path '/*/\.*' -prune \
+                              -o -type d -print 2> /dev/null | fzf +m) &&
+              cd "$dir"
+            }
+
+            fgcd () {
+              local dir
+              dir=$(/usr/bin/find ${1:-*} -path $(echo $HOME)'/*/\.*' -prune \
+                              -o -type d -print 2> /dev/null | fzf +m) &&
+              cd "$dir"
+            }
+        # }
+    # }}}
+
+    # vim {{{
+        # open files from asgard
+        asgard_open () {
+            mvim -c "echo :set buftype: \" \"" --remote-tab-silent scp://asgard//"$@"
+        }
+
+        # start vim with python 2 venv then switch back
+        pvim () {
+            venv="${VIRTUAL_ENV##*/}"
+            if [[ $venv != "" ]]
+            then
+                workon python2.7.5
+                mvim
+                workon $venv
+            else
+                mvim
+            fi
+        }
+    # }}}
+
+    # git {{{
+        # git status file list
+        git_status_files () {
+            git status --porcelain | awk '{print $2 }'
+        }
+        # pull all repositories under $pwd
+        # git_pull_rec () {
+        #     /usr/bin/find . -type d -depth 1 -exec git --git-dir={}/.git --work-tree=$PWD/{} pull origin master \;
+        # }
+
+        # show the git log as json
+        git_log_json () {
+            git log --pretty=format:'{%n  "commit": "%H",%n  "abbreviated_commit": "%h",%n  "tree": "%T",%n  "abbreviated_tree": "%t",%n  "parent": "%P",%n  "abbreviated_parent": "%p",%n  "refs": "%D",%n  "encoding": "%e",%n  "subject": "%s",%n  "sanitized_subject_line": "%f",%n  "body": "%b",%n  "commit_notes": "%N",%n  "verification_flag": "%G?",%n  "signer": "%GS",%n  "signer_key": "%GK",%n  "author": {%n    "name": "%aN",%n    "email": "%aE",%n    "date": "%aD"%n  },%n  "commiter": {%n    "name": "%cN",%n    "email": "%cE",%n    "date": "%cD"%n  }%n},'
+        }
+
+        # cd to git root
+        cdg () {
+            cd `git rev-parse --show-toplevel`
+        }
+
+        # list git tree
+        git_tree () {
+            (git ls-tree -r --name-only HEAD || /usr/bin/find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//) 2> /dev/null
+        }
+
+        # git push -u origin {BRANCH_NAME}
+        git_push_branch () {
+            git push -u origin "$(git branch --no-color | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')"
+        }
+    # }}}
+
+    # docker {{{
+        # regiobot {
+            # init regiobot docker
+            rg_init () {
+                cd ~/Workspace/regiobot/regiobot/
+                docker-machine stop regiobot
+                docker-machine start regiobot
+                eval "$(docker-machine env regiobot)"
+                make up
+            }
+
+            # open a bash session in the regiobot docker
+            rg_shell () {
+                eval "$(docker-machine env regiobot)"
+                docker exec -it $(docker ps | awk '{ if ($2 == "regiobot_django") print $1 }') /bin/bash
+            }
+        # }
+    # }}}
+
+    # actions {{{
+        # move file/dir to trash
+        trash () { mv "$@" $HOME/.Trash/. ; }
+
+        # backup the current directory under ../the-archive.tar.gz
         bu () {
             alias bu='tar -czf "../$(basename $(pwd))_$(date +%d%m%y-%H-%M-%S).tar.gz" .'
             dname=$(basename $(pwd))
@@ -372,427 +584,198 @@
             echo "-> ../$buname"
             cd -  >/dev/null 2>&1
         }
-    # }
 
-    # pull all repositories under $pwd
-    git_pull_rec () {
-        find . -type d -depth 1 -exec git --git-dir={}/.git --work-tree=$PWD/{} pull origin master \;
-    }
-
-    # show the git log as json
-    git_log_json () {
-        git log --pretty=format:'{%n  "commit": "%H",%n  "abbreviated_commit": "%h",%n  "tree": "%T",%n  "abbreviated_tree": "%t",%n  "parent": "%P",%n  "abbreviated_parent": "%p",%n  "refs": "%D",%n  "encoding": "%e",%n  "subject": "%s",%n  "sanitized_subject_line": "%f",%n  "body": "%b",%n  "commit_notes": "%N",%n  "verification_flag": "%G?",%n  "signer": "%GS",%n  "signer_key": "%GK",%n  "author": {%n    "name": "%aN",%n    "email": "%aE",%n    "date": "%aD"%n  },%n  "commiter": {%n    "name": "%cN",%n    "email": "%cE",%n    "date": "%cD"%n  }%n},'
-    }
-    # open files from asgard
-    asgard_open () {
-        mvim -c "echo :set buftype: \" \"" --remote-tab-silent scp://asgard//"$@"
-    }
-
-    # start vim with python 2 venv then switch back
-    pvim () {
-        venv="${VIRTUAL_ENV##*/}"
-        if [[ $venv != "" ]]
-        then
-            workon python2.7.5
-            mvim
-            workon $venv
-        else
-            mvim
-        fi
-    }
-
-    # open a url
-    function op () {
-        typeset -A mapping
-        mapping=(
-            google https://www.google.de/
-            spotify https://play.spotify.com/collection/songs
-        )
-        open $mapping[$@]
-    }
-
-    # showTimes: show the modification, metadata-change, and access times of a file
-    showtimes () { stat -f "%N:   %m %c %a" "$@" ; }
-    # searching
-    # ff:  to find a file under the current directory
-    ff () { /usr/bin/find . -name "$@" ; }
-
-    # ffs: to find a file whose name starts with a given string
-    ffs () { /usr/bin/find . -name "$@"'*' ; }
-
-    # ffe: to find a file whose name ends with a given string
-    ffe () { /usr/bin/find . -name '*'"$@" ; }
-
-    # fd: find a directory
-    fd () { /usr/bin/find . -type d -name '*'"$@" ; }
-
-    # ffg:  to find a file under the current git directory
-    ffg () { /usr/bin/find `git rev-parse --show-toplevel` -name "$@" ; }
-
-    # ffsg: to find a file whose name starts with a given string within the current git dir
-    ffsg () { /usr/bin/find `git rev-parse --show-toplevel` -name "$@"'*' ; }
-
-    # ffeg: to find a file whose name ends with a given string within the current git dir
-    ffeg () { /usr/bin/find `git rev-parse --show-toplevel` -name '*'"$@" ; }
-
-    # fdg: find a directory within the current git dir
-    fdg () { /usr/bin/find `git rev-parse --show-toplevel` -type d -name '*'"$@" ; }
-
-    # ack within the git dir
-    ackg () { /usr/local/bin/ack "$@" `git rev-parse --show-toplevel` ; }
-    gack () { ackg "$@" ; }
-
-    # grepfind: to grep through files found by find, e.g. grepf pattern '*.c'
-    # note that 'grep -r pattern dir_name' is an alternative if want all files
-    grepfind () { find . -type f -name "$2" -print0 | xargs -0 grep "$1" ; }
-
-    # locatemd: to search for a file using Spotlight's metadata
-    finder () { mdfind "kMDItemDisplayName == '$@'wc"; }
-
-    # finderComment: show the SpotLight comment for a file
-    findercomment () { mdls "$1" | grep kMDItemFinderComment ; }
-
-    # locaterecent: to search for files created since yesterday using Spotlight
-    # This is an illustration of using $time in a query
-    # See: http://developer.apple.com/documentation/Carbon/Conceptual/SpotlightQuery/index.html
-    findrecent () { mdfind 'kMDItemFSCreationDate >= $time.yesterday'; }
-
-    # list_all_apps: list all applications on the system
-    list_all_apps () { mdfind 'kMDItemContentTypeTree == "com.apple.application"c' ; }
-
-    # find_larger: find files larger than a certain size (in bytes)
-    find_larger () { find . -type f -size +${1}c ; }
-
-    # findword: search for a word in the Unix word list
-    findword () { /usr/bin/grep ^"$@"$ /usr/share/dict/words ; }
-
-    # requires: pip install dict.cc.py
-    # lookup dict.cc for german words
-    # TODO use pip
-    de () { $HOME/Utils/dict.cc.py/dict.cc.py de en "$1"; }
-    # lookup dict.cc for english words
-    en () { $HOME/Utils/dict.cc.py/dict.cc.py en de "$1"; }
-
-    # copy the current working dir to clipboard
-    cwd () { pwd | pbcopy }
-
-    # serve wd
-    serve () {
-        printip
-        python -m SimpleHTTPServer
-    }
-
-    # eject All Mountable Volumes
-    eject () {
-        osascript -e 'tell application "Finder" to eject (every disk whose ejectable is true)'
-    }
-
-    # Change Working Directory to Finder Path
-    cdf () {
-        cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')"
-    }
-
-    # count files
-    count () {
-        for dir in $( find . -type d -print ); do files=$( find $dir -maxdepth 1 -type f | wc -l ); echo "$dir : $files"; done
-    }
-
-    # calculator
-    = () {
-        calc="${@//p/+}"
-        calc="${calc//x/*}"
-        echo "$(($calc))"
-    }
-
-    # zipf: to create a ZIP archive of a file or folder
-    zipf () { zip -r "$1".zip "$1" ; }
-
-    # extract an archive
-    # {
-        extract () {
-            if [ -f $1 ] ; then
-                case $1 in
-                    *.tar.bz2)  tar xjf $1      ;;
-                    *.tar.gz)   tar xzf $1      ;;
-                    *.bz2)      bunzip2 $1      ;;
-                    *.rar)      rar x $1        ;;
-                    *.gz)       gunzip $1       ;;
-                    *.tar)      tar xf $1       ;;
-                    *.tbz2)     tar xjf $1      ;;
-                    *.tgz)      tar xzf $1      ;;
-                    *.zip)      unzip $1        ;;
-                    *.Z)        uncompress $1   ;;
-                    *)          echo "'$1' cannot be extracted via extract()" ;;
-            esac
-            else
-                echo "'$1' is not a valid file"
-            fi
-        }
-    # }
-
-    # show available color codes
-    # {
-        typeset -Ag FX FG BG
-
-        FX=(
-            reset     "%{[00m%}"
-            bold      "%{[01m%}" no-bold      "%{[22m%}"
-            italic    "%{[03m%}" no-italic    "%{[23m%}"
-            underline "%{[04m%}" no-underline "%{[24m%}"
-            blink     "%{[05m%}" no-blink     "%{[25m%}"
-            reverse   "%{[07m%}" no-reverse   "%{[27m%}"
-        )
-
-        for color in {000..255}; do
-            FG[$color]="%{[38;5;${color}m%}"
-            BG[$color]="%{[48;5;${color}m%}"
-        done
-
-        ZSH_SPECTRUM_TEXT=${ZSH_SPECTRUM_TEXT:-Arma virumque cano Troiae qui primus ab oris}
-
-        # Show all 256 colors with color number
-        # TODO bold
-        spectrum_ls () {
-          for code in {000..255}; do
-            print -P -- "$code: %F{$code}$ZSH_SPECTRUM_TEXT%f"
-          done
+        # convert a given zshmarks bookmarks file to zsh named directories
+        bookmarks_to_hashes () {
+            cat "$@" | awk '(FS = "|") && (NF) { gsub(/\$HOME/, "~", $1); print "hash -d " $2 "=" $1 }'
         }
 
-        # Show all 256 colors where the background is set to specific color
-        spectrum_bls () {
-          for code in {000..255}; do
-            print -P -- "$BG[$code]$code: $ZSH_SPECTRUM_TEXT %{$reset_color%}"
-          done
-        }
-    # }
+        # lookup dict.cc
+        de () { $HOME/Utils/dict.cc.py/dict.cc.py de en "$1"; }
+        # lookup dict.cc for english words
+        en () { $HOME/Utils/dict.cc.py/dict.cc.py en de "$1"; }
 
-    # tab completion for commands (input from last command)
-    # {
-        _prev-result () {
-            hstring=$(eval `fc -l -n -1`)
-            set -A hlist ${(@s/
-/)hstring}
-            compadd - ${hlist}
+        # copy the current working dir to clipboard
+        cwd () { pwd | pbcopy }
+
+        # calculator
+        = () {
+            calc="${@//p/+}"
+            calc="${calc//x/*}"
+            echo "$(($calc))"
         }
 
-        zle -C prev-comp menu-complete _prev-result
-        # use with <esc>e:
-        # find . -name "settings.py.*"
-        # vim <Esc>e<Tab>
-        bindkey '\ee' prev-comp
-    # }
-
-    # cd to git root
-    # {
-        cdg () {
-            cd `git rev-parse --show-toplevel`
-        }
-    # }
-
-    # list git tree
-    # {
-        git_tree () {
-            (git ls-tree -r --name-only HEAD || find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//) 2> /dev/null
-        }
-    # }
-
-    # git push -u origin {BRANCH_NAME}
-    # {
-        git_push_branch () {
-            git push -u origin "$(git branch --no-color | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')"
-        }
-    # }
-
-    # toggle show/hide hidden files in finder
-    # {
-        toggle_hidden () {
-            isVisible=$(defaults read com.apple.finder AppleShowAllFiles)
-
-            # toggle visibility based on variables value
-            if [ ${isVisible} = FALSE ]
-            then
-                defaults write com.apple.finder AppleShowAllFiles TRUE
-            else
-                defaults write com.apple.finder AppleShowAllFiles FALSE
-            fi
-
-            # force changes by restarting Finder
-            killall Finder
-        }
-    # }
-
-    # show clock
-    # {
+        # show clock
         clock () {
             while sleep 1;do tput sc;tput cup 0 $(($(tput cols)-29));date;tput rc;done &
         }
-    # }
 
-    # nyan cat
-    function nyan () { telnet nyancat.dakko.us }
-
-    # starwars
-    function starwars () { telnet towel.blinkenlights.nl }
-
-    # mandelbrot
-    # {
-        function mandelbrot () {
-           local lines columns colour a b p q i pnew
-           ((columns=COLUMNS-1, lines=LINES-1, colour=0))
-           for ((b=-1.5; b<=1.5; b+=3.0/lines)) do
-               for ((a=-2.0; a<=1; a+=3.0/columns)) do
-                   for ((p=0.0, q=0.0, i=0; p*p+q*q < 4 && i < 32; i++)) do
-                       ((pnew=p*p-q*q+a, q=2*p*q+b, p=pnew))
-                   done
-                   ((colour=(i/4)%8))
-                    echo -n "\\e[4${colour}m "
-                done
-                echo
+        # explain tools
+        explain () {
+          if [ "$#" -eq 0 ]; then
+            while read  -p "Command: " cmd; do
+              curl -Gs "https://www.mankier.com/api/explain/?cols="$(tput cols) --data-urlencode "q=$cmd"
             done
-        }
-    # }
-
-    # say
-    # {
-        function lol() { say -v Hysterical 'hahahahahahaha oh really?' }
-
-        function sing_song() {
-            songs=(
-                "say -v Pipe Organ Dum dum dee dum dum dum dum dee Dum dum dee dum dum dum dum dee dum dee dum dum dum de dum dum dum dee dum dee dum dum dee dummmmmmmmmmmmmmmmm" \
-                "say -v Cellos di di di di di di di di di di di di di di di di di di di di di di di di di di" \
-                "say -v Cellos oh This is a ponci song ponci song ponci song this is the ponsiano song ive ever ever heard So why keep you listening listening listening while you are supposed to hack to hack to hack to hack its because i hate bill gates hate bill gates hate bill gates its because i hate bill gates more than anything else No its because windows life windows life windows life and you better get a macintosh and iPod now" \
-                "say -v Good oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooo" \
-                "say -v Bad oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooo")
-            ponysay $songs[$1]
-            eval ${songs[$1]}
-        }
-    # }
-
-    # set alarm clock
-    alarm () {
-        echo "alarm in ""$1""m"
-        sleep "$(($1 * 60))" && sing_song 2
-        # sleep "$(($1 * 60))" && mp3blaster ~/Music/gong.mp3
-    }
-
-    # enter = ls && git status
-    # {
-        function do_enter() {
-            if [ -n "$BUFFER" ]; then
-                zle accept-line
-                return 0
-            fi
-            echo
-            ls
-            if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
-                echo
-                echo -e "\e[0;33m--- git status ---\e[0m"
-                git status -sb
-            fi
-            zle reset-prompt
-            return 0
-        }
-        zle -N do_enter
-        bindkey '^m' do_enter
-    # }
-
-    # explain tools
-    # {
-    explain () {
-      if [ "$#" -eq 0 ]; then
-        while read  -p "Command: " cmd; do
-          curl -Gs "https://www.mankier.com/api/explain/?cols="$(tput cols) --data-urlencode "q=$cmd"
-        done
-        echo "Bye!"
-      elif [ "$#" -eq 1 ]; then
-        curl -Gs "https://www.mankier.com/api/explain/?cols="$(tput cols) --data-urlencode "q=$1"
-      else
-        echo "Usage"
-        echo "explain                  interactive mode."
-        echo "explain 'cmd -o | ...'   one quoted command to explain it."
-      fi
-    }
-    # }
-# }}}
-
-# plugins {{{
-    # fortune ponies {
-        fortune | ponysay
-    # }
-
-    # zshmarks {
-        # zshmarks bookmarks folder
-        export BOOKMARKS_FILE=~/.zsh/zshmarks
-    # }
-
-    # fzf {
-        source ~/.oh-my-zsh/custom/plugins/fzf/completion.zsh
-        source ~/.oh-my-zsh/custom/plugins/fzf/key-bindings.zsh
-
-        fzf_filter() {
-            vim $(fc -e -|fzf)
-        }
-
-        # fzf bms {
-            alias fm='. fm'
-            FZF_MARKS_DIRMARKS=~/.fzf_dirmarks
-            FZF_MARKS_FILEMARKS=~/.fzf_filemarks
-            FZF_MARKS_TEXT_ACTION=${EDITOR_TAB}
-            FZF_MARKS_FILE_ACTION='open'
-            FZF_MARKS_DIR_ACTION='cd'
-            # alias do_cd='cd $1'
-            # do_cd() {
-            #     cd "$1"
-            # }
-        # }
-
-
-                # ag -g "" --path-to-agignore ~/.agignore'
-        export FZF_DEFAULT_COMMAND='
-            (git ls-files $(git rev-parse --show-toplevel) ||
-                find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
-                sed s/^..//) 2> /dev/null'
-
-        # Feed the output of ag into fzf
-        alias fzf_ag='ag -g "" | fzf'
-
-        # To apply the command to CTRL-T as well
-        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-
-        # fzf open
-        # fe [FUZZY PATTERN] - Open the selected file with the default editor
-        #   - Bypass fuzzy finder if there's only one match (--select-1)
-        #   - Exit if there's no match (--exit-0)
-        # you can press
-        #   - CTRL-O to open with `open` command,
-        #   - CTRL-E or Enter key to open with the $EDITOR
-        fo () {
-          local out file key
-          out=$(fzf --query="$1" --exit-0 --select-1 --exit-0 --cycle --expect=ctrl-o,ctrl-e)
-          key=$(head -1 <<< "$out")
-          file=$(head -2 <<< "$out" | tail -1)
-          if [ -n "$file" ]; then
-            [ "$key" = ctrl-o ] && open "$file" || eval ${EDITOR_TAB} "$file"
+            echo "Bye!"
+          elif [ "$#" -eq 1 ]; then
+            curl -Gs "https://www.mankier.com/api/explain/?cols="$(tput cols) --data-urlencode "q=$1"
+          else
+            echo "Usage"
+            echo "explain                  interactive mode."
+            echo "explain 'cmd -o | ...'   one quoted command to explain it."
           fi
         }
 
-        # fzf cd - cd to selected directory
-        fcd () {
-          local dir
-          dir=$(find ${1:-*} -path '/*/\.*' -prune \
-                          -o -type d -print 2> /dev/null | fzf +m) &&
-          cd "$dir"
-        }
+        # osx {
+            # say
+            function lol() { say -v Hysterical 'hahahahahahaha oh really?' }
 
-        fgcd () {
-          local dir
-          dir=$(find ${1:-*} -path $(echo $HOME)'/*/\.*' -prune \
-                          -o -type d -print 2> /dev/null | fzf +m) &&
-          cd "$dir"
-        }
+            function sing_song() {
+                songs=(
+                    "say -v Pipe Organ Dum dum dee dum dum dum dum dee Dum dum dee dum dum dum dum dee dum dee dum dum dum de dum dum dum dee dum dee dum dum dee dummmmmmmmmmmmmmmmm" \
+                    "say -v Cellos di di di di di di di di di di di di di di di di di di di di di di di di di di" \
+                    "say -v Cellos oh This is a ponci song ponci song ponci song this is the ponsiano song ive ever ever heard So why keep you listening listening listening while you are supposed to hack to hack to hack to hack its because i hate bill gates hate bill gates hate bill gates its because i hate bill gates more than anything else No its because windows life windows life windows life and you better get a macintosh and iPod now" \
+                    "say -v Good oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooo" \
+                    "say -v Bad oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooo")
+                ponysay $songs[$1]
+                eval ${songs[$1]}
+            }
 
-    # }
+            # set alarm clock with say
+            alarm () {
+                echo "alarm in ""$1""m"
+                sleep "$(($1 * 60))" && sing_song 2
+                # sleep "$(($1 * 60))" && mp3blaster ~/Music/gong.mp3
+            }
+            # eject all mountable volumes
+            eject () {
+                osascript -e 'tell application "Finder" to eject (every disk whose ejectable is true)'
+            }
 
+            # change working directory to Finder path
+            cdf () {
+                cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')"
+            }
+
+            # toggle show/hide hidden files in finder
+            toggle_hidden () {
+                isVisible=$(defaults read com.apple.finder AppleShowAllFiles)
+
+                # toggle visibility based on variables value
+                if [ ${isVisible} = FALSE ]
+                then
+                    defaults write com.apple.finder AppleShowAllFiles TRUE
+                else
+                    defaults write com.apple.finder AppleShowAllFiles FALSE
+                fi
+
+                # force changes by restarting Finder
+                killall Finder
+            }
+        # }
+
+        # archives {
+            # zipf: to create a ZIP archive of a file or folder
+            zipf () { zip -r "$1".zip "$1" ; }
+
+            # extract an archive
+            extract () {
+                if [ -f $1 ] ; then
+                    case $1 in
+                        *.tar.bz2)  tar xjf $1      ;;
+                        *.tar.gz)   tar xzf $1      ;;
+                        *.bz2)      bunzip2 $1      ;;
+                        *.rar)      rar x $1        ;;
+                        *.gz)       gunzip $1       ;;
+                        *.tar)      tar xf $1       ;;
+                        *.tbz2)     tar xjf $1      ;;
+                        *.tgz)      tar xzf $1      ;;
+                        *.zip)      unzip $1        ;;
+                        *.Z)        uncompress $1   ;;
+                        *)          echo "'$1' cannot be extracted via extract()" ;;
+                esac
+                else
+                    echo "'$1' is not a valid file"
+                fi
+            }
+        # }
+
+        # network {
+            # serve wd
+            serve () {
+                printip
+                python -m SimpleHTTPServer
+            }
+
+            # open a url
+            function op () {
+                typeset -A mapping
+                mapping=(
+                    google https://www.google.de/
+                    spotify https://play.spotify.com/collection/songs
+                )
+                open $mapping[$@]
+            }
+        # }
+
+        # color {
+            # show available color codes
+            typeset -Ag FX FG BG
+
+            FX=(
+                reset     "%{[00m%}"
+                bold      "%{[01m%}" no-bold      "%{[22m%}"
+                italic    "%{[03m%}" no-italic    "%{[23m%}"
+                underline "%{[04m%}" no-underline "%{[24m%}"
+                blink     "%{[05m%}" no-blink     "%{[25m%}"
+                reverse   "%{[07m%}" no-reverse   "%{[27m%}"
+            )
+
+            for color in {000..255}; do
+                FG[$color]="%{[38;5;${color}m%}"
+                BG[$color]="%{[48;5;${color}m%}"
+            done
+
+            ZSH_SPECTRUM_TEXT=${ZSH_SPECTRUM_TEXT:-Arma virumque cano Troiae qui primus ab oris}
+
+            # Show all 256 colors with color number
+            # TODO bold
+            spectrum_ls () {
+              for code in {000..255}; do
+                print -P -- "$code: %F{$code}$ZSH_SPECTRUM_TEXT%f"
+              done
+            }
+
+            # Show all 256 colors where the background is set to specific color
+            spectrum_bls () {
+              for code in {000..255}; do
+                print -P -- "$BG[$code]$code: $ZSH_SPECTRUM_TEXT %{$reset_color%}"
+              done
+            }
+        # }
+
+        # fun {
+            # nyan cat
+            function nyan () { telnet nyancat.dakko.us }
+
+            # starwars
+            function starwars () { telnet towel.blinkenlights.nl }
+
+            # mandelbrot
+            function mandelbrot () {
+               local lines columns colour a b p q i pnew
+               ((columns=COLUMNS-1, lines=LINES-1, colour=0))
+               for ((b=-1.5; b<=1.5; b+=3.0/lines)) do
+                   for ((a=-2.0; a<=1; a+=3.0/columns)) do
+                       for ((p=0.0, q=0.0, i=0; p*p+q*q < 4 && i < 32; i++)) do
+                           ((pnew=p*p-q*q+a, q=2*p*q+b, p=pnew))
+                       done
+                       ((colour=(i/4)%8))
+                        echo -n "\\e[4${colour}m "
+                    done
+                    echo
+                done
+            }
+        # }
+    # }}}
 # }}}
-
-# vim: set ft=zsh ts=4 sw=4 expandtab :
