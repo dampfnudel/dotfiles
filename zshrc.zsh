@@ -9,31 +9,24 @@
 # ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.zshrc
 
 # TODO {{{
-    # TODO: statusline, select jumpmarks, magic enter, cd ..,
-    # color scheme env vars
-
     # iterm2 drag files to cmd
-    # autocompletion
-    # cd .. && ls; cd d && ls
-    # globbing
     # global aliases
     # http://www.wunderline.rocks/
-    # hashes
-    # fzf bookmarks
-    # sampson-chen/sack
     # aafire
-    # substitutions
-        # home
-        # projects
-        # editor
-        # oh-my-zsh
-        # dotfiles
-    # link bin to scripts
-    # zshmarks to hashes
-    # o j
+    # mdfind
+    # fzf
+        # workon
+        # context starting points
+        # mru
+    # REFACTOR
+        # global vars
+        # substitutions
+            # home
+            # projects
+            # editor
+            # oh-my-zsh
+            # dotfiles
     # init script
-        # fzf keybindings, completions
-    # antigen fzf_marks, impure
 # }}}
 
 # zsh configs {{{
@@ -42,9 +35,7 @@
     # enable vcs_info used by the prompt
     autoload -Uz vcs_info
     zstyle ':vcs_info:*' enable git svn
-    precmd() {
-        vcs_info
-    }
+    precmd () { vcs_info ; }
 
     # unset mailcheck, spellcheck
     unset MAILCHECK
@@ -226,36 +217,37 @@
 # }}}
 
 # hashes / named directories {{{
-    hash -d dev=~/Workspace
-    hash -d bay=~/Workspace/bay
-    hash -d fzf_marks=~/Workspace/fzf_marks
-    hash -d gists=~/Workspace/gists
-    hash -d hackedHN=~/Workspace/hackedHN
-    hash -d moment=~/Workspace/moment
-    hash -d jason=~/Workspace/moment/jason
-    hash -d impure=~/Workspace/impure
-    hash -d regiobot=~/Workspace/regiobot
-    hash -d rg=~/Workspace/regiobot/regiobot
-    hash -d intersport=~/Workspace/regiobot/regiobot/intersport
-    hash -d scripts=~/Workspace/scripts
-    hash -d termxplorer=~/Workspace/termxplorer
-    hash -d tx=~/Workspace/termxplorer/docker
-    hash -d til=~/Workspace/til
-    hash -d dotfiles=~/Settings/dotfiles
-    hash -d colors=~/Settings/colors
-    hash -d oh-my-zsh=~/.oh-my-zsh
-    hash -d custom=~/.oh-my-zsh/custom
-    hash -d bin=~/bin
-    hash -d desktop=~/Desktop
-    hash -d documents=~/Documents
-    hash -d firma=~/Documents/firma
-    hash -d plan=~/Documents/plan
-    hash -d downloads=~/Downloads
-    hash -d dropbox=~/Dropbox
-    hash -d pictures=~/Pictures
-    hash -d library=~/Library
-    hash -d settings=~/Settings
-    hash -d trash=~/.Trash
+    hash -d dev=$HOME/Workspace
+    hash -d bay=$HOME/Workspace/bay
+    hash -d fzf_marks=$HOME/Workspace/fzf_marks
+    hash -d gists=$HOME/Workspace/gists
+    hash -d hackedHN=$HOME/Workspace/hackedHN
+    hash -d moment=$HOME/Workspace/moment
+    hash -d jason=$HOME/Workspace/moment/jason
+    hash -d impure=$HOME/Workspace/impure
+    hash -d regiobot=$HOME/Workspace/regiobot
+    hash -d rg=$HOME/Workspace/regiobot/regiobot
+    hash -d intersport=$HOME/Workspace/regiobot/regiobot/intersport
+    hash -d scripts=$HOME/Workspace/scripts
+    hash -d termxplorer=$HOME/Workspace/termxplorer
+    hash -d test=$HOME/Workspace/test_repo
+    hash -d tx=$HOME/Workspace/termxplorer/docker
+    hash -d til=$HOME/Workspace/til
+    hash -d dotfiles=$HOME/Settings/dotfiles
+    hash -d colors=$HOME/Settings/colors
+    hash -d oh-my-zsh=$HOME/.oh-my-zsh
+    hash -d custom=$HOME/.oh-my-zsh/custom
+    hash -d bin=$HOME/bin
+    hash -d desktop=$HOME/Desktop
+    hash -d documents=$HOME/Documents
+    hash -d firma=$HOME/Documents/firma
+    hash -d plan=$HOME/Documents/plan
+    hash -d downloads=$HOME/Downloads
+    hash -d dropbox=$HOME/Dropbox
+    hash -d pictures=$HOME/Pictures
+    hash -d library=$HOME/Library
+    hash -d settings=$HOME/Settings
+    hash -d trash=$HOME/.Trash
     hash -d intenso32=/Volumes/INGOT32/
 
     # files
@@ -352,22 +344,28 @@
 
     bindkey -e
     export WORDCHARS=''                                 # do not jump over whole POSIX path
-    bindkey 'å' accept-and-hold                         # alt a
-    bindkey '^[^[[D' backward-word                      # alt <arrow-left>
-    bindkey '^[^[[C' forward-word                       # alt <arrow-right>
-    bindkey '^[^H' backward-kill-word                   # cmd <del>
-    bindkey '^A' beginning-of-line                      # cmd <arrow-left>
-    bindkey '^E' end-of-line                            # cmd <arrow-right>
-    bindkey '^[^[[B' kill-whole-line                    # cmd <down-arrow>
-    bindkey '^X' delete-char                            # ctrl x
-    bindkey '^W' delete-word                            # ctrl w
-    bindkey -s '^[^[[A' 'cd ..\n'                       # alt <arrow-up>
-    bindkey -s '^L' 'ls -laH\n'                         # ctr l
-    bindkey '^[[A' history-beginning-search-backward    # <arrow-up>
-    bindkey '^[[B' history-beginning-search-forward     # <arrow-down>
+    bindkey 'å' accept-and-hold                         # alt a.......................multiselect in menu complete
+    bindkey '^[^[[D' backward-word                      # alt <arrow-left>............move a word backward
+    bindkey '^[^[[C' forward-word                       # alt <arrow-right>...........move a word forward
+    bindkey '^[^H' backward-kill-word                   # cmd <del>...................delete the word left of the cursor
+    bindkey '^A' beginning-of-line                      # cmd <arrow-left>............move to the beginning of the line
+    bindkey '^E' end-of-line                            # cmd <arrow-right>...........move to the end of the line
+    bindkey '^[^[[B' kill-whole-line                    # cmd <arrow-down>............delete the whole line
+    bindkey '^X' delete-char                            # ctrl x......................delete the char under the cursor
+    bindkey '^W' delete-word                            # ctrl w......................delete the word under the cursor
+    bindkey -s '^[^[[A' 'cd ..\n'                       # alt <arrow-up>..............cd ..
+    bindkey -s '^L' 'ls -laH\n'                         # ctr l.......................ls -laH
+    bindkey '^[[A' history-beginning-search-backward    # <arrow-up>..................history substring search backward
+    bindkey '^[[B' history-beginning-search-forward     # <arrow-down>................history substring search forward
 # }}}
 
 # aliases {{{
+    # filters / global aliases {
+        alias -g _null="> /dev/null 2>&1"
+        alias -g _vim="| eval ${EDITOR_TAB}"
+        alias -g _cc='| pbcopy'
+    # }
+
     # list {
         alias ls='gls --color=auto'
         alias ll='ls -lah'
@@ -385,6 +383,9 @@
     alias wttr='curl http://wttr.in'
     alias moon='curl http://wttr.in/Moon'
     alias yt3='cd $HOME/Downloads; youtube-dl --verbose --extract-audio --audio-format mp3 '
+    # alias emacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs'
+    alias emacs='open -a Emacs.app'
+    alias cemacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs -nw'
 
         # vim {
             alias mvim=${EDITOR}
@@ -397,7 +398,9 @@
             # find all .git directories and exec "git pull" on the parent.
             alias git_pull_rec='find . -name .git -exec sh -c "cd \"{}\"/../ && pwd && git pull" \;'
             alias git_ignore_del='git ls-files --deleted -z | git update-index --assume-unchanged -z --stdin'
-            alias g_remote_url='git config --get remote.origin.url'
+            alias git_remote_url='open `git config --get remote.origin.url`'
+            alias git_gitst_remote_url='open `git config --get remote.origin.url` | cut -c5-'
+            alias git_commit_fire='git add -A && git commit -a --allow-empty-message -m "" && git push'
         # }
     # }
 
@@ -442,6 +445,13 @@
 
 # functions {{{
     # list {{{
+        escape_spaces () {
+            echo "${(q)1}"
+        }
+        # print a directory tree
+        dir_tree () {
+            ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/'
+        }
         # count files
         count () {
             for dir in $( /usr/bin/find . -type d -print );
@@ -483,15 +493,22 @@
         gagg () { agg "$@" ; }
 
         # locatemd: to search for a file using Spotlight's metadata
-        finder () { mdfind "kMDItemDisplayName == '$@'wc"; }
+        spotlight () { mdfind "kMDItemDisplayName == '$@'wc"; }
 
         # finderComment: show the SpotLight comment for a file
-        findercomment () { mdls "$1" | grep kMDItemFinderComment ; }
+        spotlight_comment () { mdls "$1" | grep kMDItemFinderComment ; }
 
         # locaterecent: to search for files created since yesterday using Spotlight
         # this is an illustration of using $time in a query
         # see: http://developer.apple.com/documentation/Carbon/Conceptual/SpotlightQuery/index.html
-        findrecent () { mdfind 'kMDItemFSCreationDate >= $time.yesterday'; }
+        # TODO: day param
+        spotlight_recent_created () {
+            mdfind 'kMDItemFSCreationDate >= $time.yesterday' | sed '/^\/Users\/mbayer\//!d' | sed '/^\/Users\/mbayer\/Library\//d' | sed '/pyc$/d'
+        }
+
+        mru () {
+            find ~ \( -path '*/\.*' -o -path '/Users/mbayer/Library*' -o -path '/Users/mbayer/Pictures/Fotos-Mediathek.photoslibrary*' -o -path '/Users/mbayer/Workspace/Envs*' \) -prune -o \( -name '*\.pyc' \) -prune -o -type f -mtime -7 -perm -g+r,u+r,o+r -print | sed '/Dropbox.*Icon*/d'
+        }
 
         # list_all_apps: list all applications on the system
         list_all_apps () { mdfind 'kMDItemContentTypeTree == "com.apple.application"c' ; }
@@ -501,6 +518,12 @@
 
         # findword: search for a word in the Unix word list
         findword () { /usr/bin/grep ^"$@"$ /usr/share/dict/words ; }
+
+        # dictionary lookup
+        # dict_lookup is a python script which queries osx dict
+        dict () {
+            dict_lookup "$@"|tr '|' '\n'|sed 's/^ //g'
+        }
 
         # fzf {
             # fzf open
@@ -528,11 +551,77 @@
               cd "$dir"
             }
 
+            # fcd starting from $HOME
             fgcd () {
               local dir
               dir=$(/usr/bin/find ${1:-*} -path $(echo $HOME)'/*/\.*' -prune \
                               -o -type d -print 2> /dev/null | fzf +m) &&
               cd "$dir"
+            }
+
+            # search for file contents
+            fag () {
+                ag --nobreak --nonumbers --noheading . | fzf
+            }
+
+            # fbr - checkout git branch (including remote branches)
+            fzf_checkout () {
+              local branches branch
+              branches=$(git branch --all | grep -v HEAD) &&
+              branch=$(echo "$branches" |
+                       fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+              git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+            }
+            # fco - checkout git branch/tag
+            fzf_checkout_branch () {
+              local tags branches target
+              tags=$(
+                git tag | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}') || return
+              branches=$(
+                git branch --all | grep -v HEAD             |
+                sed "s/.* //"    | sed "s#remotes/[^/]*/##" |
+                sort -u          | awk '{print "\x1b[34;1mbranch\x1b[m\t" $1}') || return
+              target=$(
+                (echo "$tags"; echo "$branches") |
+                fzf-tmux -l30 -- --no-hscroll --ansi +m -d "\t" -n 2) || return
+              git checkout $(echo "$target" | awk '{print $2}')
+            }
+
+            # fcoc - checkout git commit
+            fzf_checkout_commit () {
+              local commits commit
+              commits=$(git log --pretty=oneline --abbrev-commit --reverse) &&
+              commit=$(echo "$commits" | fzf --tac +s +m -e) &&
+              git checkout $(echo "$commit" | sed "s/ .*//")
+            }
+
+            # fshow - git commit browser
+            fzf_log () {
+              git log --graph --color=always \
+                  --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
+              fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
+                  --bind "ctrl-m:execute:
+                            (grep -o '[a-f0-9]\{7\}' | head -1 |
+                            xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
+                            {}
+FZF-EOF"
+            }
+
+            # c - browse chrome history
+            fzf_chrome_history () {
+                  local cols sep
+                  cols=$(( COLUMNS / 3 ))
+                  sep='{{::}}'
+
+                  # Copy History DB to circumvent the lock
+                  # - See http://stackoverflow.com/questions/8936878 for the file path
+                  cp -f ~/Library/Application\ Support/Google/Chrome/Default/History /tmp/h
+
+                  sqlite3 -separator $sep /tmp/h \
+                    "select substr(title, 1, $cols), url
+                     from urls order by last_visit_time desc" |
+                  awk -F $sep '{printf "%-'$cols's  \x1b[36m%s\n", $1, $2}' |
+                  fzf --ansi --multi | sed 's#.*\(https*://\)#\1#' | xargs open
             }
         # }
     # }}}
@@ -540,6 +629,7 @@
     # vim {{{
         smart_open () {
             # escape spaces
+            local filename cmd cmd_dir cmd_text cmd_arbitrary
             filename=${(q)1}
 
             cmd=""
@@ -554,6 +644,7 @@
                 # $1 == file
 
                 # special case handling
+                local file_extension file_exceptions
                 file_extension="${filename##*.}"
                 file_exceptions=(csv)
                 for i in "${file_exceptions[@]}"
@@ -650,7 +741,56 @@
         # }
     # }}}
 
+    # track {{{
+        # view a ticket by nr
+        # -v -> open in browser
+        trac_view () {
+            local ticket_nr
+            ticket_nr=$1
+            if [[ ! $ticket_nr == '' ]]
+            then
+                local ticket_url
+                ticket_url=https://trac.inquant.de/regioyal/ticket/$ticket_nr
+
+                if [[ "$2" == "-v" ]]
+                then
+                    echo "🐾  $ticket"
+                    echo "🔗  $ticket_url"
+                    open https://trac.inquant.de/regioyal/ticket/$ticket_nr
+                else
+                    local ticket_description
+                    ticket_description=`cm view $ticket_nr 2>/dev/null`
+                    echo "🐾  $ticket_description"
+                    echo ""
+                    echo ""
+                    echo "-----------------------------------"
+                    echo "🔗  $ticket_url"
+                fi
+            fi
+        }
+
+        # search ticket via https://pypi.python.org/pypi/cartman/0.2.3
+        trac_search () {
+              local ticket ticket_nr
+              ticket=$(cm report 3 2>/dev/null | fzf)
+              ticket_nr=`echo $ticket | awk '{print $1}' | sed 's/[^0-9]*//g'`
+
+                if [[ ! $ticket_nr == '' ]];then
+                    trac_view $ticket_nr $1
+                fi
+        }
+    # }}}
+
     # actions {{{
+        # create an executable script
+        mk_script () {
+            (($# > 0)) && {
+                touch "$1"
+                chmod +x "$1"
+                eval ${EDITOR_TAB} "$1"
+            }
+        }
+
         # move file/dir to trash
         trash () { mv "$@" $HOME/.Trash/. ; }
 
