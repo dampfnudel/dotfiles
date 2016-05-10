@@ -30,12 +30,6 @@
 # }}}
 
 # zsh configs {{{
-    # init completion
-    autoload -U compinit && compinit
-    # enable vcs_info used by the prompt
-    autoload -Uz vcs_info
-    zstyle ':vcs_info:*' enable git svn
-    precmd () { vcs_info ; }
 
     # unset mailcheck, spellcheck
     unset MAILCHECK
@@ -43,6 +37,38 @@
     setopt correct
     # <Space> before command prevent the command from being pushed to zsh_history
     setopt HIST_IGNORE_SPACE
+
+    # completion {
+        # enable vcs_info used by the prompt
+        autoload -Uz vcs_info
+        zstyle ':vcs_info:*' enable git svn
+        precmd () { vcs_info ; }
+
+        zstyle ':completion:*' completer _expand _complete
+
+        zstyle ':completion:*' use-cache on
+        zstyle ':completion:*' users resolve
+        # use dircolours in completion listings
+        zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+        # Enable menu completion
+        zstyle ':completion*:default' menu 'select=1'
+
+        # allow approximate matching
+        zstyle ':completion:*' completer _complete _match _approximate
+        zstyle ':completion:*:match:*' original only
+        zstyle ':completion:*:approximate:*' max-errors 1 numeric
+        zstyle ':completion:*' auto-description 'Specify: %d'
+        zstyle ':completion:*' format 'Completing %d'
+        zstyle ':completion:*' verbose true
+        zstyle ':completion:*:functions' ignored-patterns '_*'
+        zstyle ':completion:*:*:(^rm):*:*files' ignored-patterns \
+        '*?.(o|c~|zwc)' '*?~'
+
+        zstyle ':completion:*:vim:*' ignored-patterns '*.(o|a|so|aux|dvi|log|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pdf|ps|pyc)'
+
+        # init completion
+        autoload -U compinit && compinit
+    #}
 
     # dirstack {
         # usage:
@@ -340,6 +366,24 @@
             zle -N do_enter
             bindkey '^m' do_enter
         # }
+
+        # rational dots {
+            # type '...' to get '../..' with successive .'s adding /..
+            function rationalise-dot {
+                local MATCH # keep the regex match from leaking to the environment
+                if [[ $LBUFFER =~ '(^|/| |      |'$'\n''|\||;|&)\.\.$' ]]; then
+                  LBUFFER+=/
+                  zle self-insert
+                  zle self-insert
+                else
+                  zle self-insert
+                fi
+            }
+            zle -N rationalise-dot
+            bindkey . rationalise-dot
+            # without this, typing a . aborts incremental history search
+            bindkey -M isearch . self-insert
+        # }
     # }
 
     bindkey -e
@@ -623,6 +667,10 @@ FZF-EOF"
                   awk -F $sep '{printf "%-'$cols's  \x1b[36m%s\n", $1, $2}' |
                   fzf --ansi --multi | sed 's#.*\(https*://\)#\1#' | xargs open
             }
+            # browse chrome bookmarks
+            fzf_chrome_bookmarks () {
+                $HOME/Workspace/scripts/fzf_chrome_bookmarks.rb
+            }
         # }
     # }}}
 
@@ -743,17 +791,15 @@ FZF-EOF"
 
     # track {{{
         # view a ticket by nr
-        # -v -> open in browser
+        # -o -> open in browser
         trac_view () {
             local ticket_nr
             ticket_nr=$1
-            if [[ ! $ticket_nr == '' ]]
-            then
+            if [[ ! $ticket_nr == '' ]]; then
                 local ticket_url
                 ticket_url=https://trac.inquant.de/regioyal/ticket/$ticket_nr
 
-                if [[ "$2" == "-v" ]]
-                then
+                if [[ "$2" == "-o" ]]; then
                     echo "🐾  $ticket"
                     echo "🔗  $ticket_url"
                     open https://trac.inquant.de/regioyal/ticket/$ticket_nr
@@ -769,14 +815,31 @@ FZF-EOF"
             fi
         }
 
-        # search ticket via https://pypi.python.org/pypi/cartman/0.2.3
-        trac_search () {
+        # search ticket titles via https://pypi.python.org/pypi/cartman/0.2.3
+        trac_fzf_search () {
               local ticket ticket_nr
               ticket=$(cm report 3 2>/dev/null | fzf)
               ticket_nr=`echo $ticket | awk '{print $1}' | sed 's/[^0-9]*//g'`
 
                 if [[ ! $ticket_nr == '' ]];then
                     trac_view $ticket_nr $1
+                fi
+        }
+
+        # search tickets (trac_search "404 pages" -o)
+        trac_search () {
+              local ticket ticket_nr
+              ticket=$(cm search "$1" 2>/dev/null | fzf)
+              ticket_nr=`echo $ticket | awk '{print $1}' | sed 's/[^0-9]*//g'`
+
+                if [[ ! $ticket_nr == '' ]];then
+                    local last_param
+                    eval last_param=\$$#
+                    if [[ $last_param == '-o' ]];then
+                        trac_view $ticket_nr $last_param
+                    else
+                        trac_view $ticket_nr
+                    fi
                 fi
         }
     # }}}
