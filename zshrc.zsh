@@ -14,7 +14,10 @@
     # http://www.wunderline.rocks/
     # aafire
     # mdfind
+    # structure!
     # fzf
+        # BOOKMARKS!
+        # -m
         # workon
         # context starting points
         # mru
@@ -30,6 +33,12 @@
 # }}}
 
 # zsh configs {{{
+    # init completion
+    autoload -U compinit && compinit
+    # enable vcs_info used by the prompt
+    autoload -Uz vcs_info
+    zstyle ':vcs_info:*' enable git svn
+    precmd() { vcs_info }
 
     # unset mailcheck, spellcheck
     unset MAILCHECK
@@ -38,37 +47,38 @@
     # <Space> before command prevent the command from being pushed to zsh_history
     setopt HIST_IGNORE_SPACE
 
-    # completion {
-        # enable vcs_info used by the prompt
-        autoload -Uz vcs_info
-        zstyle ':vcs_info:*' enable git svn
-        precmd () { vcs_info ; }
-
-        zstyle ':completion:*' completer _expand _complete
-
-        zstyle ':completion:*' use-cache on
-        zstyle ':completion:*' users resolve
-        # use dircolours in completion listings
-        zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-        # Enable menu completion
-        zstyle ':completion*:default' menu 'select=1'
-
-        # allow approximate matching
-        zstyle ':completion:*' completer _complete _match _approximate
-        zstyle ':completion:*:match:*' original only
-        zstyle ':completion:*:approximate:*' max-errors 1 numeric
-        zstyle ':completion:*' auto-description 'Specify: %d'
-        zstyle ':completion:*' format 'Completing %d'
-        zstyle ':completion:*' verbose true
-        zstyle ':completion:*:functions' ignored-patterns '_*'
-        zstyle ':completion:*:*:(^rm):*:*files' ignored-patterns \
-        '*?.(o|c~|zwc)' '*?~'
-
-        zstyle ':completion:*:vim:*' ignored-patterns '*.(o|a|so|aux|dvi|log|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pdf|ps|pyc)'
-
-        # init completion
-        autoload -U compinit && compinit
-    #}
+    # # completion {
+    #     # enable vcs_info used by the prompt
+    #     autoload -U compinit && compinit
+    #     autoload -Uz vcs_info
+    #     zstyle ':vcs_info:*' enable git svn
+    #     precmd () { vcs_info ; }
+    #
+    #     zstyle ':completion:*' completer _expand _complete
+    #
+    #     zstyle ':completion:*' use-cache on
+    #     zstyle ':completion:*' users resolve
+    #     # use dircolours in completion listings
+    #     zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+    #     # Enable menu completion
+    #     zstyle ':completion*:default' menu 'select=1'
+    #
+    #     # allow approximate matching
+    #     zstyle ':completion:*' completer _complete _match _approximate
+    #     zstyle ':completion:*:match:*' original only
+    #     zstyle ':completion:*:approximate:*' max-errors 1 numeric
+    #     zstyle ':completion:*' auto-description 'Specify: %d'
+    #     zstyle ':completion:*' format 'Completing %d'
+    #     zstyle ':completion:*' verbose true
+    #     zstyle ':completion:*:functions' ignored-patterns '_*'
+    #     zstyle ':completion:*:*:(^rm):*:*files' ignored-patterns \
+    #     '*?.(o|c~|zwc)' '*?~'
+    #
+    #     zstyle ':completion:*:vim:*' ignored-patterns '*.(o|a|so|aux|dvi|log|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pdf|ps|pyc)'
+    #
+    #     # init completion
+    #     autoload -U compinit && compinit
+    # #}
 
     # dirstack {
         # usage:
@@ -570,6 +580,14 @@
         }
 
         # fzf {
+            # open screenshot
+            fzf_open_screenshot () {
+                local screenshot_path screenshot
+                screenshot_path="$HOME/Pictures/Screenshots"
+                screenshot=$(ls -r ${screenshot_path} | sed '/Bildschirmfoto/!d' | fzf)
+                echo "$screenshot_path/${(q)screenshot}"
+                open $screenshot
+            }
             # fzf open
             # fe [FUZZY PATTERN] - Open the selected file with the default editor
             #   - Bypass fuzzy finder if there's only one match (--select-1)
@@ -842,6 +860,10 @@ FZF-EOF"
                     fi
                 fi
         }
+        # # $ cm comment 1 -m "you forgot to call twiddle()"
+        # $ cm status 1
+        # Set a ticket as accepted:
+        # $ cm status 1 accept
     # }}}
 
     # actions {{{
