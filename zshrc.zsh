@@ -15,7 +15,9 @@
     # aafire
     # mdfind
     # structure!
+    # num block
     # fzf
+        # commands
         # BOOKMARKS!
         # -m
         # workon
@@ -83,7 +85,7 @@
     # dirstack {
         # usage:
         # $ dirs
-        # $ 7
+        # $ cd -<tab> || cd -19
         DIRSTACKFILE="$HOME/.zsh/dirstack"
         DIRSTACKSIZE=20
 
@@ -379,7 +381,7 @@
 
         # rational dots {
             # type '...' to get '../..' with successive .'s adding /..
-            function rationalise-dot {
+            function rationalise_dot {
                 local MATCH # keep the regex match from leaking to the environment
                 if [[ $LBUFFER =~ '(^|/| |      |'$'\n''|\||;|&)\.\.$' ]]; then
                   LBUFFER+=/
@@ -389,8 +391,8 @@
                   zle self-insert
                 fi
             }
-            zle -N rationalise-dot
-            bindkey . rationalise-dot
+            zle -N rationalise_dot
+            bindkey . rationalise_dot
             # without this, typing a . aborts incremental history search
             bindkey -M isearch . self-insert
         # }
@@ -584,9 +586,9 @@
             fzf_open_screenshot () {
                 local screenshot_path screenshot
                 screenshot_path="$HOME/Pictures/Screenshots"
-                screenshot=$(ls -r ${screenshot_path} | sed '/Bildschirmfoto/!d' | fzf)
+                screenshot=$(ls -r ${screenshot_path} | grep Bildschirmfoto | fzf)
                 echo "$screenshot_path/${(q)screenshot}"
-                open $screenshot
+                $(open $screenshot_path/$screenshot)
             }
             # fzf open
             # fe [FUZZY PATTERN] - Open the selected file with the default editor
@@ -947,6 +949,11 @@ FZF-EOF"
             }
 
             # set alarm clock with say
+            alarm_msg () {
+                echo "alarm in ""$1""m"
+                sleep "$(($1 * 60))" && say -v Zarvox "$2"
+                # sleep "$(($1 * 60))" && mp3blaster ~/Music/gong.mp3
+            }
             alarm () {
                 echo "alarm in ""$1""m"
                 sleep "$(($1 * 60))" && sing_song 2
