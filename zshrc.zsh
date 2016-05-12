@@ -586,9 +586,11 @@
             fzf_open_screenshot () {
                 local screenshot_path screenshot
                 screenshot_path="$HOME/Pictures/Screenshots"
-                screenshot=$(ls -r ${screenshot_path} | grep Bildschirmfoto | fzf)
+                out=$(ls -r ${screenshot_path} | grep Bildschirmfoto | fzf --expect=ctrl-y)
+                key=$(head -1 <<< "$out")
+                screenshot=$(head -2 <<< "$out" | tail -1)
                 echo "$screenshot_path/${(q)screenshot}"
-                $(open $screenshot_path/$screenshot)
+                [ "$key" = ctrl-y ] && echo "$screenshot_path/${(q)screenshot}" | pbcopy || $(open $screenshot_path/$screenshot)
             }
             # fzf open
             # fe [FUZZY PATTERN] - Open the selected file with the default editor
@@ -597,15 +599,16 @@
             # you can press
             #   - CTRL-O to open with `open` command,
             #   - CTRL-E or Enter key to open with the $EDITOR
-            fo () {
-              local out file key
-              out=$(fzf --query="$1" --exit-0 --select-1 --exit-0 --cycle --expect=ctrl-o,ctrl-e)
-              key=$(head -1 <<< "$out")
-              file=$(head -2 <<< "$out" | tail -1)
-              if [ -n "$file" ]; then
-                [ "$key" = ctrl-o ] && open "$file" || eval ${EDITOR_TAB} "$file"
-              fi
+            fzf_open () {
+                local out file key
+                out=$(fzf --query="$1" --exit-0 --select-1 --exit-0 --cycle --expect=ctrl-o,ctrl-e)
+                key=$(head -1 <<< "$out")
+                file=$(head -2 <<< "$out" | tail -1)
+                if [ -n "$file" ]; then
+                    [ "$key" = ctrl-o ] && open "$file" || eval ${EDITOR_TAB} "$file"
+                fi
             }
+            alias fo='fzf_open'
 
             # fzf cd - cd to selected directory
             fcd () {
@@ -637,7 +640,7 @@
               git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
             }
             # fco - checkout git branch/tag
-            fzf_checkout_branch () {
+            fzf_checkout_tag () {
               local tags branches target
               tags=$(
                 git tag | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}') || return
