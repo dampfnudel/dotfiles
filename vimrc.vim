@@ -286,7 +286,7 @@
 
     " open rc-files
     :command Vimrc :tabedit ~/.vimrc<CR>
-    :command Zshrc tabedit ~/.zshrc
+    :command Zshrc :tabedit ~/.zshrc<CR>
 
     " source vimrc
     :command S source $MYVIMRC
@@ -524,8 +524,8 @@
         " autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.json colorscheme badwolf
 
         function! SetPlaintextOptions()
-            NeoCompleteEnable
-            colorscheme badwolf
+            " NeoCompleteEnable
+            " colorscheme badwolf
         endfunction
 
         autocmd BufNewFile,BufFilePre,BufRead,BufReadPost *.md
@@ -597,19 +597,20 @@
 
     " color {
         if has("gui_macvim")
-            set background=dark
+            set background=light
 
             " colorscheme badwolf
             " colorscheme wolfpack
             " colorscheme dracula
-            colorscheme Spacedust
+            " colorscheme Spacedust
             " colorscheme inkpot
-            " colorscheme solarized
+            colorscheme solarized
             " colorscheme molokai
             " colorscheme gruvbox
 
+            " colorscheme PaperColor
             " colorscheme facebook
-            " colorscheme material-theme
+            " colorscheme mateial-theme
             " colorscheme pencil
             " colorscheme kalisi
             " colorscheme hemisu
@@ -649,7 +650,7 @@
 
         let g:airline_detect_modified = 1
         if has('gui_running')
-            let g:airline_theme = 'badwolf'
+            let g:airline_theme = 'solarized'
         else
             let g:airline_theme = 'badwolf'
         endif
@@ -879,37 +880,37 @@
     " }
 
     " Unite {
-        let g:unite_prompt='» '
-        " yank history
-        let g:unite_source_history_yank_enable = 1
-        let g:unite_source_history_yank_file = resolve(expand('~/.vim/unite_yank_history.txt'))
-        let g:neomru#file_mru_path = resolve(expand('~/.vim/unite_mru_files.txt'))
-
-        let g:unite_source_rec_git_command = ['git', 'rev-parse', '--show-toplevel']
+        " let g:unite_prompt='» '
+        " " yank history
+        " let g:unite_source_history_yank_enable = 1
+        " let g:unite_source_history_yank_file = resolve(expand('~/.vim/unite_yank_history.txt'))
+        " let g:neomru#file_mru_path = resolve(expand('~/.vim/unite_mru_files.txt'))
+        "
+        " let g:unite_source_rec_git_command = ['git', 'rev-parse', '--show-toplevel']
         " let g:unite_source_rec_git_command = ['git', 'ls-tree', '-r', '--name-only', 'HEAD']
-        " let g:unite_source_rec_max_cache_files = 250000
-        let g:unite_source_file_rec_max_cache_files = 0
-        call unite#custom#source('file_mru,file_rec,file_rec/async,grepocate',
-                    \ 'max_candidates', 0)
-
-        if executable('ag')
-            " Use ag in unite grep source.
-            " let g:unite_source_grep_command = 'ag'
-            let g:unite_source_rec_async_command= ['ag', '--nocolor', '--nogroup', '--hidden', '-g', '""']
-            let g:unite_source_grep_default_opts =
-                \ '-i --vimgrep --hidden --ignore bower_components --ignore ' .
-                \ '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'''
-            let g:unite_source_grep_recursive_opt = ''
-        endif
-
-        " aliases
-        let g:unite_source_alias_aliases = {
-                \       'db': {
-                \           'source': 'file_rec/async',
-                \           'args': '~/Dropbox',
-                \       },
-                \       'b' : 'buffer',
-                \   }
+        " " let g:unite_source_rec_max_cache_files = 250000
+        " let g:unite_source_file_rec_max_cache_files = 0
+        " " call unite#custom#source('file_mru,file_rec,file_rec/async,grepocate',
+        " "             \ 'max_candidates', 0)
+        "
+        " if executable('ag')
+        "     " Use ag in unite grep source.
+        "     let g:unite_source_grep_command = 'ag'
+        "     let g:unite_source_rec_async_command= ['ag', '--nocolor', '--nogroup', '--hidden', '-g', '""']
+        "     let g:unite_source_grep_default_opts =
+        "         \ '-i --vimgrep --hidden --ignore bower_components --ignore ' .
+        "         \ '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'''
+        "     let g:unite_source_grep_recursive_opt = ''
+        " endif
+        "
+        " " aliases
+        " let g:unite_source_alias_aliases = {
+        "         \       'db': {
+        "         \           'source': 'file_rec/async',
+        "         \           'args': '~/Dropbox',
+        "         \       },
+        "         \       'b' : 'buffer',
+        "         \   }
 
         function! GitGrep()
             " grep the git repository the current file belongs to
@@ -923,14 +924,14 @@
             " find files within the git repository
             " -path?
             :cd `git rev-parse --show-toplevel`
-            :Unite -start-insert -tab file_rec/async -force-redraw
+            :Unite -start-insert -tab file_rec -force-redraw
             :cd -
         endfunction
 
         nnoremap <Leader>gg :call GitGrep()<CR>
-        nnoremap <Leader>g :call GitFind()<CR>
+        nnoremap <Leader>gf :call GitFind()<CR>
         " nnoremap <Leader>g :Unite -start-insert -tab file_rec/git<CR>
-        nnoremap <Leader>f :Unite -start-insert -tab file_rec/async<CR>
+        nnoremap <Leader>f :Unite -start-insert -tab file_rec<CR>
         nnoremap <Leader>t :Unite -start-insert tab<CR>
         nnoremap <Leader>g. :Unite -start-insert -tab grep:.<CR>
         nnoremap <Leader>tg :Unite -start-insert -tab grep:$buffers<CR>
