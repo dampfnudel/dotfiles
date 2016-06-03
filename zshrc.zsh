@@ -9,6 +9,9 @@
 # ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.zshrc
 
 # TODO {{{
+    # better imgls
+    # f_dirs
+    # modes hist, cd...
     # iterm2 drag files to cmd
     # global aliases
     # http://www.wunderline.rocks/
@@ -17,6 +20,8 @@
     # structure!
     # num block
     # fzf
+        # ctrl-t for dirs
+        # clipboard
         # commands
         # BOOKMARKS!
         # -m
@@ -87,7 +92,7 @@
         # $ dirs
         # $ cd -<tab> || cd -19
         DIRSTACKFILE="$HOME/.zsh/dirstack"
-        DIRSTACKSIZE=20
+        DIRSTACKSIZE=50
 
         if [[ -f $DIRSTACKFILE ]] && [[ $#dirstack -eq 0 ]]; then
           dirstack=( ${(f)"$(< $DIRSTACKFILE)"} )
@@ -198,7 +203,7 @@
                 # ag -g "" --path-to-agignore ~/.agignore'
         export FZF_DEFAULT_COMMAND='
             (git ls-files $(git rev-parse --show-toplevel) ||
-                /user/bin/find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
+                /usr/bin/find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
                 sed s/^..//) 2> /dev/null'
 
         # Feed the output of ag into fzf
@@ -265,7 +270,7 @@
     hash -d impure=$HOME/Workspace/impure
     hash -d regiobot=$HOME/Workspace/regiobot
     hash -d rg=$HOME/Workspace/regiobot/regiobot
-    hash -d intersport=$HOME/Workspace/regiobot/regiobot/intersport
+    hash -d import=$HOME/Workspace/regiobot/regiobot/import
     hash -d scripts=$HOME/Workspace/scripts
     hash -d termxplorer=$HOME/Workspace/termxplorer
     hash -d test=$HOME/Workspace/test_repo
@@ -294,6 +299,7 @@
     hash -d vimrc=~/.vimrc
     hash -d zsh_cheatsheet=~/Workspace/gists/zsh_cheatsheet/zsh.md
     hash -d vim_cheatsheet=~/Workspace/gists/vim_cheatsheet/vim.md
+    hash -d emacs_cheatsheet=~/Workspace/gists/emacs_cheatsheet/emacs.md
 # }}}
 
 # keybindings / keymappings {{{
@@ -442,6 +448,7 @@
     # alias emacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs'
     alias emacs='open -a Emacs.app'
     alias cemacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs -nw'
+    alias bpython='$WORKON_HOME/python3.4.1/bin/bpython'
 
         # vim {
             alias mvim=${EDITOR}
@@ -455,7 +462,6 @@
             alias git_pull_rec='find . -name .git -exec sh -c "cd \"{}\"/../ && pwd && git pull" \;'
             alias git_ignore_del='git ls-files --deleted -z | git update-index --assume-unchanged -z --stdin'
             alias git_remote_url='open `git config --get remote.origin.url`'
-            alias git_gitst_remote_url='open `git config --get remote.origin.url` | cut -c5-'
             alias git_commit_fire='git add -A && git commit -a --allow-empty-message -m "" && git push'
         # }
     # }
@@ -583,7 +589,7 @@
 
         # fzf {
             # open screenshot
-            fzf_open_screenshot () {
+            f_screenshot () {
                 local screenshot_path screenshot
                 screenshot_path="$HOME/Pictures/Screenshots"
                 out=$(ls -r ${screenshot_path} | grep Bildschirmfoto | fzf --expect=ctrl-y)
@@ -599,48 +605,61 @@
             # you can press
             #   - CTRL-O to open with `open` command,
             #   - CTRL-E or Enter key to open with the $EDITOR
-            fzf_open () {
+            f_open () {
                 local out file key
                 out=$(fzf --query="$1" --exit-0 --select-1 --exit-0 --cycle --expect=ctrl-o,ctrl-e)
                 key=$(head -1 <<< "$out")
                 file=$(head -2 <<< "$out" | tail -1)
                 if [ -n "$file" ]; then
                     [ "$key" = ctrl-o ] && open "$file" || eval ${EDITOR_TAB} "$file"
+                    echo "$file"
                 fi
             }
-            alias fo='fzf_open'
+            alias fo='f_open'
 
             # fzf cd - cd to selected directory
-            fcd () {
+            f_cd () {
               local dir
               dir=$(/usr/bin/find ${1:-*} -path '/*/\.*' -prune \
                               -o -type d -print 2> /dev/null | fzf +m) &&
               cd "$dir"
             }
+            alias fcd='f_cd'
 
             # fcd starting from $HOME
-            fgcd () {
+            f_gcd () {
               local dir
               dir=$(/usr/bin/find ${1:-*} -path $(echo $HOME)'/*/\.*' -prune \
                               -o -type d -print 2> /dev/null | fzf +m) &&
               cd "$dir"
             }
+            alias fgcd='f_cd'
 
-            # search for file contents
-            fag () {
-                ag --nobreak --nonumbers --noheading . | fzf
+            f_dirs () {
+                local dir
+                dir=$(dirs | awk '{print $2}' | fzf)
+                dn=$(dirname "$dir")
+                echo $dn
+                cd $dn
             }
 
+            # search for file contents
+            f_ag () {
+                ag --nobreak --nonumbers --noheading . | fzf
+            }
+            alias fag='f_ag'
+
             # fbr - checkout git branch (including remote branches)
-            fzf_checkout () {
+            f_git_checkout () {
               local branches branch
               branches=$(git branch --all | grep -v HEAD) &&
               branch=$(echo "$branches" |
                        fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
               git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
             }
+
             # fco - checkout git branch/tag
-            fzf_checkout_tag () {
+            f_git_checkout_tag () {
               local tags branches target
               tags=$(
                 git tag | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}') || return
@@ -655,7 +674,7 @@
             }
 
             # fcoc - checkout git commit
-            fzf_checkout_commit () {
+            f_git_checkout_commit () {
               local commits commit
               commits=$(git log --pretty=oneline --abbrev-commit --reverse) &&
               commit=$(echo "$commits" | fzf --tac +s +m -e) &&
@@ -663,7 +682,7 @@
             }
 
             # fshow - git commit browser
-            fzf_log () {
+            f_git_log () {
               git log --graph --color=always \
                   --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
               fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
@@ -675,7 +694,7 @@ FZF-EOF"
             }
 
             # c - browse chrome history
-            fzf_chrome_history () {
+            f_chrome_history () {
                   local cols sep
                   cols=$(( COLUMNS / 3 ))
                   sep='{{::}}'
@@ -690,8 +709,9 @@ FZF-EOF"
                   awk -F $sep '{printf "%-'$cols's  \x1b[36m%s\n", $1, $2}' |
                   fzf --ansi --multi | sed 's#.*\(https*://\)#\1#' | xargs open
             }
+
             # browse chrome bookmarks
-            fzf_chrome_bookmarks () {
+            f_chrome_bookmarks () {
                 $HOME/Workspace/scripts/fzf_chrome_bookmarks.rb
             }
         # }
@@ -791,6 +811,14 @@ FZF-EOF"
         git_log_json () {
             git log --pretty=format:'{%n  "commit": "%H",%n  "abbreviated_commit": "%h",%n  "tree": "%T",%n  "abbreviated_tree": "%t",%n  "parent": "%P",%n  "abbreviated_parent": "%p",%n  "refs": "%D",%n  "encoding": "%e",%n  "subject": "%s",%n  "sanitized_subject_line": "%f",%n  "body": "%b",%n  "commit_notes": "%N",%n  "verification_flag": "%G?",%n  "signer": "%GS",%n  "signer_key": "%GK",%n  "author": {%n    "name": "%aN",%n    "email": "%aE",%n    "date": "%aD"%n  },%n  "commiter": {%n    "name": "%cN",%n    "email": "%cE",%n    "date": "%cD"%n  }%n},'
         }
+
+        # open a gist repository in the browser
+        git_gist_remote_url () {
+            local gist_url
+            gist_url="https://gist.github.com/embayer/"$(git config --get remote.origin.url | cut -c21- | sed 's/\.git$//')
+            echo "$gist_url"
+            open "$gist_url"
+        }
     # }}}
 
     # docker {{{
@@ -809,10 +837,36 @@ FZF-EOF"
                 eval "$(docker-machine env regiobot)"
                 docker exec -it $(docker ps | awk '{ if ($2 == "regiobot_django") print $1 }') /bin/bash
             }
+
+            import_shell () {
+                eval "$(docker-machine env regiobot)"
+                docker exec -it $(docker ps | awk '{ if ($2 == "rgimport_rgimport") print $1 }') /bin/bash
+            }
         # }
     # }}}
 
-    # track {{{
+    # trac {{{
+        # cartman wrapper
+        trac () {
+            $WORKON_HOME/python2.7.5/bin/cm "$@" 2>/dev/null
+        }
+
+        # comment on a ticket
+        trac_comment () {
+            # trac_comment {ticket_nr} "{comment}"
+            trac comment "$1" -m "$2"
+        }
+
+        # view ticket status
+        trac_status () {
+            trac status "$@"
+        }
+
+        # accept a ticket
+        trac_accept () {
+            trac status "$1" accept
+        }
+
         # view a ticket by nr
         # -o -> open in browser
         trac_view () {
@@ -828,20 +882,21 @@ FZF-EOF"
                     open https://trac.inquant.de/regioyal/ticket/$ticket_nr
                 else
                     local ticket_description
-                    ticket_description=`cm view $ticket_nr 2>/dev/null`
+                    ticket_description=`trac view $ticket_nr`
                     echo "🐾  $ticket_description"
                     echo ""
                     echo ""
-                    echo "-----------------------------------"
+                    echo "------------------------------------------------"
                     echo "🔗  $ticket_url"
                 fi
             fi
         }
 
         # search ticket titles via https://pypi.python.org/pypi/cartman/0.2.3
-        trac_fzf_search () {
+        trac_ticket () {
               local ticket ticket_nr
-              ticket=$(cm report 3 2>/dev/null | fzf)
+              # sort numerical
+              ticket=$(trac report 3 | sort -t '#' -k 2n | fzf)
               ticket_nr=`echo $ticket | awk '{print $1}' | sed 's/[^0-9]*//g'`
 
                 if [[ ! $ticket_nr == '' ]];then
@@ -852,7 +907,7 @@ FZF-EOF"
         # search tickets (trac_search "404 pages" -o)
         trac_search () {
               local ticket ticket_nr
-              ticket=$(cm search "$1" 2>/dev/null | fzf)
+              ticket=$(trac search "$1" | fzf)
               ticket_nr=`echo $ticket | awk '{print $1}' | sed 's/[^0-9]*//g'`
 
                 if [[ ! $ticket_nr == '' ]];then
@@ -865,13 +920,13 @@ FZF-EOF"
                     fi
                 fi
         }
-        # # $ cm comment 1 -m "you forgot to call twiddle()"
-        # $ cm status 1
-        # Set a ticket as accepted:
-        # $ cm status 1 accept
     # }}}
 
     # actions {{{
+        # print a divider
+        div () {
+            imgcat ~dropbox/Bilder/Art/MC-Escher-Metamorphosis.jpg
+        }
         # create an executable script
         mk_script () {
             (($# > 0)) && {
@@ -1020,6 +1075,12 @@ FZF-EOF"
             serve () {
                 printip
                 python -m SimpleHTTPServer
+            }
+
+            serve_bash () {
+                printip | awk '{print $1":8080"}'
+                while true; do { echo -e 'HTTP/1.1 200 OK\r\n'; \
+                cat "$1"; } | nc -l 8080; done
             }
 
             # open a url
