@@ -471,12 +471,11 @@
         # }
 
         # git {
-            # find all .git directories and exec "git pull" on the parent.
             alias gs='git status'
-            alias ga='git add'
             alias gpl='git pull'
             alias gps='git push'
-            alias git_pull_rec='find . -name .git -exec sh -c "cd \"{}\"/../ && pwd && git pull" \;'
+            # find all .git directories and exec "git pull" on the parent.
+            # alias git_pull_rec='find . -name .git -exec sh -c "cd \"{}\"/../ && pwd && git pull" \;'
             alias git_ignore_del='git ls-files --deleted -z | git update-index --assume-unchanged -z --stdin'
             alias git_remote_url='open `git config --get remote.origin.url`'
             alias git_push_fire='git add -A && git commit -a --allow-empty-message -m "" && git push'
@@ -523,7 +522,7 @@
 # }}}
 
 # functions {{{
-    # list {{{
+    # list {
         escape_spaces () {
             echo "${(q)1}"
         }
@@ -732,9 +731,9 @@ FZF-EOF"
                 $HOME/Workspace/scripts/fzf_chrome_bookmarks.rb
             }
         # }
-    # }}}
+    # }
 
-    # vim {{{
+    # vim {
         smart_open () {
             # escape spaces
             local filename cmd cmd_dir cmd_text cmd_arbitrary
@@ -795,9 +794,9 @@ FZF-EOF"
                 mvim
             fi
         }
-    # }}}
+    # }
 
-    # git {{{
+    # git {
         # git diff
         gd () {
             git diff $1 $2
@@ -851,9 +850,9 @@ FZF-EOF"
             echo "$gist_url"
             open "$gist_url"
         }
-    # }}}
+    # }
 
-    # docker {{{
+    # docker {
         # regiobot {
             # init regiobot docker
             rg_init () {
@@ -875,9 +874,9 @@ FZF-EOF"
                 docker exec -it $(docker ps | awk '{ if ($2 == "rgimport_rgimport") print $1 }') /bin/bash
             }
         # }
-    # }}}
+    # }
 
-    # trac {{{
+    # trac {
         # cartman wrapper
         trac () {
             $WORKON_HOME/python2.7.5/bin/cm "$@" 2>/dev/null
@@ -952,9 +951,9 @@ FZF-EOF"
                     fi
                 fi
         }
-    # }}}
+    # }
 
-    # actions {{{
+    # actions {
         # escape spaces
         esc () {
             echo ${(q)@}
@@ -1208,5 +1207,5 @@ FZF-EOF"
                 done
             }
         # }
-    # }}}
+    # }
 # }}}
