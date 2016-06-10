@@ -9,6 +9,8 @@
 # ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.zshrc
 
 # TODO {{{
+    # https://github.com/unixorn/git-extra-commands
+    # https://github.com/supercrabtree/k
     # better imgls
     # f_dirs
     # modes hist, cd...
@@ -174,7 +176,6 @@
     plugins=(
         osx
         brew
-        git
         python
         pip
         zshmarks
@@ -335,20 +336,6 @@
             bindkey '\ee' prev-comp
         # }
 
-        # tab completion for git status files {
-            _git_status_files () {
-                files=$(git status --porcelain | awk '{print $2 }')
-                set -A flist ${(@s/
-/)files}
-                compadd - ${flist}
-            }
-
-            zle -C git-files menu-complete _git_status_files
-            # usage
-            # $ git add <Escape>g<Tab>
-            bindkey '\eg' git-files
-        # }
-
         # fzf filter for the output of the previous command {
             fzf_filter_prev () {
                 selection=$(fc -e - | fzf)
@@ -363,6 +350,32 @@
             # $ ls
             # $ <Escape>f
             bindkey -s '\ef' 'fzf_filter_prev\n'
+        # }
+
+        # copy the output of the previous command to clipboard {
+            cp_prev () {
+                fc -e - | pbcopy
+            }
+
+            zle -N cp_prev
+            # usage
+            # $ ls
+            # $ <Escape>c
+            bindkey -s '\ec' 'cp_prev\n'
+        # }
+
+        # tab completion for git status files {
+            _git_status_files () {
+                files=$(git status --porcelain | awk '{print $2 }')
+                set -A flist ${(@s/
+/)files}
+                compadd - ${flist}
+            }
+
+            zle -C git-files menu-complete _git_status_files
+            # usage
+            # $ git add <Escape>g<Tab>
+            bindkey '\eg' git-files
         # }
 
         # magic enter = ls && git status {
@@ -459,10 +472,14 @@
 
         # git {
             # find all .git directories and exec "git pull" on the parent.
+            alias gs='git status'
+            alias ga='git add'
+            alias gpl='git pull'
+            alias gps='git push'
             alias git_pull_rec='find . -name .git -exec sh -c "cd \"{}\"/../ && pwd && git pull" \;'
             alias git_ignore_del='git ls-files --deleted -z | git update-index --assume-unchanged -z --stdin'
             alias git_remote_url='open `git config --get remote.origin.url`'
-            alias git_commit_fire='git add -A && git commit -a --allow-empty-message -m "" && git push'
+            alias git_push_fire='git add -A && git commit -a --allow-empty-message -m "" && git push'
         # }
     # }
 
@@ -781,6 +798,21 @@ FZF-EOF"
     # }}}
 
     # git {{{
+        # git diff
+        gd () {
+            git diff $1 $2
+        }
+
+        # git add
+        ga () {
+            git add $@
+        }
+
+        # git commit -m
+        gc () {
+            git commit -m "$1"
+        }
+
         # cd to git root
         cdg () {
             cd `git rev-parse --show-toplevel`
@@ -923,8 +955,20 @@ FZF-EOF"
     # }}}
 
     # actions {{{
+        # escape spaces
+        esc () {
+            echo ${(q)@}
+        }
+
+        # print time logged in
+        print_uptime () {
+            last | grep `whoami` | grep -v logged | cut -c61-71 | sed -e 's/[()]//g' | awk '{ sub("\\+", ":");split($1,a,":");if(a[3]){print a[1]*60*60+a[2]*60+a[3]} else {print a[1]*60+a[2] }; }' | paste -s -d+ - | bc | awk '{printf "%dh:%dm:%ds\n",$1/(60*60),$1%(60*60)/60,$1%60}'
+        }
+
+
         # print a divider
         div () {
+            echo ""
             imgcat ~dropbox/Bilder/Art/MC-Escher-Metamorphosis.jpg
         }
         # create an executable script
@@ -934,6 +978,10 @@ FZF-EOF"
                 chmod +x "$1"
                 eval ${EDITOR_TAB} "$1"
             }
+        }
+
+        cd_mkdir () {
+            mkdir $1 && cd $_
         }
 
         # move file/dir to trash
@@ -962,6 +1010,12 @@ FZF-EOF"
 
         # copy the current working dir to clipboard
         cwd () { pwd | pbcopy }
+
+        # copy the last command to clipboard
+        cbb () {
+            # echo "!!" | pbcopy
+            history | tail -1 | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}' | pbcopy
+        }
 
         # calculator
         = () {
