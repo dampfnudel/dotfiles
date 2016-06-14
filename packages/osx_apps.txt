@@ -28,6 +28,7 @@ JustLooking
 Keka
 LibreOffice
 Limechat
+MacBreakZ
 MacVim
 OpenEmu
 PyCharm
@@ -42,4 +43,5 @@ TrueCrypt
 VLC
 VirtualBox
 Wunderlist
+gitup
 yEd
