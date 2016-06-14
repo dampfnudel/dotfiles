@@ -1,6 +1,32 @@
+; vim: set ft=lisp ts=4 sw=4 expandtab :
+
+;    ███████╗███╗   ███╗ █████╗  ██████╗███████╗██████╗  ██████╗
+;    ██╔════╝████╗ ████║██╔══██╗██╔════╝██╔════╝██╔══██╗██╔════╝
+;    █████╗  ██╔████╔██║███████║██║     ███████╗██████╔╝██║
+;    ██╔══╝  ██║╚██╔╝██║██╔══██║██║     ╚════██║██╔══██╗██║
+; ██╗███████╗██║ ╚═╝ ██║██║  ██║╚██████╗███████║██║  ██║╚██████╗
+; ╚═╝╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚══════╝╚═╝  ╚═╝ ╚═════╝
+
+; ASCII-Art credits: http://patorjk.com/software/taag/#p=testall&h=0&v=0&f=ANSI%20Shadow&t=.emacsrc
+
+;;; TODO {
+    ; orgmodify
+        ; magit
+        ; restclient
+        ; dired
+        ; ace-jump
+        ; yasnippet
+        ; undo tree
+        ; expand region
+        ; eshell
+        ; paredit
+        ; doctor
+        ; dunnet
+;;; }
+
 ;;; general {
     ;;; theme
-    (load-theme 'misterioso)
+    ; (load-theme 'misterioso)
 
     ;;; disable blinking cursor
     (blink-cursor-mode 0)
@@ -9,15 +35,29 @@
     (setq ns-pop-up-frames nil)
 
     ;;; disable audio bell
-     (setq visible-bell t)
+    (setq ring-bell-function 'ignore)
 
     ;;; disable tool-bar
     (tool-bar-mode -1)
+
     ;;; set font size to 16pt
     (set-face-attribute 'default nil :height 160)
 
+    ;;; show line numbers
+    (global-linum-mode t)
+
     ;;; show trailing whitespace
     (setq-default show-trailing-whitespace t)
+
+    ;;; set backup directory
+    (setq backup-directory-alist `(("." . "~/.emacs.d/backup")))
+    ;;; backup method
+    (setq backup-by-copying t)
+    ;;; backup frequency
+    (setq delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)
 ;;; }
 
 ;;; key mappings {
@@ -65,3 +105,21 @@
     ;;; fireplace
     (require 'fireplace)
 ;;; }
+
+;;; custom {
+    (custom-set-variables
+	;; custom-set-variables was added by Custom.
+	;; If you edit it by hand, you could mess it up, so be careful.
+	;; Your init file should contain only one such instance.
+	;; If there is more than one, they won't work right.
+	'(custom-enabled-themes (quote (zenburn)))
+	'(custom-safe-themes
+	(quote
+	    ("afbb40954f67924d3153f27b6d3399df221b2050f2a72eb2cfa8d29ca783c5a8" default))))
+	(custom-set-faces
+	;; custom-set-faces was added by Custom.
+	;; If you edit it by hand, you could mess it up, so be careful.
+	;; Your init file should contain only one such instance.
+	;; If there is more than one, they won't work right.
+    )
+; }
