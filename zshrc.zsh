@@ -1,3 +1,5 @@
+# vim: set ft=zsh ts=4 sw=4 expandtab :
+
 #          ▄███████▄     ▄████████    ▄█    █▄       ▄████████  ▄████████
 #          ▀█▀▄███▀▄▄   ███         ▄███▄▄▄▄███▄▄  ▄███▄▄▄▄██▀ ███
 #           ▄███▀   ▀ ▀███████████ ▀▀███▀▀▀▀███▀  ▀▀███▀▀▀▀▀   ███
@@ -9,6 +11,8 @@
 # ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.zshrc
 
 # TODO {{{
+    # dir consts
+        # python
     # https://github.com/unixorn/git-extra-commands
     # https://github.com/supercrabtree/k
     # better imgls
@@ -236,6 +240,7 @@
         export PROJECT_HOME=$HOME/Workspace
         export WORKON_HOME=$HOME/Workspace/Envs
         export VIRTUALENV_ROOT=$WORKON_HOME
+        export DEFAULT_PYTHON_INTERPRETER=$WORKON_HOME/python2.7.5/bin/python
         source /usr/local/bin/virtualenvwrapper.sh
 
         # fix the new tab = virtual_env dir bug
@@ -261,46 +266,54 @@
 # }}}
 
 # hashes / named directories {{{
-    hash -d dev=$HOME/Workspace
+    hash -d ai=$HOME/Workspace/ai
     hash -d bay=$HOME/Workspace/bay
-    hash -d fzf_marks=$HOME/Workspace/fzf_marks
-    hash -d gists=$HOME/Workspace/gists
-    hash -d hackedHN=$HOME/Workspace/hackedHN
-    hash -d moment=$HOME/Workspace/moment
-    hash -d jason=$HOME/Workspace/moment/jason
-    hash -d impure=$HOME/Workspace/impure
-    hash -d regiobot=$HOME/Workspace/regiobot
-    hash -d rg=$HOME/Workspace/regiobot/regiobot
-    hash -d import=$HOME/Workspace/regiobot/regiobot/import
-    hash -d scripts=$HOME/Workspace/scripts
-    hash -d termxplorer=$HOME/Workspace/termxplorer
-    hash -d test=$HOME/Workspace/test_repo
-    hash -d tx=$HOME/Workspace/termxplorer/docker
-    hash -d til=$HOME/Workspace/til
-    hash -d dotfiles=$HOME/Settings/dotfiles
-    hash -d colors=$HOME/Settings/colors
-    hash -d oh-my-zsh=$HOME/.oh-my-zsh
-    hash -d custom=$HOME/.oh-my-zsh/custom
     hash -d bin=$HOME/bin
+    hash -d colors=$HOME/Settings/colors
+    hash -d custom=$HOME/.oh-my-zsh/custom
     hash -d desktop=$HOME/Desktop
+    hash -d dev=$HOME/Workspace
     hash -d documents=$HOME/Documents
-    hash -d firma=$HOME/Documents/firma
-    hash -d plan=$HOME/Documents/plan
+    hash -d dotfiles=$HOME/Settings/dotfiles
     hash -d downloads=$HOME/Downloads
     hash -d dropbox=$HOME/Dropbox
-    hash -d pictures=$HOME/Pictures
-    hash -d library=$HOME/Library
-    hash -d settings=$HOME/Settings
-    hash -d trash=$HOME/.Trash
+    hash -d firma=$HOME/Documents/firma
+    hash -d fzf_marks=$HOME/Workspace/fzf_marks
+    hash -d gist_vim=$HOME/Workspace/gists/vim_cheatsheet
+    hash -d gist_zsh=$HOME/Workspace/gists/zsh_cheatsheet
+    hash -d gists=$HOME/Workspace/gists
+    hash -d hackedHN=$HOME/Workspace/hackedHN
+    hash -d import=$HOME/Workspace/regiobot/regiobot/import
+    hash -d impure=$HOME/Workspace/impure
     hash -d intenso32=/Volumes/INGOT32/
+    hash -d jason=$HOME/Workspace/moment/jason
+    hash -d library=$HOME/Library
+    hash -d moment=$HOME/Workspace/moment
+    hash -d music=$HOME/Music
+    hash -d oh-my-zsh=$HOME/.oh-my-zsh
+    hash -d pictures=$HOME/Pictures
+    hash -d plan=$HOME/Documents/plan
+    hash -d regiobot=$HOME/Workspace/regiobot
+    hash -d rg=$HOME/Workspace/regiobot/regiobot
+    hash -d scripts=$HOME/Workspace/scripts
+    hash -d settings=$HOME/Settings
+    hash -d termxplorer=$HOME/Workspace/termxplorer
+    hash -d test=$HOME/Workspace/test_repo
+    hash -d til=$HOME/Workspace/til
+    hash -d trash=$HOME/.Trash
+    hash -d tx=$HOME/Workspace/termxplorer/docker
+    hash -d videos=$HOME/Movies
 
     # files
-    hash -d rg_ctrl=~/Workspace/regiobot/regiobot/web/regiobot/static/regiobot/js/regiobot_ctrl.js
-    hash -d zshrc=~/.zshrc
-    hash -d vimrc=~/.vimrc
-    hash -d zsh_cheatsheet=~/Workspace/gists/zsh_cheatsheet/zsh.md
-    hash -d vim_cheatsheet=~/Workspace/gists/vim_cheatsheet/vim.md
-    hash -d emacs_cheatsheet=~/Workspace/gists/emacs_cheatsheet/emacs.md
+    hash -d emacs_cheatsheet=$HOME/Workspace/gists/emacs_cheatsheet/emacs.md
+    hash -d emacsrc=$HOME/Settings/dotfiles/emacsrc.el
+    hash -d notes_ai=$HOME/Workspace/ai/notes.org
+    hash -d pjs=$HOME/Documents/pjs.md
+    hash -d rg_ctrl=$HOME/Workspace/regiobot/regiobot/web/regiobot/static/regiobot/js/regiobot_ctrl.js
+    hash -d vim_cheatsheet=$HOME/Workspace/gists/vim_cheatsheet/vim.md
+    hash -d vimrc=$HOME/.vimrc
+    hash -d zsh_cheatsheet=$HOME/Workspace/gists/zsh_cheatsheet/zsh.md
+    hash -d zshrc=$HOME/.zshrc
 # }}}
 
 # keybindings / keymappings {{{
@@ -457,7 +470,8 @@
     alias pony='fortune | ponysay'
     alias wttr='curl http://wttr.in'
     alias moon='curl http://wttr.in/Moon'
-    alias yt3='cd $HOME/Downloads; youtube-dl --verbose --extract-audio --audio-format mp3 '
+    alias yt3='$WORKON_HOME/python2.7.5/bin/youtube-dl --verbose --extract-audio --audio-format mp3'
+    alias yt='$WORKON_HOME/python2.7.5/bin/youtube-dl'
     # alias emacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs'
     alias emacs='open -a Emacs.app'
     alias cemacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs -nw'
@@ -474,11 +488,25 @@
             alias gs='git status'
             alias gpl='git pull'
             alias gps='git push'
+            alias gl='git log'
             # find all .git directories and exec "git pull" on the parent.
             # alias git_pull_rec='find . -name .git -exec sh -c "cd \"{}\"/../ && pwd && git pull" \;'
             alias git_ignore_del='git ls-files --deleted -z | git update-index --assume-unchanged -z --stdin'
             alias git_remote_url='open `git config --get remote.origin.url`'
             alias git_push_fire='git add -A && git commit -a --allow-empty-message -m "" && git push'
+            alias git_graph='git log --oneline --graph'
+            alias git_branch='git branch | cut -c3-'
+        # }
+
+        # docker {
+            # kill all running containers
+            alias docker_kill_all='docker kill $(docker ps -q)'
+            # delete all stopped containers
+            alias docker_rm_stopped_containers='printf "\n>>> Deleting stopped containers\n\n" && docker rm $(docker ps -a -q)'
+            # delete all untagged images
+            alias docker_rmi_untagged='printf "\n>>> Deleting untagged images\n\n" && docker rmi $(docker images -q -f dangling=true)'
+            # delete all stopped containers and untagged images
+            alias docker_clean='docker_rm_stopped_containers || true && docker_rmi_untagged'
         # }
     # }
 
@@ -1003,9 +1031,9 @@ FZF-EOF"
         }
 
         # lookup dict.cc
-        de () { $HOME/Utils/dict.cc.py/dict.cc.py de en "$1"; }
+        de () { $DEFAULT_PYTHON_INTERPRETER $HOME/Utils/dict.cc.py/dict.cc.py de en "$1"; }
         # lookup dict.cc for english words
-        en () { $HOME/Utils/dict.cc.py/dict.cc.py en de "$1"; }
+        en () { $DEFAULT_PYTHON_INTERPRETER $HOME/Utils/dict.cc.py/dict.cc.py en de "$1"; }
 
         # copy the current working dir to clipboard
         cwd () { pwd | pbcopy }
