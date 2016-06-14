@@ -604,9 +604,10 @@
             " colorscheme dracula
             " colorscheme Spacedust
             " colorscheme inkpot
-            colorscheme solarized
+            " colorscheme solarized
             " colorscheme molokai
             " colorscheme gruvbox
+            colorscheme zenburn
 
             " colorscheme PaperColor
             " colorscheme facebook
@@ -628,6 +629,11 @@
 " plugin settings {{{
     " Airline
     " {
+        if has('gui_running')
+            let g:airline_theme = 'zenburn'
+        else
+            let g:airline_theme = 'badwolf'
+        endif
         if !exists('g:airline_symbols')
             let g:airline_symbols = {}
         endif
@@ -649,12 +655,6 @@
         let g:airline_symbols.whitespace = 'Ξ'
 
         let g:airline_detect_modified = 1
-        if has('gui_running')
-            let g:airline_theme = 'solarized'
-        else
-            let g:airline_theme = 'badwolf'
-        endif
-
         let g:airline#extensions#tagbar#enabled = 1
 
         " total linenr/total lines
@@ -807,7 +807,8 @@
         " :SDelete
         let g:startify_bookmarks = [
                 \ '~/.vimrc',
-                \ '~/.zshrc'
+                \ '~/.zshrc',
+                \ '~/.emacs.d/init.el'
                 \ ]
         let g:startify_change_to_dir = 1
         let g:startify_change_to_vcs_root = 0
