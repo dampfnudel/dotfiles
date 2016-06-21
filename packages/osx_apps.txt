@@ -9,6 +9,7 @@ Firefox
 Flux
 Flycut
 Gimp
+GitKraken
 Google Chrome
     AdBlock
     Ghostery
