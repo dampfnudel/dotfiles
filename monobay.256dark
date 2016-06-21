@@ -203,7 +203,6 @@ EXEC 01;38;5;196
 .md              01;38;5;186
 .org             01;38;5;186
 .markdown        01;38;5;186
-*README.markdown 01;38;5;186
 .ini             01;38;5;186
 .yml             01;38;5;186
 .cfg             01;38;5;186
@@ -214,10 +213,15 @@ EXEC 01;38;5;196
 .csv             01;38;5;186
 .log             01;38;5;186
 .min             01;38;5;186
-*LICENSE          01;38;5;186
-*license          01;38;5;186
+*LICENSE         01;38;5;186
+*license         01;38;5;186
+.sqlite3         01;38;5;186
+*Dockerfile      01;38;5;186
+*Makefile        01;38;5;186
+*Rakefile        01;38;5;186
+*build.xml       01;38;5;186
 
-# "unimportant" files as logs and backups (base01)
+# "unimportant" files as backups (base01)
 .bak        00;38;5;240
 .aux        00;38;5;240
 .lof        00;38;5;240
@@ -288,5 +292,3 @@ EXEC 01;38;5;196
 .anx 01;38;5;197
 .ogv 01;38;5;197
 .ogx 01;38;5;197
-
-
