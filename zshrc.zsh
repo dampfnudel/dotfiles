@@ -11,6 +11,7 @@
 # ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.zshrc
 
 # TODO {{{
+    # impure `docker-machine active 2> /dev/null`
     # dir consts
         # python
     # https://github.com/unixorn/git-extra-commands
@@ -21,11 +22,10 @@
     # iterm2 drag files to cmd
     # global aliases
     # http://www.wunderline.rocks/
-    # aafire
-    # mdfind
-    # structure!
     # num block
     # fzf
+        # fo multiple files
+        # docker unify docker cmds
         # ctrl-t for dirs
         # clipboard
         # commands
@@ -449,33 +449,40 @@
 
 # aliases {{{
     # filters / global aliases {
-        alias -g _null="> /dev/null 2>&1"
+        # redirect stdout, stderr
+        alias -g _no_output='> /dev/null 2>&1'
+        # redirect stderr
+        alias -g _no_stderr='2> /dev/null'
+        # redirect stdout
+        alias -g _no_stdout='&> /dev/null'
+
         alias -g _vim="| eval ${EDITOR_TAB}"
-        alias -g _cc='| pbcopy'
+        alias -g _copy='| pbcopy'
     # }
 
     # list {
         alias ls='gls --color=auto'
         alias ll='ls -lah'
         alias ls_size='ls -lahS'                # sort by size
-        alias ls_date='ls -latr'                 # sort by date
+        alias ls_date='ls -latr'                # sort by date
+        alias ls_today='find . -maxdepth 1 -type f -mtime 1'
         # numFiles: number of (non-hidden) files in current directory
         alias ls_count='echo $(ls -1 | wc -l)'
     # }
 
     # tools {
-    alias ag='ag --path-to-agignore ~/.agignore'
-    alias grep='grep --color'
-    alias df='df -h'
-    alias pony='fortune | ponysay'
-    alias wttr='curl http://wttr.in'
-    alias moon='curl http://wttr.in/Moon'
-    alias yt3='$WORKON_HOME/python2.7.5/bin/youtube-dl --verbose --extract-audio --audio-format mp3'
-    alias yt='$WORKON_HOME/python2.7.5/bin/youtube-dl'
-    # alias emacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs'
-    alias emacs='open -a Emacs.app'
-    alias cemacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs -nw'
-    alias bpython='$WORKON_HOME/python3.4.1/bin/bpython'
+        alias ag='ag --path-to-agignore ~/.agignore'
+        alias grep='grep --color'
+        alias df='df -h'
+        alias pony='fortune | ponysay'
+        alias wttr='curl http://wttr.in'
+        alias moon='curl http://wttr.in/Moon'
+        alias yt3='$WORKON_HOME/python2.7.5/bin/youtube-dl --verbose --extract-audio --audio-format mp3 --no-mtime'
+        alias yt='$WORKON_HOME/python2.7.5/bin/youtube-dl --no-mtime'
+        # alias emacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs'
+        alias emacs='open -a Emacs.app'
+        alias cemacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs -nw'
+        alias bpython='$WORKON_HOME/python3.4.1/bin/bpython'
 
         # vim {
             alias mvim=${EDITOR}
@@ -499,6 +506,21 @@
         # }
 
         # docker {
+            alias start_regiobot='docker-machine start regiobot && eval "$(docker-machine env regiobot)"'
+            alias stop_regiobot='docker-machine stop regiobot'
+
+            alias start_termxplorer='docker-machine start termxplorer && eval "$(docker-machine env termxplorer)"'
+            alias stop_termxplorer='docker-machine stop termxplorer'
+
+            # stop all containers
+            alias docker_stop_all='docker stop $(docker ps -a -q)'
+            # rm all containers
+            alias docker_rm_all='docker rm $(docker ps -a -q)'
+            # stop and rm all containers
+            alias docker_nuke='docker_stop_all && docker_rm_all'
+            # remove all images
+            alias docker_rmi_all='docker rmi $(docker images -q)'
+
             # kill all running containers
             alias docker_kill_all='docker kill $(docker ps -q)'
             # delete all stopped containers
@@ -517,6 +539,8 @@
         alias dirs='dirs -vp'
         # substitute windows linebreak with unix linebreak
         alias fix_linebreaks="/usr/bin/perl -i -pe's/\r$//'"
+        # open a gist with fzf
+        alias gist='(cd ~gists && fo)'
 
         # osx {
             alias osx_show_hidden='defaults write com.apple.Finder AppleShowAllFiles YES && killall Finder'
@@ -529,17 +553,6 @@
             alias rm_ds_store='find . -name .DS_Store -exec rm {} \;'
             alias rm_pyc_files='find . -name "*.pyc" -exec rm {} \;'
             alias rm_svn_files='find . -type d -name .svn -exec rm -rf {} \;'
-        # }
-
-        # directory navigation {
-            alias ..='cd ..'
-            alias ...='cd ../..'
-            alias ....='cd ../../..'
-            alias .....='cd ../../../..'
-            alias ......='cd ../../../../..'
-            alias .......='cd ../../../../../..'
-            alias ........='cd ../../../../../../..'
-            alias .........='cd ../../../../../../../..'
         # }
 
         # file-shortcuts {
@@ -598,10 +611,10 @@
         agg () { /usr/local/bin/ag "$@" `git rev-parse --show-toplevel` ; }
         gagg () { agg "$@" ; }
 
-        # locatemd: to search for a file using Spotlight's metadata
+        # search for a file using Spotlight's metadata
         spotlight () { mdfind "kMDItemDisplayName == '$@'wc"; }
 
-        # finderComment: show the SpotLight comment for a file
+        # show the SpotLight comment for a file
         spotlight_comment () { mdls "$1" | grep kMDItemFinderComment ; }
 
         # locaterecent: to search for files created since yesterday using Spotlight
@@ -642,6 +655,7 @@
                 echo "$screenshot_path/${(q)screenshot}"
                 [ "$key" = ctrl-y ] && echo "$screenshot_path/${(q)screenshot}" | pbcopy || $(open $screenshot_path/$screenshot)
             }
+
             # fzf open
             # fe [FUZZY PATTERN] - Open the selected file with the default editor
             #   - Bypass fuzzy finder if there's only one match (--select-1)
@@ -660,6 +674,11 @@
                 fi
             }
             alias fo='f_open'
+
+            # open a file at path
+            fo_at () {
+                (cd "$1" && fo)
+            }
 
             # fzf cd - cd to selected directory
             f_cd () {
@@ -735,6 +754,45 @@
                             xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
                             {}
 FZF-EOF"
+            }
+
+            # pick a container id from all containers
+            f_docker_container_id () {
+                local selection c_id
+                selection=$(docker ps -a | fzf --reverse --header-lines=1 --prompt="🐳  ")
+                c_id=$(echo $selection | awk '{print $1}')
+                echo $c_id | pbcopy
+                echo "copied:"
+                echo $c_id
+            }
+
+            f_docker_exec_select () {
+                local selection c_id cmd
+                selection=$(docker ps -a | fzf --reverse --header-lines=1 --prompt="🐳  ")
+                c_id=$(echo $selection | awk '{print $1}')
+                cmd="docker exec -id $c_id /bin/bash"
+                echo $cmd
+                eval $cmd
+            }
+
+            # pick a container id from all running containers
+            f_docker_container_running_id () {
+                local selection c_id
+                selection=$(docker ps | fzf --reverse --header-lines=1 --prompt="🐳  ")
+                c_id=$(echo $selection | awk '{print $1}')
+                echo $c_id | pbcopy
+                echo "copied:"
+                echo $c_id
+            }
+
+            # pick an image name
+            f_docker_image_name () {
+                local selection c_id
+                selection=$(docker ps -a | fzf --reverse --header-lines=1 --prompt="🐳  ")
+                c_id=$(echo $selection | awk '{print $2}')
+                echo $c_id | pbcopy
+                echo "copied:"
+                echo $c_id
             }
 
             # c - browse chrome history
@@ -982,6 +1040,10 @@ FZF-EOF"
     # }
 
     # actions {
+        diff_sorted () {
+            diff <(sort "$1") <(sort "$2")
+        }
+
         # escape spaces
         esc () {
             echo ${(q)@}
