@@ -23,7 +23,10 @@
     # global aliases
     # http://www.wunderline.rocks/
     # num block
+    # git add without """
     # fzf
+        # spotlight open
+        # git add
         # fo multiple files
         # docker unify docker cmds
         # ctrl-t for dirs
@@ -281,6 +284,7 @@
     hash -d fzf_marks=$HOME/Workspace/fzf_marks
     hash -d gist_vim=$HOME/Workspace/gists/vim_cheatsheet
     hash -d gist_zsh=$HOME/Workspace/gists/zsh_cheatsheet
+    hash -d gist_zsh=$HOME/Workspace/gists/emacs_cheatsheet
     hash -d gists=$HOME/Workspace/gists
     hash -d hackedHN=$HOME/Workspace/hackedHN
     hash -d import=$HOME/Workspace/regiobot/regiobot/import
@@ -366,7 +370,7 @@
         # }
 
         # copy the output of the previous command to clipboard {
-            cp_prev () {
+            copy_prev () {
                 fc -e - | pbcopy
             }
 
@@ -503,6 +507,7 @@
             alias git_push_fire='git add -A && git commit -a --allow-empty-message -m "" && git push'
             alias git_graph='git log --oneline --graph'
             alias git_branch='git branch | cut -c3-'
+            alias git_undo_commit='git reset --soft HEAD~'
         # }
 
         # docker {
@@ -533,14 +538,17 @@
     # }
 
     # actions {
+        # open a gist with fzf
+        alias gist='(cd ~gists && fo)'
+        alias dotfile='(cd ~dotfiles && fo)'
+
+
         alias s='source ~/.zshrc'
         alias i_am_root='su -c "$(history -p !-1)"'
         alias printip='ifconfig | grep "inet " | grep -v 127.0.0.1 | cut -d\  -f2'
         alias dirs='dirs -vp'
         # substitute windows linebreak with unix linebreak
         alias fix_linebreaks="/usr/bin/perl -i -pe's/\r$//'"
-        # open a gist with fzf
-        alias gist='(cd ~gists && fo)'
 
         # osx {
             alias osx_show_hidden='defaults write com.apple.Finder AppleShowAllFiles YES && killall Finder'
@@ -614,6 +622,10 @@
         # search for a file using Spotlight's metadata
         spotlight () { mdfind "kMDItemDisplayName == '$@'wc"; }
 
+        f_spotlight () {
+            smart_open $(spotlight "$@" | fzf)
+        }
+
         # show the SpotLight comment for a file
         spotlight_comment () { mdls "$1" | grep kMDItemFinderComment ; }
 
@@ -627,6 +639,10 @@
 
         mru () {
             find ~ \( -path '*/\.*' -o -path '/Users/mbayer/Library*' -o -path '/Users/mbayer/Pictures/Fotos-Mediathek.photoslibrary*' -o -path '/Users/mbayer/Workspace/Envs*' \) -prune -o \( -name '*\.pyc' \) -prune -o -type f -mtime -7 -perm -g+r,u+r,o+r -print | sed '/Dropbox.*Icon*/d'
+        }
+
+        f_mru () {
+            smart_open $(mru | fzf)
         }
 
         # list_all_apps: list all applications on the system
@@ -770,10 +786,11 @@ FZF-EOF"
                 local selection c_id cmd
                 selection=$(docker ps -a | fzf --reverse --header-lines=1 --prompt="🐳  ")
                 c_id=$(echo $selection | awk '{print $1}')
-                cmd="docker exec -id $c_id /bin/bash"
+                cmd="docker exec -it $c_id /bin/bash"
                 echo $cmd
                 eval $cmd
             }
+            alias docker_shell='f_docker_exec_select'
 
             # pick a container id from all running containers
             f_docker_container_running_id () {
@@ -895,7 +912,7 @@ FZF-EOF"
 
         # git commit -m
         gc () {
-            git commit -m "$1"
+            git commit -m "$@"
         }
 
         # cd to git root
@@ -1098,10 +1115,10 @@ FZF-EOF"
         en () { $DEFAULT_PYTHON_INTERPRETER $HOME/Utils/dict.cc.py/dict.cc.py en de "$1"; }
 
         # copy the current working dir to clipboard
-        cwd () { pwd | pbcopy }
+        copy_pwd () { pwd | pbcopy }
 
         # copy the last command to clipboard
-        cbb () {
+        copy_last_cmd () {
             # echo "!!" | pbcopy
             history | tail -1 | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}' | pbcopy
         }
