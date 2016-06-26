@@ -120,6 +120,7 @@
     Plugin 'junegunn/vim-journal'
     Plugin 'godlygeek/csapprox'
     Plugin 'davidhalter/jedi-vim'
+    Plugin 'jceb/vim-orgmode'
 
     " plugin examples
     " {
