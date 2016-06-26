@@ -19,7 +19,7 @@
 	<key>AutoHideTmuxClientSession</key>
 	<false/>
 	<key>CheckTestRelease</key>
-	<true/>
+	<false/>
 	<key>ClosingHotkeySwitchesSpaces</key>
 	<false/>
 	<key>CommandSelection</key>
@@ -42078,11 +42078,13 @@
 	<key>NSWindow Frame NSFontPanel</key>
 	<string>824 235 445 77 0 0 1440 877 </string>
 	<key>NSWindow Frame Preferences</key>
-	<string>229 381 606 456 0 0 1440 877 </string>
+	<string>1847 415 606 456 1440 -540 2560 1417 </string>
+	<key>NSWindow Frame SUUpdateAlert</key>
+	<string>2410 228 620 392 1440 -540 2560 1417 </string>
 	<key>NSWindow Frame UKCrashReporter</key>
 	<string>1567 294 592 584 1440 -150 1680 1028 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>3 11 1434 858 0 0 1440 877 </string>
+	<string>3 11 954 1038 0 0 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>150 287 1290 567 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
@@ -42725,7 +42727,7 @@
 				<key>editor</key>
 				<string>org.vim.MacVim</string>
 				<key>text</key>
-				<string>/Users/mbayer/Workspace/scripts/iterm2open.sh \1 +\2</string>
+				<string>/Users/mbayer/Workspace/scripts/iterm2open \1 +\2</string>
 			</dict>
 			<key>Send Code When Idle</key>
 			<false/>
@@ -43601,6 +43603,8 @@
 			<string>/Users/mbayer</string>
 		</dict>
 	</array>
+	<key>NoSyncConfirmBeta</key>
+	<true/>
 	<key>NoSyncDoNotWarnBeforePastingOneLineEndingInNewlineAtShellPrompt</key>
 	<true/>
 	<key>NoSyncDoNotWarnBeforePastingOneLineEndingInNewlineAtShellPrompt_selection</key>
@@ -43610,7 +43614,7 @@
 	<key>NoSyncInstallationId</key>
 	<string>654E3C3E-FF6A-440E-95B1-E67E045095D3</string>
 	<key>NoSyncLastTipTime</key>
-	<real>487519183.36384398</real>
+	<real>488457564.240924</real>
 	<key>NoSyncPermissionToShowTip</key>
 	<true/>
 	<key>NoSyncTimeOfFirstLaunchOfVersionWithTip</key>
@@ -43628,6 +43632,16 @@
 		<string>0003</string>
 		<string>0004</string>
 		<string>0005</string>
+		<string>0006</string>
+		<string>0007</string>
+		<string>0008</string>
+		<string>0009</string>
+		<string>0010</string>
+		<string>0011</string>
+		<string>0012</string>
+		<string>0013</string>
+		<string>0014</string>
+		<string>0015</string>
 	</array>
 	<key>OnlyWhenMoreTabs</key>
 	<false/>
@@ -43693,11 +43707,11 @@
 	<key>SUFeedAlternateAppNameKey</key>
 	<string>iTerm</string>
 	<key>SUFeedURL</key>
-	<string>https://iterm2.com/appcasts/testing.xml?shard=23</string>
+	<string>https://iterm2.com/appcasts/final.xml?shard=23</string>
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2016-06-12T17:51:18Z</date>
+	<date>2016-06-23T08:56:00Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>SavePasteHistory</key>
@@ -43761,7 +43775,7 @@
 	<key>findRegex_iTerm</key>
 	<false/>
 	<key>iTerm Version</key>
-	<string>3.0.0</string>
+	<string>3.0.2</string>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>0</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
