@@ -10,7 +10,17 @@
 ; ASCII-Art credits: http://patorjk.com/software/taag/#p=testall&h=0&v=0&f=ANSI%20Shadow&t=.emacsrc
 
 ;;; TODO {
+    ; osx
+        ; shell open
+        ; copy
+        ; cmd a
     ; orgmodify
+        ; cheatsheets
+        ; org-files
+        ; archive
+        ; capture
+        ; evil o
+    ; plugins
         ; magit
         ; restclient
         ; dired
@@ -27,6 +37,12 @@
 ;;; general {
     ;;; theme
     ; (load-theme 'misterioso)
+
+    ;;; use 4 spaces instead of tabs
+    ; (setq-default indent-tabs-mode nil)
+    ; (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60
+    ;                       64 68 72 76 80 84 88 92 96 100 104 108 112
+    ;                       116 120))
 
     ;;; disable blinking cursor
     (blink-cursor-mode 0)
@@ -67,23 +83,33 @@
     (if (boundp 'ns-option-modifier)
         (setq ns-option-modifier nil))
 
-    ;;; osx: quit, close, copy, paste, save
-    (global-set-key (kbd "M-q") 'save-buffers-kill-terminal)
-    (global-set-key (kbd "M-w") 'kill-buffer)
-    (global-set-key (kbd "M-c") 'kill-ring-save)
-    (global-set-key (kbd "M-v") 'yank)
-    (global-set-key (kbd "M-s") 'save-buffer)
+    ;;; osx
+    (global-set-key (kbd "M-q") 'save-buffers-kill-terminal)        ; quit
+    (global-set-key (kbd "M-w") 'kill-buffer)                       ; close
+    (global-set-key (kbd "M-c") 'kill-ring-save)                    ; copy
+    (global-set-key (kbd "M-v") 'yank)                              ; paste
+    (global-set-key (kbd "M-s") 'save-buffer)                       ; save
+    (global-set-key (kbd "M-a") 'mark-whole-buffer)                 ; select all
 ;;; }
 
 
 ;;; plugins {
     ;;; activate package managers
     (require 'package)
-    (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
     (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
     (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
-    (setq package-enable-at-startup nil)
+    (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
+    (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+    ; (setq package-enable-at-startup nil)
     (package-initialize)
+
+    ;; weather-metno-el
+    (require 'weather-metno)
+    (add-to-list 'load-path "~/.emacs.d/elpa/weather-metno-20150831.1807")
+    (setq weather-metno-get-image-props '(:width 16 :height 16 :ascent center))
+    (setq weather-metno-location-name "Lindau, Germany"
+      weather-metno-location-latitude 47
+      weather-metno-location-longitude 9)
 
     ;;; org-mode
     (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
@@ -91,9 +117,27 @@
     (define-key global-map "\C-cl" 'org-store-link)
     (define-key global-map "\C-ca" 'org-agenda)
     (setq org-log-done t)
+    (setq org-agenda-files (append '("~/.notes.org") (file-expand-wildcards "~/Documents/org/cal/*\.org")))
+
+    ; Must have org-mode loaded before we can configure org-babel
+    ; (require 'org-install)
+
+    ; Some initial langauges we want org-babel to support
+    (org-babel-do-load-languages
+        'org-babel-load-languages '(
+            (sh . t)
+            (python . t)
+            (ruby . t)
+            (sqlite . t)
+            (java . t)
+            (js . t)
+            (sql . t)
+            (css . t)
+    ))
 
     ;;; os-rst (org-mode rst export)
     (require 'ox-rst)
+    (require 'ox-odt)
 
     ;;; evil
     (require 'evil)
@@ -101,6 +145,8 @@
 
     ;;; helm
     (require 'helm-config)
+    ;;; set helm-M-x as default
+    (global-set-key (kbd "M-x") 'helm-M-x)
 
     ;;; fireplace
     (require 'fireplace)
