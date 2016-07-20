@@ -11,6 +11,7 @@
 # ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.zshrc
 
 # TODO {{{
+    # pbpaste | vim
     # impure `docker-machine active 2> /dev/null`
     # dir consts
         # python
@@ -283,20 +284,22 @@
     hash -d firma=$HOME/Documents/firma
     hash -d fzf_marks=$HOME/Workspace/fzf_marks
     hash -d gist_vim=$HOME/Workspace/gists/vim_cheatsheet
-    hash -d gist_zsh=$HOME/Workspace/gists/zsh_cheatsheet
     hash -d gist_zsh=$HOME/Workspace/gists/emacs_cheatsheet
+    hash -d gist_zsh=$HOME/Workspace/gists/zsh_cheatsheet
     hash -d gists=$HOME/Workspace/gists
     hash -d hackedHN=$HOME/Workspace/hackedHN
+    hash -d i32=/Volumes/INGOT32
+    hash -d i64=/Volumes/INGOT64
     hash -d import=$HOME/Workspace/regiobot/regiobot/import
     hash -d impure=$HOME/Workspace/impure
-    hash -d intenso32=/Volumes/INGOT32/
     hash -d jason=$HOME/Workspace/moment/jason
     hash -d library=$HOME/Library
     hash -d moment=$HOME/Workspace/moment
     hash -d music=$HOME/Music
     hash -d oh-my-zsh=$HOME/.oh-my-zsh
+    hash -d org=$HOME/Documents/org
     hash -d pictures=$HOME/Pictures
-    hash -d plan=$HOME/Documents/plan
+    hash -d plan=$HOME/Documents/org/plan
     hash -d regiobot=$HOME/Workspace/regiobot
     hash -d rg=$HOME/Workspace/regiobot/regiobot
     hash -d scripts=$HOME/Workspace/scripts
@@ -475,12 +478,14 @@
     # }
 
     # tools {
+        alias p='pbpaste'
+        alias c='pbcopy'
         alias ag='ag --path-to-agignore ~/.agignore'
         alias grep='grep --color'
         alias df='df -h'
         alias pony='fortune | ponysay'
-        alias wttr='curl http://wttr.in'
-        alias moon='curl http://wttr.in/Moon'
+        alias wttr='curl -s http://wttr.in | tail +8 | head -30'
+        alias moon='curl -s wttr.in/Moon|head -25'
         alias yt3='$WORKON_HOME/python2.7.5/bin/youtube-dl --verbose --extract-audio --audio-format mp3 --no-mtime'
         alias yt='$WORKON_HOME/python2.7.5/bin/youtube-dl --no-mtime'
         # alias emacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs'
@@ -500,6 +505,7 @@
             alias gpl='git pull'
             alias gps='git push'
             alias gl='git log'
+            alias gco='git checkout'
             # find all .git directories and exec "git pull" on the parent.
             # alias git_pull_rec='find . -name .git -exec sh -c "cd \"{}\"/../ && pwd && git pull" \;'
             alias git_ignore_del='git ls-files --deleted -z | git update-index --assume-unchanged -z --stdin'
@@ -511,6 +517,7 @@
         # }
 
         # docker {
+            alias dm='docker-machine'
             alias start_regiobot='docker-machine start regiobot && eval "$(docker-machine env regiobot)"'
             alias stop_regiobot='docker-machine stop regiobot'
 
@@ -538,11 +545,6 @@
     # }
 
     # actions {
-        # open a gist with fzf
-        alias gist='(cd ~gists && fo)'
-        alias dotfile='(cd ~dotfiles && fo)'
-
-
         alias s='source ~/.zshrc'
         alias i_am_root='su -c "$(history -p !-1)"'
         alias printip='ifconfig | grep "inet " | grep -v 127.0.0.1 | cut -d\  -f2'
@@ -561,6 +563,7 @@
             alias rm_ds_store='find . -name .DS_Store -exec rm {} \;'
             alias rm_pyc_files='find . -name "*.pyc" -exec rm {} \;'
             alias rm_svn_files='find . -type d -name .svn -exec rm -rf {} \;'
+            alias rm_emacs_files="find . -maxdepth 1 -type f -name '#*#' -exec rm {}\;"
         # }
 
         # file-shortcuts {
@@ -685,8 +688,9 @@
                 key=$(head -1 <<< "$out")
                 file=$(head -2 <<< "$out" | tail -1)
                 if [ -n "$file" ]; then
-                    [ "$key" = ctrl-o ] && open "$file" || eval ${EDITOR_TAB} "$file"
-                    echo "$file"
+                    # [ "$key" = ctrl-o ] && open "$file" || eval ${EDITOR_TAB} "$file"
+                    [ "$key" = ctrl-o ] && open "$file" || smart_open "$file"
+                    # echo "$file"
                 fi
             }
             alias fo='f_open'
@@ -696,11 +700,27 @@
                 (cd "$1" && fo)
             }
 
+            # open a file under a hashed path
+            f_hash () {
+                local scope=$(hash -d | grep -v '_' | sed 's/=.*//' | grep "$1")
+                if [[ "$scope" != "" ]]; then
+                    local hash_path=$(hash -d | grep -v '_' | sed 's/.*=//' | grep "$scope")
+                    (cd "$hash_path" && fo)
+                else
+                    echo "unknown hash: $1"
+                fi
+            }
+
+            org () { (cd ~org && fo "$1") }
+            gist () { (cd ~gist && fo "$1") }
+            dotfile () { (cd ~dotfiles && fo "$1") }
+
             # fzf cd - cd to selected directory
             f_cd () {
               local dir
               dir=$(/usr/bin/find ${1:-*} -path '/*/\.*' -prune \
                               -o -type d -print 2> /dev/null | fzf +m) &&
+              realpath "$dir"
               cd "$dir"
             }
             alias fcd='f_cd'
@@ -784,7 +804,7 @@ FZF-EOF"
 
             f_docker_exec_select () {
                 local selection c_id cmd
-                selection=$(docker ps -a | fzf --reverse --header-lines=1 --prompt="🐳  ")
+                selection=$(docker ps | fzf --reverse --header-lines=1 --prompt="🐳  ")
                 c_id=$(echo $selection | awk '{print $1}')
                 cmd="docker exec -it $c_id /bin/bash"
                 echo $cmd
@@ -851,30 +871,33 @@ FZF-EOF"
             if [[ -d "$filename" ]]; then
                 cmd=$cmd_dir
             else
-                # $1 == file
-
                 # special case handling
                 local file_extension file_exceptions
                 file_extension="${filename##*.}"
-                file_exceptions=(csv)
+                file_exceptions=(csv org)
                 for i in "${file_exceptions[@]}"
                 do
-                    if [[ "$i" == $file_extension ]]; then
+                    if [[ "$i" == "$file_extension" ]]; then
                         cmd=$cmd_arbitrary
                     fi
                 done
 
-                # if meta information is text
-                if [[ $(file "$filename" | awk '{print $NF}') == 'text' ]]; then
-                    cmd=$cmd_text
-                else
-                    # fallback
-                    cmd=$cmd_arbitrary
+                # skip if it was special case
+                if [[ "$cmd" == "" ]]; then
+                    # if meta information is text
+                    if [[ $(file "$filename" | awk '{print $NF}') == 'text' ]]; then
+                        cmd=$cmd_text
+                    else
+                        # fallback
+                        cmd=$cmd_arbitrary
+                    fi
                 fi
             fi
 
             if [[ $cmd != '' ]]; then
-                echo ${cmd} && eval ${cmd}
+                realpath $file
+                # echo ${cmd} && eval ${cmd}
+                eval ${cmd}
             else
                 echo "nothing to do here"
             fi
@@ -1316,3 +1339,5 @@ FZF-EOF"
         # }
     # }
 # }}}
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
