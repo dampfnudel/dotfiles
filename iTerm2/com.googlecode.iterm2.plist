@@ -16,6 +16,8 @@
 	<integer>0</integer>
 	<key>AppleSmoothFixedFontsSizeThreshold</key>
 	<integer>1</integer>
+	<key>AutoCommandHistory</key>
+	<false/>
 	<key>AutoHideTmuxClientSession</key>
 	<false/>
 	<key>CheckTestRelease</key>
@@ -42078,13 +42080,13 @@
 	<key>NSWindow Frame NSFontPanel</key>
 	<string>824 235 445 77 0 0 1440 877 </string>
 	<key>NSWindow Frame Preferences</key>
-	<string>1847 415 606 456 1440 -540 2560 1417 </string>
+	<string>504 421 606 456 0 0 1440 877 </string>
 	<key>NSWindow Frame SUUpdateAlert</key>
-	<string>2410 228 620 392 1440 -540 2560 1417 </string>
+	<string>650 499 620 392 0 0 1920 1057 </string>
 	<key>NSWindow Frame UKCrashReporter</key>
 	<string>1567 294 592 584 1440 -150 1680 1028 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>3 11 954 1038 0 0 1920 1057 </string>
+	<string>3 32 954 1017 0 0 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>150 287 1290 567 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
@@ -43603,6 +43605,8 @@
 			<string>/Users/mbayer</string>
 		</dict>
 	</array>
+	<key>NoSyncCommandHistoryHasEverBeenUsed</key>
+	<true/>
 	<key>NoSyncConfirmBeta</key>
 	<true/>
 	<key>NoSyncDoNotWarnBeforePastingOneLineEndingInNewlineAtShellPrompt</key>
@@ -43614,8 +43618,10 @@
 	<key>NoSyncInstallationId</key>
 	<string>654E3C3E-FF6A-440E-95B1-E67E045095D3</string>
 	<key>NoSyncLastTipTime</key>
-	<real>488457564.240924</real>
+	<real>490177572.22554499</real>
 	<key>NoSyncPermissionToShowTip</key>
+	<true/>
+	<key>NoSyncSilenceAnnoyingBellAutomatically</key>
 	<true/>
 	<key>NoSyncTimeOfFirstLaunchOfVersionWithTip</key>
 	<real>486591758.47544098</real>
@@ -43642,6 +43648,24 @@
 		<string>0013</string>
 		<string>0014</string>
 		<string>0015</string>
+		<string>0016</string>
+		<string>0017</string>
+		<string>0018</string>
+		<string>0019</string>
+		<string>0020</string>
+		<string>0021</string>
+		<string>0022</string>
+		<string>0023</string>
+		<string>0024</string>
+		<string>0025</string>
+		<string>0026</string>
+		<string>0027</string>
+		<string>0028</string>
+		<string>0029</string>
+		<string>0030</string>
+		<string>0031</string>
+		<string>0032</string>
+		<string>0033</string>
 	</array>
 	<key>OnlyWhenMoreTabs</key>
 	<false/>
@@ -43657,6 +43681,8 @@
 	<false/>
 	<key>PasteFromClipboard</key>
 	<false/>
+	<key>PasteTabToStringTabStopSize</key>
+	<integer>4</integer>
 	<key>PointerActions</key>
 	<dict>
 		<key>Button,1,1,,</key>
@@ -43711,11 +43737,13 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2016-06-23T08:56:00Z</date>
+	<date>2016-07-13T16:54:34Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>SavePasteHistory</key>
 	<false/>
+	<key>Selection Respects Soft Boundaries</key>
+	<true/>
 	<key>Show Toolbelt</key>
 	<false/>
 	<key>ShowBookmarkName</key>
