@@ -485,6 +485,9 @@
         set shell=/bin/sh
     endif
 
+    " visual border
+    set colorcolumn=80
+
     " encryption-algorithm for files
     set cm=blowfish2
 
@@ -605,10 +608,10 @@
             " colorscheme dracula
             " colorscheme Spacedust
             " colorscheme inkpot
-            " colorscheme solarized
+            colorscheme solarized
             " colorscheme molokai
             " colorscheme gruvbox
-            colorscheme zenburn
+            " colorscheme zenburn
 
             " colorscheme PaperColor
             " colorscheme facebook
@@ -631,7 +634,7 @@
     " Airline
     " {
         if has('gui_running')
-            let g:airline_theme = 'zenburn'
+            let g:airline_theme = 'solarized'
         else
             let g:airline_theme = 'badwolf'
         endif
