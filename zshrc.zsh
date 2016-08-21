@@ -301,15 +301,19 @@
     hash -d pictures=$HOME/Pictures
     hash -d plan=$HOME/Documents/org/plan
     hash -d regiobot=$HOME/Workspace/regiobot
+    hash -d rezepte=$HOME/Documents/org/rezepte
     hash -d rg=$HOME/Workspace/regiobot/regiobot
     hash -d scripts=$HOME/Workspace/scripts
+    hash -d sd=/Volumes/sd
     hash -d settings=$HOME/Settings
     hash -d termxplorer=$HOME/Workspace/termxplorer
     hash -d test=$HOME/Workspace/test_repo
     hash -d til=$HOME/Workspace/til
     hash -d trash=$HOME/.Trash
     hash -d tx=$HOME/Workspace/termxplorer/docker
+    hash -d v=/Volumes
     hash -d videos=$HOME/Movies
+    hash -d wil=$HOME/Workspace/wil
 
     # files
     hash -d emacs_cheatsheet=$HOME/Workspace/gists/emacs_cheatsheet/emacs.md
@@ -567,14 +571,29 @@
         # }
 
         # file-shortcuts {
-            alias zshrc='mvim --remote-tab-silent $HOME/Settings/dotfiles/zshrc.zsh'
-            alias vimrc='mvim --remote-tab-silent $HOME/Settings/dotfiles/vimrc.vim'
+            alias zshrc='eval ${EDITOR_TAB} $HOME/Settings/dotfiles/zshrc.zsh'
+            alias vimrc='eval ${EDITOR_TAB} $HOME/Settings/dotfiles/vimrc.vim'
+            alias emacsrc='eval ${EDITOR_TAB} $HOME/Settings/dotfiles/emacsrc.el'
         # }
     # }
 # }}}
 
 # functions {{{
     # list {
+        starcat () {
+            for i in *; do
+                echo ""
+                echo "=-=-= $i =-=-="
+                echo "------------------------------------------------"
+                echo ""
+                cat "$i"
+                echo ""
+            done
+        }
+
+        recipes () {
+            (cd ~org/rezepte && ls -1a|sed -e 's/\.org//g' -e 's/_/ /g')
+        }
         escape_spaces () {
             echo "${(q)1}"
         }
@@ -626,7 +645,7 @@
         spotlight () { mdfind "kMDItemDisplayName == '$@'wc"; }
 
         f_spotlight () {
-            smart_open $(spotlight "$@" | fzf)
+            smart_open $(spotlight "$@" | fzf --select-1)
         }
 
         # show the SpotLight comment for a file
@@ -712,7 +731,7 @@
             }
 
             org () { (cd ~org && fo "$1") }
-            gist () { (cd ~gist && fo "$1") }
+            gist () { (cd ~gists && fo "$1") }
             dotfile () { (cd ~dotfiles && fo "$1") }
 
             # fzf cd - cd to selected directory
@@ -895,8 +914,7 @@ FZF-EOF"
             fi
 
             if [[ $cmd != '' ]]; then
-                realpath $file
-                # echo ${cmd} && eval ${cmd}
+                echo $filename
                 eval ${cmd}
             else
                 echo "nothing to do here"
@@ -1080,6 +1098,21 @@ FZF-EOF"
     # }
 
     # actions {
+
+        # colored man pages
+        man () {
+            env \
+            LESS_TERMCAP_mb=$(printf "\e[1;31m") \
+            LESS_TERMCAP_md=$(printf "\e[1;31m") \
+            LESS_TERMCAP_me=$(printf "\e[0m") \
+            LESS_TERMCAP_se=$(printf "\e[0m") \
+            LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
+            LESS_TERMCAP_ue=$(printf "\e[0m") \
+            LESS_TERMCAP_us=$(printf "\e[1;32m") \
+                man "$@"
+        }
+
+
         diff_sorted () {
             diff <(sort "$1") <(sort "$2")
         }
@@ -1118,7 +1151,7 @@ FZF-EOF"
 
         # backup the current directory under ../the-archive.tar.gz
         bu () {
-            alias bu='tar -czf "../$(basename $(pwd))_$(date +%d%m%y-%H-%M-%S).tar.gz" .'
+            # alias bu='tar -czf "../$(basename $(pwd))_$(date +%d%m%y-%H-%M-%S).tar.gz" .'
             dname=$(basename $(pwd))
             buname=$dname""_$(date +%d%m%y-%H-%M-%S).tar.gz
             cd ..
