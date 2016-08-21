@@ -38,32 +38,26 @@
     ;;; theme
     ; (load-theme 'misterioso)
 
-    ;;; use 4 spaces instead of tabs
-    ; (setq-default indent-tabs-mode nil)
-    ; (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60
-    ;                       64 68 72 76 80 84 88 92 96 100 104 108 112
-    ;                       116 120))
-
     ;;; disable blinking cursor
     (blink-cursor-mode 0)
-
     ;;; disable welcome window
     (setq ns-pop-up-frames nil)
-
     ;;; disable audio bell
     (setq ring-bell-function 'ignore)
-
     ;;; disable tool-bar
     (tool-bar-mode -1)
-
     ;;; set font size to 16pt
     (set-face-attribute 'default nil :height 160)
-
     ;;; show line numbers
     (global-linum-mode t)
 
     ;;; show trailing whitespace
     (setq-default show-trailing-whitespace t)
+    ;;; use 4 spaces instead of tabs
+    (setq-default indent-tabs-mode nil)
+    (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60
+                          64 68 72 76 80 84 88 92 96 100 104 108 112
+                          116 120))
 
     ;;; set backup directory
     (setq backup-directory-alist `(("." . "~/.emacs.d/backup")))
@@ -83,6 +77,7 @@
     (if (boundp 'ns-option-modifier)
         (setq ns-option-modifier nil))
 
+    (global-set-key (kbd "C-e") 'end-of-line)
     ;;; osx
     (global-set-key (kbd "M-q") 'save-buffers-kill-terminal)        ; quit
     (global-set-key (kbd "M-w") 'kill-buffer)                       ; close
@@ -90,6 +85,12 @@
     (global-set-key (kbd "M-v") 'yank)                              ; paste
     (global-set-key (kbd "M-s") 'save-buffer)                       ; save
     (global-set-key (kbd "M-a") 'mark-whole-buffer)                 ; select all
+
+    ;; template insertion
+    (defun insert-checkbox ()
+      (interactive)
+      (insert "- [ ] "))
+    (global-set-key (kbd "M--") 'insert-checkbox)
 ;;; }
 
 
@@ -122,6 +123,12 @@
     ; Must have org-mode loaded before we can configure org-babel
     ; (require 'org-install)
 
+    ; indentation
+    (add-hook 'org-mode-hook
+              (lambda ()
+                (org-indent-mode t))
+              t)
+
     ; Some initial langauges we want org-babel to support
     (org-babel-do-load-languages
         'org-babel-load-languages '(
@@ -134,6 +141,9 @@
             (sql . t)
             (css . t)
     ))
+
+    (require 'org-autolist)
+    (add-hook 'org-mode-hook (lambda () (org-autolist-mode)))
 
     ;;; os-rst (org-mode rst export)
     (require 'ox-rst)
@@ -152,20 +162,20 @@
     (require 'fireplace)
 ;;; }
 
-;;; custom {
+;;; generated {
     (custom-set-variables
-	;; custom-set-variables was added by Custom.
-	;; If you edit it by hand, you could mess it up, so be careful.
-	;; Your init file should contain only one such instance.
-	;; If there is more than one, they won't work right.
-	'(custom-enabled-themes (quote (zenburn)))
-	'(custom-safe-themes
-	(quote
-	    ("afbb40954f67924d3153f27b6d3399df221b2050f2a72eb2cfa8d29ca783c5a8" default))))
-	(custom-set-faces
-	;; custom-set-faces was added by Custom.
-	;; If you edit it by hand, you could mess it up, so be careful.
-	;; Your init file should contain only one such instance.
-	;; If there is more than one, they won't work right.
-    )
+        ;; custom-set-variables was added by Custom.
+        ;; If you edit it by hand, you could mess it up, so be careful.
+        ;; Your init file should contain only one such instance.
+        ;; If there is more than one, they won't work right.
+    '(custom-enabled-themes (quote (zenburn)))
+    '(custom-safe-themes
+    (quote
+        ("afbb40954f67924d3153f27b6d3399df221b2050f2a72eb2cfa8d29ca783c5a8" default))))
+    (custom-set-faces
+        ;; custom-set-faces was added by Custom.
+        ;; If you edit it by hand, you could mess it up, so be careful.
+        ;; Your init file should contain only one such instance.
+        ;; If there is more than one, they won't work right.
+        )
 ; }
