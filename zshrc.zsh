@@ -318,13 +318,11 @@
     # files
     hash -d emacs_cheatsheet=$HOME/Workspace/gists/emacs_cheatsheet/emacs.md
     hash -d emacsrc=$HOME/Settings/dotfiles/emacsrc.el
-    hash -d notes_ai=$HOME/Workspace/ai/notes.org
-    hash -d pjs=$HOME/Documents/pjs.md
-    hash -d rg_ctrl=$HOME/Workspace/regiobot/regiobot/web/regiobot/static/regiobot/js/regiobot_ctrl.js
     hash -d vim_cheatsheet=$HOME/Workspace/gists/vim_cheatsheet/vim.md
-    hash -d vimrc=$HOME/.vimrc
+    hash -d vimrc=$HOME/Settings/dotfiles/vimrc.vim
     hash -d zsh_cheatsheet=$HOME/Workspace/gists/zsh_cheatsheet/zsh.md
-    hash -d zshrc=$HOME/.zshrc
+    hash -d zsh_history=$HOME/.zsh_history
+    hash -d zshrc=$HOME/Settings/dotfiles/zshrc.zsh
 # }}}
 
 # keybindings / keymappings {{{
@@ -549,7 +547,7 @@
     # }
 
     # actions {
-        alias s='source ~/.zshrc'
+        alias s='source ~zshrc'
         alias i_am_root='su -c "$(history -p !-1)"'
         alias printip='ifconfig | grep "inet " | grep -v 127.0.0.1 | cut -d\  -f2'
         alias dirs='dirs -vp'
@@ -571,9 +569,10 @@
         # }
 
         # file-shortcuts {
-            alias zshrc='eval ${EDITOR_TAB} $HOME/Settings/dotfiles/zshrc.zsh'
-            alias vimrc='eval ${EDITOR_TAB} $HOME/Settings/dotfiles/vimrc.vim'
-            alias emacsrc='eval ${EDITOR_TAB} $HOME/Settings/dotfiles/emacsrc.el'
+            alias zshrc='eval ${EDITOR_TAB} ~zshrc'
+            alias zsh_history='eval ${EDITOR_TAB} ~zsh_history'
+            alias vimrc='eval ${EDITOR_TAB} ~vimrc'
+            alias emacsrc='eval ${EDITOR_TAB} ~emacsrc'
         # }
     # }
 # }}}
@@ -1149,13 +1148,18 @@ FZF-EOF"
         # move file/dir to trash
         trash () { mv "$@" $HOME/.Trash/. ; }
 
-        # backup the current directory under ../the-archive.tar.gz
+        # backup the current directory at the parent directoy
+        # use encryption with -e
         bu () {
-            # alias bu='tar -czf "../$(basename $(pwd))_$(date +%d%m%y-%H-%M-%S).tar.gz" .'
             dname=$(basename $(pwd))
-            buname=$dname""_$(date +%d%m%y-%H-%M-%S).tar.gz
             cd ..
-            tar -czf "$buname" "$dname/"
+            if [[ "$1" == "-e" ]]; then
+                buname=$dname""_$(date +%d%m%y-%H-%M-%S).tar.gz.enc
+                tar cz "$dname/" | openssl enc -aes-256-cbc -e > "$buname"
+            else
+                buname=$dname""_$(date +%d%m%y-%H-%M-%S).tar.gz
+                tar czf "$buname" "$dname/"
+            fi
             echo "-> ../$buname"
             cd -  >/dev/null 2>&1
         }
