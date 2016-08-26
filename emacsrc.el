@@ -71,26 +71,46 @@
 ;;; }
 
 ;;; key mappings {
+    (defvar my-keys-minor-mode-map
+      (let ((map (make-sparse-keymap)))
+        (define-key map (kbd "M-e") 'move-end-of-line)
+        (define-key map (kbd "M-b") 'move-beginning-of-line)
+        ;;; osx
+        (define-key map (kbd "M-q") 'save-buffers-kill-terminal)        ; quit
+        (define-key map (kbd "M-w") 'kill-buffer)                       ; close
+        (define-key map (kbd "M-c") 'kill-ring-save)                    ; copy
+        (define-key map (kbd "M-v") 'yank)                              ; paste
+        (define-key map (kbd "M-s") 'save-buffer)                       ; save
+        (define-key map (kbd "M-a") 'mark-whole-buffer)                 ; select all
+        map)
+      "my-keys-minor-mode keymap.")
+
+    (define-minor-mode my-keys-minor-mode
+      "A minor mode so that my key settings override annoying major modes."
+      :init-value t
+      :lighter " my-keys")
+
+    (my-keys-minor-mode 1)
+
     ;;; map command key to meta
     (if (boundp 'ns-command-modifier)
         (setq ns-command-modifier 'meta))
     (if (boundp 'ns-option-modifier)
         (setq ns-option-modifier nil))
 
-    (global-set-key (kbd "C-e") 'end-of-line)
-    ;;; osx
-    (global-set-key (kbd "M-q") 'save-buffers-kill-terminal)        ; quit
-    (global-set-key (kbd "M-w") 'kill-buffer)                       ; close
-    (global-set-key (kbd "M-c") 'kill-ring-save)                    ; copy
-    (global-set-key (kbd "M-v") 'yank)                              ; paste
-    (global-set-key (kbd "M-s") 'save-buffer)                       ; save
-    (global-set-key (kbd "M-a") 'mark-whole-buffer)                 ; select all
-
     ;; template insertion
     (defun insert-checkbox ()
       (interactive)
       (insert "- [ ] "))
     (global-set-key (kbd "M--") 'insert-checkbox)
+
+    (defun insert-org-mininam-theme ()
+      (interactive)
+      (insert "#+SETUPFILE: ~/Settings/dotfiles/org-minimal-theme.setup"))
+
+    (defun insert-org-title ()
+      (interactive)
+      (insert "#+TITLE: "))
 ;;; }
 
 
