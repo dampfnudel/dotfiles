@@ -374,6 +374,22 @@
             bindkey -s '\ef' 'fzf_filter_prev\n'
         # }
 
+        # open last output {
+            open_prev () {
+                selection=$(fc -e -)
+                if [[ -a $selection ]]
+                then
+                    smart_open $selection
+                fi
+            }
+
+            zle -N open_prev
+            # usage
+            # $ ls
+            # $ <Escape>o
+            bindkey -s '\eo' 'open_prev\n'
+        # }
+
         # copy the output of the previous command to clipboard {
             copy_prev () {
                 fc -e - | pbcopy
