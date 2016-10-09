@@ -19,6 +19,9 @@
 " hack font
 
 " TODO
+" shebang abbrivation
+" paranthesis
+" snippets
 " servername
 " vim tabs
 " virtual lines?
@@ -314,6 +317,7 @@
         autocmd FileType python abbr p_utf8 # -*- coding: utf-8 -*-<esc>o<del><esc>
         autocmd FileType python abbr p_author __author__ = "Markus Bayer"<CR><del><esc>o<del>
         abbr vimline # vim: set ft=python ts=4 sw=4 expandtab :<del><esc>
+        abbr shebang # #!/usr/bin/env bash :<del><esc>
     " }
 " }}}
 
