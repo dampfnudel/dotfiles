@@ -128,7 +128,8 @@
         if [[ -n $SSH_CONNECTION ]]; then
           export EDITOR='/usr/local/bin/vim'
         else
-          export EDITOR='/usr/local/Cellar/macvim/7.4-99/bin/mvim'
+          # export EDITOR='/usr/local/Cellar/macvim/7.4-99/bin/mvim'
+          export EDITOR='/usr/local/Cellar/macvim/8.0-110/bin/mvim'
           export EDITOR_TAB=${EDITOR}' --remote-tab-silent'
         fi
 
@@ -300,9 +301,9 @@
     hash -d org=$HOME/Documents/org
     hash -d pictures=$HOME/Pictures
     hash -d plan=$HOME/Documents/org/plan
-    hash -d regiobot=$HOME/Workspace/regiobot
+    hash -d regiobot=$HOME/Workspace/regioyal/regiobot
     hash -d rezepte=$HOME/Documents/org/rezepte
-    hash -d rg=$HOME/Workspace/regiobot/regiobot
+    hash -d rg=$HOME/Workspace/regioyal/rgsite
     hash -d scripts=$HOME/Workspace/scripts
     hash -d sd=/Volumes/sd
     hash -d settings=$HOME/Settings
@@ -345,6 +346,7 @@
 
         # tab completion for the output of the previous command {
             _prev_result () {
+                local hstring
                 hstring=$(eval `fc -l -n -1`)
                 set -A hlist ${(@s/
 /)hstring}
@@ -360,6 +362,7 @@
 
         # fzf filter for the output of the previous command {
             fzf_filter_prev () {
+                local selection
                 selection=$(fc -e - | fzf)
                 if [[ -a $selection ]]
                 then
@@ -376,10 +379,11 @@
 
         # open last output {
             open_prev () {
-                selection=$(fc -e -)
-                if [[ -a $selection ]]
+                local files
+                files=$(fc -e -)
+                if [[ -a $files ]]
                 then
-                    smart_open $selection
+                    smart_open $files
                 fi
             }
 
@@ -404,6 +408,7 @@
 
         # tab completion for git status files {
             _git_status_files () {
+                local files
                 files=$(git status --porcelain | awk '{print $2 }')
                 set -A flist ${(@s/
 /)files}
@@ -483,6 +488,8 @@
 
         alias -g _vim="| eval ${EDITOR_TAB}"
         alias -g _copy='| pbcopy'
+
+        alias -g õrg='~org'
     # }
 
     # list {
@@ -507,7 +514,7 @@
         alias yt3='$WORKON_HOME/python2.7.5/bin/youtube-dl --verbose --extract-audio --audio-format mp3 --no-mtime'
         alias yt='$WORKON_HOME/python2.7.5/bin/youtube-dl --no-mtime'
         # alias emacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs'
-        alias emacs='open -a Emacs.app'
+        # alias emacs='open -a Emacs.app'
         alias cemacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs -nw'
         alias bpython='$WORKON_HOME/python3.4.1/bin/bpython'
 
@@ -659,6 +666,7 @@
         # search for a file using Spotlight's metadata
         spotlight () { mdfind "kMDItemDisplayName == '$@'wc"; }
 
+        # TODO FIXME
         f_spotlight () {
             smart_open $(spotlight "$@" | fzf --select-1)
         }
@@ -890,6 +898,27 @@ FZF-EOF"
         # }
     # }
 
+    # print {
+        # pretty print json
+        # pjson '{"test": "test"}'
+        # pjson myjsonfile.json
+        # pjson '{"test": "test"}' myjsonfile.json
+        pjson () {
+            if [ $# -gt 0 ];
+                then
+                for arg in $@
+                do
+                    if [ -f $arg ];
+                        then
+                        less $arg | python -m json.tool
+                    else
+                        echo "$arg" | python -m json.tool
+                    fi
+                done
+            fi
+        }
+    # }
+
     # vim {
         smart_open () {
             # escape spaces
@@ -952,6 +981,15 @@ FZF-EOF"
             else
                 mvim
             fi
+        }
+    # }
+
+    # emacs {
+        emacs () {
+            for var in "$@"; do
+                touch "$var"
+                open -a Emacs.app "$var"
+            done
         }
     # }
 
@@ -1157,9 +1195,10 @@ FZF-EOF"
             }
         }
 
-        cd_mkdir () {
+        mkdir_cd () {
             mkdir $1 && cd $_
         }
+        alias mkdircd='mkdir_cd'
 
         # move file/dir to trash
         trash () { mv "$@" $HOME/.Trash/. ; }
@@ -1228,7 +1267,18 @@ FZF-EOF"
         }
 
         # osx {
+            pomodoro () {
+                for i in `seq 1 3`; do
+                    osascript -e 'beep'
+                done
+            }
+
             # say
+            # test voices
+            say_test () {
+                say -v '?' | awk '{print $1}' | while read voice; do printf "using $voice...\n"; say -v $voice "hello, this is me using the $voice voice"; sleep 1; done
+            }
+
             lol () { say -v Hysterical 'hahahahahahaha oh really?' }
 
             sing_song () {
