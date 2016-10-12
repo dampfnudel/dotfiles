@@ -24,12 +24,15 @@
         ; paredit
         ; doctor
         ; dunnet
+        ;https://github.com/flycheck/flycheck/
         ;https://github.com/Fuco1/smartparens
         ;https://github.com/auto-complete/auto-complete
         ;https://github.com/abo-abo/avy
         ;https://github.com/nonsequitur/smex/
         ;https://github.com/jacktasia/dumb-jump
         ;https://github.com/abo-abo/hydra
+        ;https://github.com/timcharper/evil-surround
+        ;http://cedet.sourceforge.net/
 ;;; )
 
 ;;; (general
@@ -58,7 +61,11 @@
                           116 120))
 
     ;;; set backup directory
-    (setq backup-directory-alist `(("." . "~/.emacs.d/backup")))
+    (setq auto-save-file-name-transforms
+              `((".*" ,(concat user-emacs-directory "auto-save/") t)))
+    (setq backup-directory-alist
+          `(("." . ,(expand-file-name
+                     (concat user-emacs-directory "backup")))))
     ;;; backup method
     (setq backup-by-copying t)
     ;;; backup frequency
@@ -66,6 +73,10 @@
       kept-new-versions 6
       kept-old-versions 2
       version-control t)
+
+    ;;; modeline
+    ;;; display column number
+    (setq column-number-mode t)
 ;;; )
 
 ;;; (plugins
@@ -102,6 +113,18 @@
           (unless (package-installed-p package)
             (package-install package)))
     ;;; )
+    ; ; Bootstrap `use-package'
+    ; (unless (package-installed-p 'use-package)
+    ;   (package-refresh-contents)
+    ;   (package-install 'use-package))
+    ;
+    ; ;;; (flycheck
+    ;     (use-package flycheck
+    ;       :ensure t
+    ;       :init (global-flycheck-mode))
+    ;
+    ;     (add-hook 'after-init-hook #'global-flycheck-mode)
+    ;;; )
 
     ;;; (weather-metno-el
         (require 'weather-metno)
@@ -117,6 +140,9 @@
         (require 'org)
         (setq org-log-done t)
         (setq org-startup-folded "showeverything")
+        (setq org-highest-priority ?A)
+        (setq org-lowest-priority ?Z)
+        (setq org-default-priority ?A)
         (setq org-agenda-files (append '("~/.notes.org") (file-expand-wildcards "~/Documents/org/cal/*\.org")))
 
         ; indentation
@@ -209,7 +235,17 @@
         (global-git-gutter-mode +1)
         ; live update
         (custom-set-variables
-         '(git-gutter:update-interval 5))
+         '(git-gutter:update-interval 2)
+         '(git-gutter:modified-sign "~")
+         ; '(git-gutter:added-sign "+")
+         ; '(git-gutter:deleted-sign "-")
+        )
+    ;;; )
+
+    ;;; (nyan-mode
+        (add-to-list 'load-path "~/.emacs.d/github/nyan-mode")
+        (require 'nyan-mode)
+        (nyan-mode)
     ;;; )
 
     ;;; expand-region
