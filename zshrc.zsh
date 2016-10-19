@@ -264,10 +264,10 @@
 # }}}
 
 # docker {{{
-    $(boot2docker shellinit 2> /dev/null)
-    export DOCKER_HOST=tcp://192.168.59.103:2376
-    export DOCKER_CERT_PATH=$HOME/.boot2docker/certs/boot2docker-vm
-    export DOCKER_TLS_VERIFY=1
+    # $(boot2docker shellinit 2> /dev/null)
+    # export DOCKER_HOST=tcp://192.168.59.103:2376
+    # export DOCKER_CERT_PATH=$HOME/.boot2docker/certs/boot2docker-vm
+    # export DOCKER_TLS_VERIFY=1
 # }}}
 
 # hashes / named directories {{{
@@ -303,7 +303,9 @@
     hash -d plan=$HOME/Documents/org/plan
     hash -d regiobot=$HOME/Workspace/regioyal/regiobot
     hash -d rezepte=$HOME/Documents/org/rezepte
-    hash -d rg=$HOME/Workspace/regioyal/rgsite
+    hash -d rg=$HOME/Workspace/regioyal
+    hash -d rgs=$HOME/Workspace/regioyal/rgsite
+    hash -d rgi=$HOME/Workspace/regioyal/rgimport
     hash -d scripts=$HOME/Workspace/scripts
     hash -d sd=/Volumes/sd
     hash -d settings=$HOME/Settings
@@ -890,11 +892,13 @@ FZF-EOF"
                   awk -F $sep '{printf "%-'$cols's  \x1b[36m%s\n", $1, $2}' |
                   fzf --ansi --multi | sed 's#.*\(https*://\)#\1#' | xargs open
             }
+            alias chrome_history='f_chrome_history'
 
             # browse chrome bookmarks
             f_chrome_bookmarks () {
                 $HOME/Workspace/scripts/fzf_chrome_bookmarks.rb
             }
+            alias chrome_bookmarks='f_chrome_bookmarks'
         # }
     # }
 
@@ -986,6 +990,10 @@ FZF-EOF"
 
     # emacs {
         emacs () {
+            if [ $# -eq 0 ]; then
+                open -a Emacs.app
+                exit 0
+            fi
             for var in "$@"; do
                 touch "$var"
                 open -a Emacs.app "$var"
