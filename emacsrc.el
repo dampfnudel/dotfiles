@@ -39,6 +39,16 @@
     ;;; theme
     ; (load-theme 'misterioso)
 
+    ;; maximized on startup
+    ; (add-hook 'after-init-hook '(lambda () (w32-send-sys-command #xf030)))
+    ;; remember cursor position, for emacs 25.1 or later
+    ; (save-place-mode 1)
+    ;; remember cursor position
+    (if (version< emacs-version "25.0")
+    (progn
+      (require 'saveplace)
+      (setq-default save-place t))
+  (save-place-mode 1))
     ;;; disable blinking cursor
     (blink-cursor-mode 0)
     ;;; disable welcome window
@@ -56,9 +66,34 @@
     (setq-default show-trailing-whitespace t)
     ;;; use 4 spaces instead of tabs
     (setq-default indent-tabs-mode nil)
-    (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60
-                          64 68 72 76 80 84 88 92 96 100 104 108 112
-                          116 120))
+    (setq-default tab-width 4)
+    (setq indent-line-function 'insert-tab)
+
+(defvar my-offset 4 "My indentation offset. ")
+(defun backspace-whitespace-to-tab-stop ()
+  "Delete whitespace backwards to the next tab-stop, otherwise delete one character."
+  (interactive)
+  (if (or indent-tabs-mode
+          (region-active-p)
+          (save-excursion
+            (> (point) (progn (back-to-indentation)
+                              (point)))))
+      (call-interactively 'backward-delete-char-untabify)
+    (let ((movement (% (current-column) my-offset))
+          (p (point)))
+      (when (= movement 0) (setq movement my-offset))
+      ;; Account for edge case near beginning of buffer
+      (setq movement (min (- p 1) movement))
+      (save-match-data
+        (if (string-match "[^\t ]*\\([\t ]+\\)$" (buffer-substring-no-properties (- p movement) p))
+            (backward-delete-char (- (match-end 1) (match-beginning 1)))
+          (call-interactively 'backward-delete-char))))))
+
+    ; (setq-default indent-tabs-mode nil)
+    ; (setq tab-width 4) ; or any other preferred value
+    ; (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60
+    ;                       64 68 72 76 80 84 88 92 96 100 104 108 112
+    ;                       116 120))
 
     ;;; set backup directory
     (setq auto-save-file-name-transforms
@@ -77,6 +112,21 @@
     ;;; modeline
     ;;; display column number
     (setq column-number-mode t)
+;;; )
+
+;;; (fun
+    (require 'zone)
+    ; (zone-when-idle 120)
+
+    (defun zone-choose (pgm)
+        "Choose a PGM to run for `zone'."
+        (interactive
+         (list
+          (completing-read
+           "Program: "
+           (mapcar 'symbol-name zone-programs))))
+        (let ((zone-programs (list (intern pgm))))
+          (zone)))
 ;;; )
 
 ;;; (plugins
@@ -113,18 +163,41 @@
           (unless (package-installed-p package)
             (package-install package)))
     ;;; )
-    ; ; Bootstrap `use-package'
-    ; (unless (package-installed-p 'use-package)
-    ;   (package-refresh-contents)
-    ;   (package-install 'use-package))
-    ;
-    ; ;;; (flycheck
-    ;     (use-package flycheck
-    ;       :ensure t
-    ;       :init (global-flycheck-mode))
-    ;
-    ;     (add-hook 'after-init-hook #'global-flycheck-mode)
+    ;;; (flycheck
+        (add-hook 'after-init-hook #'global-flycheck-mode)
+
+        ;; TODO only activate for specific modes
+        ; (add-hook 'python-mode-hook             #'flycheck-mode)
+        ; (add-hook 'js-mode-hook                 #'flycheck-mode)
+        ; (add-hook 'web-mode-hook                #'flycheck-mode)
+        ; (add-hook 'lisp-interaction-mode-hook   #'flycheck-mode)
+
+        (defun my-flycheck-hook ()
+          "Limit Flycheck error list buffer height to 10 lines."
+          (when (not (get-buffer-window "*Flycheck errors*"))
+            (save-selected-window
+              (save-excursion
+                (let* ((w (split-window-vertically))
+                       (h (window-height w)))
+                  (select-window w)
+                  (switch-to-buffer "*Flycheck errors*")
+                  (shrink-window (- h 5)))))))
+        (add-hook 'flycheck-error-list-mode-hook 'my-flycheck-hook)
+
+        ;; disable jshint since we prefer eslint checking
+        ; (setq-default flycheck-disabled-checkers
+        ;   (append flycheck-disabled-checkers
+        ;     '(javascript-jshint)))
+
+        ; (add-to-list 'display-buffer-alist
+        ;              (,(rx bos "*Flycheck errors*" eos)
+        ;               (display-buffer-reuse-window
+        ;                display-buffer-in-side-window)
+        ;               (side            . bottom)
+        ;               (reusable-frames . visible)
+        ;               (window-height   . 0.33)))
     ;;; )
+
 
     ;;; (weather-metno-el
         (require 'weather-metno)
@@ -260,8 +333,34 @@
     ;;; windmove
     (windmove-default-keybindings)
 
-    ;;; company
-    (add-hook 'after-init-hook 'global-company-mode)
+    ; ;;; company
+    ; (add-hook 'after-init-hook 'global-company-mode)
+
+    ;;; (auto-complete
+        (require 'auto-complete)
+        ;; TODO deactivate for minibuffer
+        ; ;; no auto-complete in minibuffers
+        ; (defun auto-complete-mode-maybe ()
+        ;   "No maybe for you. Only AC!"
+        ;   (unless (minibufferp (current-buffer))
+        ;     (auto-complete-mode 1)))
+        (global-auto-complete-mode t)
+    ;;; )
+
+
+    ;;; json-mode
+    ;; TODO really required
+    (require 'json-mode)
+
+    ;;; json-snatcher
+    (require 'json-snatcher)
+    (defun js-mode-bindings ()
+    "Sets a hotkey for using the json-snatcher plugin"
+     (when (string-match  "\\.json$" (buffer-name))
+            ;;; TODO map @ mappings
+        (local-set-key (kbd "C-c C-g") 'jsons-print-path)))
+    (add-hook 'js-mode-hook 'js-mode-bindings)
+    (add-hook 'js2-mode-hook 'js-mode-bindings)
 ;;; )
 
 ;;; (generated
@@ -283,6 +382,15 @@
 ; )
 
 ;;; (keymappings, keybindings, keychords
+(define-key input-decode-map "\e\eOA" [(meta up)])
+(define-key input-decode-map "\e\eOB" [(meta down)])
+(global-set-key [(meta up)] 'scroll-down-command)
+(global-set-key [(meta down)] 'scroll-up-command)
+
+(define-key input-decode-map "\e\eOB" [(meta down)])
+(global-set-key [(meta up)] 'scroll-down-command)
+
+
     (defvar my-keys-minor-mode-map
       (let ((map (make-sparse-keymap)))
         (define-key map (kbd "M-e") 'move-end-of-line)
@@ -305,6 +413,7 @@
         (define-key map (kbd "C-<") 'tabbar-backward)
         (define-key map (kbd "C-+") 'er/expand-region)
         (define-key map (kbd "C-c SPC") 'ace-jump-mode)
+        (define-key map (kbd "DEL") 'backward-delete-char)
         map)
       "my-keys-minor-mode keymap.")
 
