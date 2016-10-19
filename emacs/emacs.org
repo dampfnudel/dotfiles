@@ -1,0 +1,83 @@
+* Meta
+** Todo
+*** basics
+**** reproduzierbare package-list
+**** Tabs
+- 4 auf einmal löschen
+- 4 auf einmal überspringen
+- smart tabs
+**** Tab Reiter
+cmd alt left/right
+
+*** flycheck
+- error list für alle source files öffnen
+
+*** evil
+**** g; persistieren
+**** leader key
+***** preview wie bei spacemacs
+**** Visual selection beim Einrücken selektiert lassen
+
+*** org-mode
+**** archive
+**** capture
+**** Wetter
+**** Gcal
+
+*** auto-complete
+https://github.com/auto-complete/auto-complete
+**** python
+- jedi
+**** Yasnippet
+
+
+*** andere Plugins
+https://www.quora.com/What-are-some-of-the-most-useful-extensions-for-Emacs
+https://www.reddit.com/r/emacs/comments/42g6u9/what_are_some_lesserknown_packages_that_you_love/
+https://news.ycombinator.com/item?id=9395271
+https://www.reddit.com/r/vim/comments/2ezvst/why_cant_vim_to_be_appealing_like_emacs/
+
+https://github.com/konr/tomatinho
+https://github.com/Fuco1/smartparens
+https://github.com/abo-abo/avy
+https://github.com/nonsequitur/smex/
+https://github.com/jacktasia/dumb-jump
+https://github.com/abo-abo/hydra
+https://github.com/timcharper/evil-surround
+http://cedet.sourceforge.net/
+https://github.com/repl-electric/view-pane/tree/master/animations
+- tags
+- magit
+**** DB Client
+**** fzf
+**** pomodoro
+**** Gcal
+**** rainbow parens
+**** paredit
+http://danmidwood.com/content/2014/11/21/animated-paredit.html
+
+*** Themes
+**** previews
+
+** Cheatsheet
+*** paredit
+*** Yasnippet
+*** Dired
+
+** Resourcen
+*** Lernen
+http://tuhdo.github.io/emacs-tutor.html
+http://emacs-doctor.com/learn-emacs-lisp-in-15-minutes.html
+https://github.com/redguardtoo/mastering-emacs-in-one-year-guide
+
+*** Listen
+http://emacsrocks.com/
+https://github.com/emacs-tw/awesome-emacs
+https://github.com/search?o=desc&q=emacs&s=stars&type=Repositories&utf8=%E2%9C%93
+
+*** Distros
+http://spacemacs.org/
+https://github.com/bbatsov/prelude
+https://github.com/overtone/emacs-live
+https://github.com/technomancy/emacs-starter-kit
+https://github.com/purcell/emacs.d
