@@ -50,6 +50,7 @@ Setup package archives.
             idle-require            ; load elisp libraries while Emacs is idle
             org                     ; Outline-based notes management and organizer
             org-autolist            ; Automatically insert new list items.
+            ;; always load finally
             ox-rst                  ; Export reStructuredText
             ox-odt                  ; Export OpenDocument
             ox-md                   ; Markdown exporter (from org)
@@ -144,6 +145,8 @@ the tangled file is compiled."
     (tool-bar-mode -1)
     ;; show line numbers
     (global-linum-mode t)
+    ;; y & n instead of yes & no
+    (fset 'yes-or-no-p 'y-or-n-p)
     #+END_SRC
 
 *** modeline
@@ -171,6 +174,12 @@ the tangled file is compiled."
     (setq indent-line-function 'insert-tab)
     #+END_SRC
 
+** encoding
+
+    #+BEGIN_SRC emacs-lisp
+    (set-language-environment "UTF-8")
+    #+END_SRC
+
 ** temporary files
 
     #+BEGIN_SRC emacs-lisp
@@ -190,9 +199,9 @@ the tangled file is compiled."
     #+END_SRC
 
 ** fun
-#+BEGIN_SRC emacs-lisp
-(require 'zone)
 
+#+BEGIN_SRC emacs-lisp
+;; required by require
 (defun zone-choose (pgm)
     "Choose a PGM to run for `zone'."
     (interactive
@@ -218,7 +227,7 @@ the tangled file is compiled."
 #+BEGIN_SRC emacs-lisp
 ;; org-mode for .org-files
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
-;; (require 'org)
+;; required by require
 (setq org-log-done t)
 ;; setup priorities from A-Z
 (setq org-highest-priority ?A)
@@ -248,19 +257,8 @@ the tangled file is compiled."
 ))
 
 ;; automatically insert list items
-(require 'org-autolist)
+;; required by require
 (add-hook 'org-mode-hook (lambda () (org-autolist-mode)))
-
-;; export formats
-(require 'ox-rst)
-(require 'ox-md)
-(require 'ox-odt)
-#+END_SRC
-
-** expand-region.el
-
-#+BEGIN_SRC emacs-lisp
-(require 'expand-region)
 #+END_SRC
 
 ** helm
@@ -273,6 +271,7 @@ the tangled file is compiled."
 
 #+BEGIN_SRC emacs-lisp
 ;; TODO only init for src files
+;; required by require
 (add-hook 'after-init-hook #'global-flycheck-mode)
 ;; TODO customize error window
 #+END_SRC
@@ -281,11 +280,10 @@ the tangled file is compiled."
 
 #+BEGIN_SRC emacs-lisp
 ;; snippet direcories
-(require 'yasnippet)
+;; required by require
 (setq yas-snippet-dirs
         '("~/.emacs.d/snippets/yasnippet-snippets"
         ))
-
 ;; yasnippet everywhere
 (yas-global-mode 1)
 #+END_SRC
@@ -293,7 +291,7 @@ the tangled file is compiled."
 ** git-gutter
 
 #+BEGIN_SRC emacs-lisp
-(require 'git-gutter)
+;; required by require
 (global-git-gutter-mode +1)
 ; live update
 (custom-set-variables
@@ -307,7 +305,7 @@ the tangled file is compiled."
 ** undo-tree
 
 #+BEGIN_SRC emacs-lisp
-(require 'undo-tree)
+;; required by require
 (global-undo-tree-mode)
 #+END_SRC
 
@@ -330,7 +328,7 @@ M-x jedi:install-server
 ** json-snatcher
 
 #+BEGIN_SRC emacs-lisp
-(require 'json-snatcher)
+;; required by require
 (defun js-mode-bindings ()
 "Sets a hotkey for using the json-snatcher plugin"
     (when (string-match  "\\.json$" (buffer-name))
@@ -338,12 +336,6 @@ M-x jedi:install-server
     (local-set-key (kbd "C-c C-g") 'jsons-print-path)))
 (add-hook 'js-mode-hook 'js-mode-bindings)
 (add-hook 'js2-mode-hook 'js-mode-bindings)
-#+END_SRC
-
-** fireplace
-
-#+BEGIN_SRC emacs-lisp
-(require 'fireplace)
 #+END_SRC
 
 ** nyan-mode                                                        :manual:
@@ -360,17 +352,30 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
 * require
 
 #+BEGIN_SRC emacs-lisp
-(require 'idle-require)             ; Need in order to use idle-require
+(require 'idle-require)             ; Needed in order to use idle-require
 
 (dolist (feature
          '(auto-compile             ; auto-compile .el files
            jedi                     ; auto-completion for python
-           matlab                   ; matlab-mode
-           ob-matlab                ; org-babel matlab
-           ox-latex                 ; the latex-exporter (from org)
-           ox-md                    ; Markdown exporter (from org)
-           recentf                  ; recently opened files
-           tex-mode))               ; TeX, LaTeX, and SliTeX mode commands
+           zone
+           expand-region
+           fireplace
+           json-snatcher
+           undo-tree
+           yasnippet
+           git-gutter
+           org-mode
+           org-autolist
+           ;; always load finally
+           ox-rst
+           ox-odt
+           ox-md                       ; Markdown exporter (from org)
+           ;; matlab                   ; matlab-mode
+           ;; ob-matlab                ; org-babel matlab
+           ;; ox-latex                 ; the latex-exporter (from org)
+           ;; recentf                  ; recently opened files
+           ;; tex-mode))               ; TeX, LaTeX, and SliTeX mode commands
+           ))
   (idle-require feature))
 
 (setq idle-require-idle-delay 5)
