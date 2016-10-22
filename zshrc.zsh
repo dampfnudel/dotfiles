@@ -264,6 +264,7 @@
 # }}}
 
 # docker {{{
+    export OSX_PRIVATE=/private
     # $(boot2docker shellinit 2> /dev/null)
     # export DOCKER_HOST=tcp://192.168.59.103:2376
     # export DOCKER_CERT_PATH=$HOME/.boot2docker/certs/boot2docker-vm
@@ -305,7 +306,9 @@
     hash -d rezepte=$HOME/Documents/org/rezepte
     hash -d rg=$HOME/Workspace/regioyal
     hash -d rgs=$HOME/Workspace/regioyal/rgsite
+    hash -d rgsr=$HOME/Workspace/regioyal/rgsite/web/regiobot
     hash -d rgi=$HOME/Workspace/regioyal/rgimport
+    hash -d rgir=$HOME/Workspace/regioyal/rgimport/web/regiobot
     hash -d scripts=$HOME/Workspace/scripts
     hash -d sd=/Volumes/sd
     hash -d settings=$HOME/Settings
@@ -1206,7 +1209,7 @@ FZF-EOF"
         mkdir_cd () {
             mkdir $1 && cd $_
         }
-        alias mkdircd='mkdir_cd'
+        alias mkcd='mkdir_cd'
 
         # move file/dir to trash
         trash () { mv "$@" $HOME/.Trash/. ; }
