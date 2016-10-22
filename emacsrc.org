@@ -39,6 +39,15 @@ Setup package archives.
             evil                    ; extensible vi layer
             helm                    ; Incremental and narrowing framework
             expand-region           ; Increases the selected region by semantic units
+            yasnippet               ; template system
+            flycheck                ; modern on-the-fly syntax checking extension
+            git-gutter              ; icons in the gutter area indicating src ctrl changes
+            undo-tree               ; undo system
+            auto-complete           ; auto completion with popup menu
+            json-snatcher           ; extract the path to a json value, display at modeline
+            fireplace               ; a cozy fireplace
+            jedi                    ; Python auto-completion for Emacs
+            idle-require            ; load elisp libraries while Emacs is idle
             org                     ; Outline-based notes management and organizer
             org-autolist            ; Automatically insert new list items.
             ox-rst                  ; Export reStructuredText
@@ -51,7 +60,6 @@ Setup package archives.
             ;; drag-stuff           ; Drag stuff around in Emacs
             ;; expand-region        ; Increase selected region by semantic units
             ;; focus                ; Dim color of text in surrounding sections
-            ;; idle-require         ; load elisp libraries while Emacs is idle
             ;; geiser               ; GNU Emacs and Scheme talk to each other
             ;; git-gutter-fringe    ; Fringe version of git-gutter.el
             ;; golden-ratio         ; Automatic resizing windows to golden ratio
@@ -59,7 +67,6 @@ Setup package archives.
             ;; helm-company         ; Helm interface for company-mode
             ;; helm-projectile      ; Helm integration for Projectile
             ;; helm-swoop           ; Efficiently hopping squeezed lines
-            ;; jedi                 ; Python auto-completion for Emacs
             ;; js2-mode             ; Improved JavaScript editing mode
             ;; magit                ; control Git from Emacs
             ;; markdown-mode        ; Emacs Major mode for Markdown-formatted files
@@ -85,7 +92,7 @@ Setup package archives.
                         (package-install 'exec-path-from-shell)))))
 #+END_SRC
 
-* init.org
+* emacsrc.org setup
 
 always tangle and byte-compile the =org=-document after changes.
 
@@ -145,6 +152,13 @@ the tangled file is compiled."
     ;; display column number
     (setq column-number-mode t)
     #+END_SRC
+
+*** frames
+
+#+BEGIN_SRC emacs-lisp
+;; switch frames with <Shift-Left/Right/Up/Down>
+(windmove-default-keybindings)
+#+END_SRC
 
 ** whitespace
 
@@ -256,8 +270,111 @@ the tangled file is compiled."
 #+END_SRC
 
 ** flycheck
+
 #+BEGIN_SRC emacs-lisp
-;;(add-hook 'after-init-hook #'global-flycheck-mode)
+;; TODO only init for src files
+(add-hook 'after-init-hook #'global-flycheck-mode)
+;; TODO customize error window
+#+END_SRC
+
+** yasnippet
+
+#+BEGIN_SRC emacs-lisp
+;; snippet direcories
+(require 'yasnippet)
+(setq yas-snippet-dirs
+        '("~/.emacs.d/snippets/yasnippet-snippets"
+        ))
+
+;; yasnippet everywhere
+(yas-global-mode 1)
+#+END_SRC
+
+** git-gutter
+
+#+BEGIN_SRC emacs-lisp
+(require 'git-gutter)
+(global-git-gutter-mode +1)
+; live update
+(custom-set-variables
+    '(git-gutter:update-interval 1)
+    '(git-gutter:modified-sign "~")
+    ; '(git-gutter:added-sign "+")
+    ; '(git-gutter:deleted-sign "-")
+)
+#+END_SRC
+
+** undo-tree
+
+#+BEGIN_SRC emacs-lisp
+(require 'undo-tree)
+(global-undo-tree-mode)
+#+END_SRC
+
+** auto-complete
+
+#+BEGIN_SRC emacs-lisp
+(require 'auto-complete)
+;; TODO deactivate for minibuffer
+(global-auto-complete-mode t)
+#+END_SRC
+
+** jedi                                                             :manual:
+M-x jedi:install-server
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:complete-on-dot t)
+#+END_SRC
+
+** json-snatcher
+
+#+BEGIN_SRC emacs-lisp
+(require 'json-snatcher)
+(defun js-mode-bindings ()
+"Sets a hotkey for using the json-snatcher plugin"
+    (when (string-match  "\\.json$" (buffer-name))
+        ;;; TODO map @ mappings
+    (local-set-key (kbd "C-c C-g") 'jsons-print-path)))
+(add-hook 'js-mode-hook 'js-mode-bindings)
+(add-hook 'js2-mode-hook 'js-mode-bindings)
+#+END_SRC
+
+** fireplace
+
+#+BEGIN_SRC emacs-lisp
+(require 'fireplace)
+#+END_SRC
+
+** nyan-mode                                                        :manual:
+
+depends on https://github.com/TeMPOraL/nyan-mode.git
+expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path (expand-file-name
+    (concat user-emacs-directory "other-srcs/nyan-mode")))
+(require 'nyan-mode)
+(nyan-mode)
+#+END_SRC
+
+* require
+
+#+BEGIN_SRC emacs-lisp
+(require 'idle-require)             ; Need in order to use idle-require
+
+(dolist (feature
+         '(auto-compile             ; auto-compile .el files
+           jedi                     ; auto-completion for python
+           matlab                   ; matlab-mode
+           ob-matlab                ; org-babel matlab
+           ox-latex                 ; the latex-exporter (from org)
+           ox-md                    ; Markdown exporter (from org)
+           recentf                  ; recently opened files
+           tex-mode))               ; TeX, LaTeX, and SliTeX mode commands
+  (idle-require feature))
+
+(setq idle-require-idle-delay 5)
+(idle-require-mode 1)
 #+END_SRC
 
 * keybindings keymappings
@@ -320,6 +437,7 @@ the tangled file is compiled."
     (setq ns-option-modifier nil))
 
 ;; (template insertion
+;; TODO use yasnippet
 (defun insert-org-checkbox ()
   (interactive)
   (insert "- [ ] "))
@@ -335,5 +453,5 @@ the tangled file is compiled."
 
 (defun insert-src ()
   (interactive)
-  (insert "#+BEGIN_SRC emacs-lisp\n#+END_SRC"))
+  (insert "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC"))
 #+END_SRC
