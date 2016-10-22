@@ -1,5 +1,7 @@
 * Meta
 ** Todo
+*** mappings
+**** c-x 1
 *** basics
 **** reproduzierbare package-list
 **** Tabs
@@ -8,9 +10,15 @@
 - smart tabs
 **** Tab Reiter
 cmd alt left/right
+**** Encryption
+**** mode-line
+***** git infos
+***** Sprache
+**** emojis
 
 *** flycheck
 - error list für alle source files öffnen
+- error list buffer style darf keine anderen minibuffer betreffen
 
 *** evil
 **** g; persistieren
@@ -23,12 +31,16 @@ cmd alt left/right
 **** capture
 **** Wetter
 **** Gcal
+**** keybindings
+***** new subheadline
 
 *** auto-complete
 https://github.com/auto-complete/auto-complete
 **** python
 - jedi
+**** javascript
 **** Yasnippet
+- durch params steppen
 
 
 *** andere Plugins
@@ -46,10 +58,23 @@ https://github.com/abo-abo/hydra
 https://github.com/timcharper/evil-surround
 http://cedet.sourceforge.net/
 https://github.com/repl-electric/view-pane/tree/master/animations
-- tags
-- magit
+https://github.com/mooz/js2-mode
+https://github.com/fxbois/web-mode
+https://github.com/ShingoFukuyama/helm-swoop
+https://github.com/lewang/flx
+https://github.com/Wilfred/ag.el
+https://github.com/skeeto/elfeed
+**** stack exchange
+https://github.com/vermiculus/sx.el
+**** tag
+**** Dash
+**** eclim
+**** 80-Column-Ruler
+**** magit
 **** DB Client
 **** fzf
+**** elpy?
+https://github.com/jorgenschaefer/elpy
 **** pomodoro
 **** Gcal
 **** rainbow parens
@@ -58,6 +83,8 @@ http://danmidwood.com/content/2014/11/21/animated-paredit.html
 
 *** Themes
 **** previews
+**** other
+https://github.com/hlissner/emacs-doom-theme/tree/screenshots
 
 ** Cheatsheet
 *** paredit
@@ -69,6 +96,10 @@ http://danmidwood.com/content/2014/11/21/animated-paredit.html
 http://tuhdo.github.io/emacs-tutor.html
 http://emacs-doctor.com/learn-emacs-lisp-in-15-minutes.html
 https://github.com/redguardtoo/mastering-emacs-in-one-year-guide
+https://github.com/noctuid/evil-guide
+http://www.howardism.org/Technical/Emacs/emacs-init.html
+http://bling.github.io/blog/2015/01/06/emacs-as-my-leader-1-year-later/
+https://github.com/gabrielelanaro/emacs-for-python
 
 *** Listen
 http://emacsrocks.com/

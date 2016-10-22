@@ -37,7 +37,7 @@
 
 ;;; (general
     ;;; theme
-    ; (load-theme 'misterioso)
+    (load-theme 'misterioso)
 
     ;; maximized on startup
     ; (add-hook 'after-init-hook '(lambda () (w32-send-sys-command #xf030)))
@@ -132,12 +132,16 @@
 ;;; (plugins
     ;;; (activate package managers
         (require 'package)
-        (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+        ; (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+        (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
         (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
-        (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
         (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+        (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
+
         ; (setq package-enable-at-startup nil)
         (package-initialize)
+        (when (not package-archive-contents)
+            (package-refresh-contents))
 
         ;;; automate package installs
         ; list the packages you want
@@ -361,24 +365,30 @@
         (local-set-key (kbd "C-c C-g") 'jsons-print-path)))
     (add-hook 'js-mode-hook 'js-mode-bindings)
     (add-hook 'js2-mode-hook 'js-mode-bindings)
+
+    ;;; (jedi
+        (add-hook 'python-mode-hook 'jedi:setup)
+        (setq jedi:complete-on-dot t)
+        ;; M-x jedi:install-server RET
+    ;;; )
 ;;; )
 
 ;;; (generated
-    (custom-set-variables
-        ;; custom-set-variables was added by Custom.
-        ;; If you edit it by hand, you could mess it up, so be careful.
-        ;; Your init file should contain only one such instance.
-        ;; If there is more than one, they won't work right.
-    '(custom-enabled-themes (quote (zenburn)))
-    '(custom-safe-themes
-    (quote
-        ("afbb40954f67924d3153f27b6d3399df221b2050f2a72eb2cfa8d29ca783c5a8" default))))
-    (custom-set-faces
-        ;; custom-set-faces was added by Custom.
-        ;; If you edit it by hand, you could mess it up, so be careful.
-        ;; Your init file should contain only one such instance.
-        ;; If there is more than one, they won't work right.
-        )
+    ; (custom-set-variables
+    ;     ;; custom-set-variables was added by Custom.
+    ;     ;; If you edit it by hand, you could mess it up, so be careful.
+    ;     ;; Your init file should contain only one such instance.
+    ;     ;; If there is more than one, they won't work right.
+    ; '(custom-enabled-themes (quote (zenburn)))
+    ; '(custom-safe-themes
+    ; (quote
+    ;     ("afbb40954f67924d3153f27b6d3399df221b2050f2a72eb2cfa8d29ca783c5a8" default))))
+    ; (custom-set-faces
+    ;     ;; custom-set-faces was added by Custom.
+    ;     ;; If you edit it by hand, you could mess it up, so be careful.
+    ;     ;; Your init file should contain only one such instance.
+    ;     ;; If there is more than one, they won't work right.
+    ;     )
 ; )
 
 ;;; (keymappings, keybindings, keychords
@@ -428,6 +438,8 @@
     (define-key evil-normal-state-map (kbd "M-b") 'helm-buffers-list)
     (define-key evil-normal-state-map (kbd "+") 'er/expand-region)
     (define-key evil-normal-state-map (kbd "f") 'ace-jump-mode)
+    (define-key evil-normal-state-map (kbd "B") 'evil-first-non-blank)
+    (define-key evil-normal-state-map (kbd "E") 'evil-end-of-line)
 
     ;;; map command key to meta
     (if (boundp 'ns-command-modifier)
