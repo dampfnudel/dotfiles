@@ -3,25 +3,9 @@
 #+BABEL: :cache yes
 #+PROPERTY: header-args :tangle yes
 
-* init.org
-always tangle and byte-compile the =org=-document after changes.
-
-#+BEGIN_SRC emacs-lisp
-(defun tangle-init ()
-"If the current buffer is 'init.org' the code-blocks are tangled, and
-the tangled file is compiled."
-(when (equal (buffer-file-name)
-    (expand-file-name (concat user-emacs-directory "emacsrc.org")))
-    ;; avoid running hooks when tangling.
-    (let ((prog-mode-hook nil))
-    (org-babel-tangle)
-    (byte-compile-file (concat user-emacs-directory "init.el")))))
-
-(add-hook 'after-save-hook 'tangle-init)
-#+END_SRC
-
 * package management
-** Packages
+
+** packages
 
 To load downloaded packages we need to
 initialize =package=. =cl= is a library that contains many functions from
@@ -29,9 +13,10 @@ Common Lisp, and comes in handy quite often, so we want to make sure it's
 loaded, along with =package=, which is obviously needed.
 
 #+BEGIN_SRC emacs-lisp
-(require 'cl)
-(require 'package)
 (package-initialize)
+(require 'package)
+(require 'cl)
+(setq package-enable-at-startup nil)
 #+END_SRC
 
 Setup package archives.
@@ -46,18 +31,19 @@ Setup package archives.
 ;; (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
 #+END_SRC
 
-Install packages if they are missing.
+** install missing packages
 
 #+BEGIN_SRC emacs-lisp
 (let* ((packages
-        '(auto-compile         ; automatically compile Emacs Lisp libraries
-            evil
+        '(auto-compile              ; automatically compile Emacs Lisp libraries
+            evil                    ; extensible vi layer
+            helm                    ; Incremental and narrowing framework
+            expand-region           ; Increases the selected region by semantic units
             org                     ; Outline-based notes management and organizer
             org-autolist            ; Automatically insert new list items.
             ox-rst                  ; Export reStructuredText
             ox-odt                  ; Export OpenDocument
-            expand-region           ; Increases the selected region by semantic units
-
+            ox-md                   ; Markdown exporter (from org)
             ;; cider                ; Clojure Interactive Development Environment
             ;; company              ; Modular text completion framework
             ;; define-word          ; display the definition of word at point
@@ -70,7 +56,6 @@ Install packages if they are missing.
             ;; git-gutter-fringe    ; Fringe version of git-gutter.el
             ;; golden-ratio         ; Automatic resizing windows to golden ratio
             ;; haskell-mode         ; A Haskell editing mode
-            ;; helm                 ; Incremental and narrowing framework
             ;; helm-company         ; Helm interface for company-mode
             ;; helm-projectile      ; Helm integration for Projectile
             ;; helm-swoop           ; Efficiently hopping squeezed lines
@@ -91,12 +76,31 @@ Install packages if they are missing.
             ))
         ;; Remove all packages already installed
         (packages (remove-if 'package-installed-p packages)))
+    ;; TODO only connect if neccessary
     (when packages
         (ignore-errors (package-refresh-contents)
                     (mapcar 'package-install packages)
-                    ;; This package is only relevant for Mac OS X.
+                    ;; macOS
                     (when (memq window-system '(mac ns))
                         (package-install 'exec-path-from-shell)))))
+#+END_SRC
+
+* init.org
+
+always tangle and byte-compile the =org=-document after changes.
+
+#+BEGIN_SRC emacs-lisp
+(defun tangle-init ()
+"If the current buffer is 'init.org' the code-blocks are tangled, and
+the tangled file is compiled."
+(when (equal (buffer-file-name)
+    (expand-file-name (concat user-emacs-directory "emacsrc.org")))
+    ;; avoid running hooks when tangling.
+    (let ((prog-mode-hook nil))
+    (org-babel-tangle)
+    (byte-compile-file (concat user-emacs-directory "init.el")))))
+
+(add-hook 'after-save-hook 'tangle-init)
 #+END_SRC
 
 * general
@@ -106,19 +110,85 @@ Install packages if they are missing.
     #+BEGIN_SRC emacs-lisp
     ;; theme
     (load-theme 'misterioso)
-    ;; disable blinking cursor
-    (blink-cursor-mode 0)
-    ;; disable welcome window
-    (setq ns-pop-up-frames nil)
-    ;; disable audio bell
-    (setq ring-bell-function 'ignore)
-    ;; disable tool-bar
-    (tool-bar-mode -1)
     ;; set font size to 16pt
     (set-face-attribute 'default nil :height 160)
+    #+END_SRC
+
+** cursor
+
+    #+BEGIN_SRC emacs-lisp
+    ;; disable blinking cursor
+    (blink-cursor-mode 0)
+    ;; disable audio bell
+    (setq ring-bell-function 'ignore)
+    ;; remember cursor position
+    (if (version< emacs-version "25.0")
+        (progn
+            (require 'saveplace)
+      (setq-default save-place t))
+      (save-place-mode 1))
+    #+END_SRC
+
+** UI
+    #+BEGIN_SRC emacs-lisp
+    ;; disable welcome window
+    (setq ns-pop-up-frames nil)
+    ;; disable tool-bar
+    (tool-bar-mode -1)
     ;; show line numbers
     (global-linum-mode t)
     #+END_SRC
+
+*** modeline
+
+    #+BEGIN_SRC emacs-lisp
+    ;; display column number
+    (setq column-number-mode t)
+    #+END_SRC
+
+** whitespace
+
+    #+BEGIN_SRC emacs-lisp
+    ;; show trailing whitespace
+    (setq-default show-trailing-whitespace t)
+    ;;; use 4 spaces instead of tabs
+    (setq-default indent-tabs-mode nil)
+    (setq-default tab-width 4)
+    (setq indent-line-function 'insert-tab)
+    #+END_SRC
+
+** temporary files
+
+    #+BEGIN_SRC emacs-lisp
+    ;; paths
+    (setq auto-save-file-name-transforms
+              `((".*" ,(concat user-emacs-directory "tmp/auto-save/") t)))
+    (setq backup-directory-alist
+          `(("." . ,(expand-file-name
+                     (concat user-emacs-directory "tmp/backup")))))
+    ;; backup method
+    (setq backup-by-copying t)
+    ;; backup frequency
+    (setq delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)
+    #+END_SRC
+
+** fun
+#+BEGIN_SRC emacs-lisp
+(require 'zone)
+
+(defun zone-choose (pgm)
+    "Choose a PGM to run for `zone'."
+    (interactive
+        (list
+        (completing-read
+        "Program: "
+        (mapcar 'symbol-name zone-programs))))
+    (let ((zone-programs (list (intern pgm))))
+        (zone)))
+#+END_SRC
 
 * packages
 
@@ -169,12 +239,25 @@ Install packages if they are missing.
 
 ;; export formats
 (require 'ox-rst)
+(require 'ox-md)
 (require 'ox-odt)
 #+END_SRC
 
 ** expand-region.el
+
 #+BEGIN_SRC emacs-lisp
 (require 'expand-region)
+#+END_SRC
+
+** helm
+
+#+BEGIN_SRC emacs-lisp
+(require 'helm-config)
+#+END_SRC
+
+** flycheck
+#+BEGIN_SRC emacs-lisp
+;;(add-hook 'after-init-hook #'global-flycheck-mode)
 #+END_SRC
 
 * keybindings keymappings
@@ -242,12 +325,15 @@ Install packages if they are missing.
   (insert "- [ ] "))
 (global-set-key (kbd "M--") 'insert-checkbox)
 
-(defun insert-org-mininal-theme ()
+(defun insert-org-minimal-theme ()
   (interactive)
     (insert "#+SETUPFILE: ~/Settings/dotfiles/org-minimal-theme.setup"))
 
 (defun insert-org-title ()
   (interactive)
   (insert "#+TITLE: "))
-#+END_SRC
 
+(defun insert-src ()
+  (interactive)
+  (insert "#+BEGIN_SRC emacs-lisp\n#+END_SRC"))
+#+END_SRC
