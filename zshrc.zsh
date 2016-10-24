@@ -1030,6 +1030,12 @@ FZF-EOF"
             git status --porcelain | awk '{print $2 }'
         }
 
+        # show which branch the current one is forked from
+        git_parent_branch () {
+            local current_branch=`git rev-parse --abbrev-ref HEAD`
+            git show-branch -a | ack '\*' | ack -v "$current_branch" | head -n1 | sed 's/.*\[\(.*\)\].*/\1/' | sed 's/[\^~].*//'
+        }
+
         # list git tree
         git_tree () {
             (git ls-tree -r --name-only HEAD || /usr/bin/find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//) 2> /dev/null
