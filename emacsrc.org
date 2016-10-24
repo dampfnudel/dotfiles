@@ -3,6 +3,15 @@
 #+BABEL: :cache yes
 #+PROPERTY: header-args :tangle yes
 
+   ███████╗███╗   ███╗ █████╗  ██████╗███████╗██████╗  ██████╗
+   ██╔════╝████╗ ████║██╔══██╗██╔════╝██╔════╝██╔══██╗██╔════╝
+   █████╗  ██╔████╔██║███████║██║     ███████╗██████╔╝██║
+   ██╔══╝  ██║╚██╔╝██║██╔══██║██║     ╚════██║██╔══██╗██║
+██╗███████╗██║ ╚═╝ ██║██║  ██║╚██████╗███████║██║  ██║╚██████╗
+╚═╝╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚══════╝╚═╝  ╚═╝ ╚═════╝
+
+ASCII-Art credits: http://patorjk.com/software/taag/#p=testall&h=0&v=0&f=ANSI%20Shadow&t=.emacsrc
+
 * package management
 
 ** packages
@@ -37,6 +46,7 @@ Setup package archives.
 (let* ((packages
         '(auto-compile              ; automatically compile Emacs Lisp libraries
             evil                    ; extensible vi layer
+            evil-leader             ; the <leader> feature from Vim
             helm                    ; Incremental and narrowing framework
             expand-region           ; Increases the selected region by semantic units
             yasnippet               ; template system
@@ -48,6 +58,14 @@ Setup package archives.
             fireplace               ; a cozy fireplace
             jedi                    ; Python auto-completion for Emacs
             idle-require            ; load elisp libraries while Emacs is idle
+            evil-nerd-commenter     ; comment code efficiently
+            avy                     ; jumping to visible text using a char-based decision tree
+            restclient              ; tool to manually explore and test HTTP REST webservices 
+            ;; themes
+            gruvbox-theme
+            solarized-theme
+            monokai-theme
+            zenburn-theme
             org                     ; Outline-based notes management and organizer
             org-autolist            ; Automatically insert new list items.
             ;; always load finally
@@ -95,6 +113,21 @@ Setup package archives.
 
 * emacsrc.org setup
 
+initial init.d content
+
+#+BEGIN_SRC emacs-lisp :tangle no
+;; require org for tangling
+(require 'org)
+;; open the configuration
+(find-file (concat user-emacs-directory "init.org"))
+;; tangle it
+(org-babel-tangle)
+;; load it
+(load-file (concat user-emacs-directory "init.el"))
+;; finally byte-compile it
+(byte-compile-file (concat user-emacs-directory "init.el"))
+#+END_SRC
+
 always tangle and byte-compile the =org=-document after changes.
 
 #+BEGIN_SRC emacs-lisp
@@ -117,7 +150,9 @@ the tangled file is compiled."
 
     #+BEGIN_SRC emacs-lisp
     ;; theme
-    (load-theme 'misterioso)
+    ;; trust theme
+    (setq custom-safe-themes t)
+    (load-theme 'gruvbox)
     ;; set font size to 16pt
     (set-face-attribute 'default nil :height 160)
     #+END_SRC
@@ -180,6 +215,16 @@ the tangled file is compiled."
     (set-language-environment "UTF-8")
     #+END_SRC
 
+** paranthesis
+
+    #+BEGIN_SRC emacs-lisp
+    (show-paren-mode 1)
+    (require 'paren)
+    (set-face-background 'show-paren-match (face-background 'default))
+    (set-face-foreground 'show-paren-match "#FF0097")
+    (set-face-attribute 'show-paren-match nil :weight 'extra-bold)
+    #+END_SRC
+
 ** temporary files
 
     #+BEGIN_SRC emacs-lisp
@@ -214,6 +259,15 @@ the tangled file is compiled."
 #+END_SRC
 
 * packages
+
+** evil-leader
+
+#+BEGIN_SRC emacs-lisp
+(require 'evil-leader)
+(global-evil-leader-mode)
+;; set space as leader-key
+(evil-leader/set-leader "<SPC>")
+#+END_SRC
 
 ** evil
 
@@ -411,11 +465,10 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
     (define-key map (kbd "M-l") 'helm-semantic-or-imenu)
     (define-key map (kbd "\C-cl") 'org-store-link)
     (define-key map (kbd "\C-ca") 'org-agenda)
-    (define-key map (kbd "C->") 'tabbar-forward)
-    (define-key map (kbd "C-<") 'tabbar-backward)
     (define-key map (kbd "C-+") 'er/expand-region)
-    (define-key map (kbd "C-c SPC") 'ace-jump-mode)
+    ;; TOOD Backspace?
     (define-key map (kbd "DEL") 'backward-delete-char)
+    (define-key map (kbd "C--") 'evilnc-comment-or-uncomment-lines)
     map)
   "my-keys-minor-mode keymap.")
 
@@ -427,12 +480,25 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
 (my-keys-minor-mode 1)
 
 ;; evil keymappings
+;; normal state
 (define-key evil-normal-state-map (kbd "M-o") 'helm-find-files)
 (define-key evil-normal-state-map (kbd "M-b") 'helm-buffers-list)
 (define-key evil-normal-state-map (kbd "+") 'er/expand-region)
 (define-key evil-normal-state-map (kbd "f") 'ace-jump-mode)
 (define-key evil-normal-state-map (kbd "B") 'evil-first-non-blank)
 (define-key evil-normal-state-map (kbd "E") 'evil-end-of-line)
+(define-key evil-normal-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
+(define-key evil-normal-state-map (kbd "ö") 'avy-goto-char)
+(define-key evil-normal-state-map (kbd "Ö") 'avy-goto-line)
+(define-key evil-normal-state-map (kbd "f") 'avy-goto-char-in-line)
+
+;; visual line
+(define-key evil-visual-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
+
+;; evil-leader
+(evil-leader/set-key
+  "f" 'find-file
+  "b" 'helm-buffers-list)
 
 ;; macOS
 ;; map command key to meta
@@ -460,3 +526,120 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
   (interactive)
   (insert "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC"))
 #+END_SRC
+
+* Meta
+** Todo
+*** mappings
+**** c-x 1
+*** basics
+**** reproduzierbare package-list
+**** Tabs
+- 4 auf einmal löschen
+- 4 auf einmal überspringen
+- smart tabs
+**** Tab Reiter
+cmd alt left/right
+**** Encryption
+**** mode-line
+***** git infos
+***** Sprache
+**** emojis
+
+*** flycheck
+- error list für alle source files öffnen
+- error list buffer style darf keine anderen minibuffer betreffen
+
+*** evil
+**** g; persistieren
+**** leader key
+***** preview wie bei spacemacs
+**** Visual selection beim Einrücken selektiert lassen
+
+*** org-mode
+**** archive
+**** capture
+**** Wetter
+**** Gcal
+**** keybindings
+***** new subheadline
+
+*** auto-complete
+https://github.com/auto-complete/auto-complete
+**** python
+- jedi
+**** javascript
+**** Yasnippet
+- durch params steppen
+**** directories
+
+
+*** andere Plugins
+https://www.quora.com/What-are-some-of-the-most-useful-extensions-for-Emacs
+https://www.reddit.com/r/emacs/comments/42g6u9/what_are_some_lesserknown_packages_that_you_love/
+https://news.ycombinator.com/item?id=9395271
+https://www.reddit.com/r/vim/comments/2ezvst/why_cant_vim_to_be_appealing_like_emacs/
+
+https://github.com/mooz/js2-mode
+https://github.com/jacktasia/dumb-jump
+https://github.com/ShingoFukuyama/helm-swoop
+https://github.com/Fuco1/smartparens
+https://github.com/nonsequitur/smex/
+https://github.com/konr/tomatinho
+https://github.com/abo-abo/hydra
+https://github.com/timcharper/evil-surround
+http://cedet.sourceforge.net/
+https://github.com/repl-electric/view-pane/tree/master/animations
+https://github.com/fxbois/web-mode
+https://github.com/lewang/flx
+https://github.com/Wilfred/ag.el
+https://github.com/skeeto/elfeed
+**** stack exchange
+https://github.com/vermiculus/sx.el
+**** tag
+**** Dash
+**** eclim
+**** 80-Column-Ruler
+**** magit
+**** DB Client
+**** fzf
+**** elpy?
+https://github.com/jorgenschaefer/elpy
+**** pomodoro
+**** Gcal
+**** rainbow parens
+**** paredit
+http://danmidwood.com/content/2014/11/21/animated-paredit.html
+
+*** Themes
+**** previews
+**** other
+https://github.com/hlissner/emacs-doom-theme/tree/screenshots
+
+** Cheatsheet
+*** paredit
+*** Yasnippet
+*** Dired
+
+** Resourcen
+*** Lernen
+http://tuhdo.github.io/emacs-tutor.html
+http://emacs-doctor.com/learn-emacs-lisp-in-15-minutes.html
+https://github.com/redguardtoo/mastering-emacs-in-one-year-guide
+https://github.com/noctuid/evil-guide
+http://www.howardism.org/Technical/Emacs/emacs-init.html
+http://bling.github.io/blog/2015/01/06/emacs-as-my-leader-1-year-later/
+https://github.com/gabrielelanaro/emacs-for-python
+http://tuhdo.github.io/helm-intro.html
+https://github.com/larstvei/dot-emacs/blob/master/init.org
+https://www.emacswiki.org/emacs/EmacsNiftyTricks
+*** Listen
+http://emacsrocks.com/
+https://github.com/emacs-tw/awesome-emacs
+https://github.com/search?o=desc&q=emacs&s=stars&type=Repositories&utf8=%E2%9C%93
+
+*** Distros
+http://spacemacs.org/
+https://github.com/bbatsov/prelude
+https://github.com/overtone/emacs-live
+https://github.com/technomancy/emacs-starter-kit
+https://github.com/purcell/emacs.d
