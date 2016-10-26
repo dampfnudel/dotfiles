@@ -68,6 +68,9 @@ Setup package archives.
             helm-swoop              ; Efficiently hopping squeezed lines
             smartparens             ; minor mode for dealing with pairs
             which-key               ; minor mode for Emacs that displays the key bindings following your currently entered incomplete command (a prefix) in a popup
+            smart-mode-line         ; sexy mode-line
+            smart-mode-line-powerline-theme
+            ;; new package
             ;; themes
             gruvbox-theme
             solarized-theme
@@ -453,11 +456,20 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
 (add-hook 'python-mode-hook #'smartparens-mode)
 #+END_SRC
 
-** new package
+** which-key
 
 #+BEGIN_SRC emacs-lisp
 (require 'which-key)
 (which-key-mode)
+#+END_SRC
+
+** smart-mode-line
+
+#+BEGIN_SRC emacs-lisp
+(setq powerline-arrow-shape 'curve)
+(setq powerline-default-separator-dir '(right . left))
+(setq sml/theme 'powerline)
+(sml/setup)
 #+END_SRC
 
 ** new package
@@ -624,6 +636,9 @@ http://emacs-fu.blogspot.de/2008/12/highlighting-todo-fixme-and-friends.html
 - error list für alle source files öffnen
 - error list buffer style darf keine anderen minibuffer betreffen
 
+*** yasnippet
+https://www.emacswiki.org/emacs/Yasnippet
+
 *** evil
 **** g; persistieren
 **** leader key
@@ -651,10 +666,6 @@ https://github.com/auto-complete/auto-complete
 Anzu shows the number of occurrence when performing a search. Spacemacs integrates nicely the Anzu status by displaying it temporarily when n or N are being pressed. See the 5/6 segment on the screenshot below.
 
 When Flycheck minor mode is enabled, a new element appears in modeline showing the number of errors, warnings and info.
-
-
-
-
 
 *** andere Plugins
 https://www.quora.com/What-are-some-of-the-most-useful-extensions-for-Emacs
@@ -716,6 +727,8 @@ https://github.com/larstvei/dot-emacs/blob/master/init.org
 https://www.emacswiki.org/emacs/EmacsNiftyTricks
 http://emacs-fu.blogspot.de/
 http://danmidwood.com/content/2014/11/21/animated-paredit.html
+https://joaotavora.github.io/yasnippet/snippet-development.html
+
 *** Listen
 http://emacsrocks.com/
 https://github.com/emacs-tw/awesome-emacs
