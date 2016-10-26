@@ -68,8 +68,9 @@ Setup package archives.
             helm-swoop              ; Efficiently hopping squeezed lines
             smartparens             ; minor mode for dealing with pairs
             which-key               ; minor mode for Emacs that displays the key bindings following your currently entered incomplete command (a prefix) in a popup
-            smart-mode-line         ; sexy mode-line
-            smart-mode-line-powerline-theme
+            spaceline               ; Spacemacs powerline theme
+            ;; smart-mode-line         ; sexy mode-line
+            ;; smart-mode-line-powerline-theme
             ;; new package
             ;; themes
             gruvbox-theme
@@ -463,13 +464,22 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
 (which-key-mode)
 #+END_SRC
 
-** smart-mode-line
+** TODO smart-mode-line
 
-#+BEGIN_SRC emacs-lisp
+decide
+
+ #+BEGIN_SRC emacs-lisp :tangle no
 (setq powerline-arrow-shape 'curve)
 (setq powerline-default-separator-dir '(right . left))
 (setq sml/theme 'powerline)
 (sml/setup)
+ #+END_SRC
+
+** spaceline
+
+#+BEGIN_SRC emacs-lisp
+(require 'spaceline-config)
+(spaceline-spacemacs-theme)
 #+END_SRC
 
 ** new package
