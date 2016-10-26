@@ -1,6 +1,7 @@
 #+TITLE: Emacs configuration file
 #+AUTHOR: Markus Bayer
 #+BABEL: :cache yes
+#+DATE: <2016-06-03 Fr 18:35>
 #+PROPERTY: header-args :tangle yes
 
    ███████╗███╗   ███╗ █████╗  ██████╗███████╗██████╗  ██████╗
@@ -60,7 +61,13 @@ Setup package archives.
             idle-require            ; load elisp libraries while Emacs is idle
             evil-nerd-commenter     ; comment code efficiently
             avy                     ; jumping to visible text using a char-based decision tree
-            restclient              ; tool to manually explore and test HTTP REST webservices 
+            restclient              ; tool to manually explore and test HTTP REST webservices
+            js2-mode                ; Improved JavaScript editing mode
+            web-mode                ; major mode for editing web templates aka HTML files
+            dumb-jump               ; "jump to definition" with support for multiple programming languages
+            helm-swoop              ; Efficiently hopping squeezed lines
+            smartparens             ; minor mode for dealing with pairs
+            which-key               ; minor mode for Emacs that displays the key bindings following your currently entered incomplete command (a prefix) in a popup
             ;; themes
             gruvbox-theme
             solarized-theme
@@ -85,12 +92,9 @@ Setup package archives.
             ;; haskell-mode         ; A Haskell editing mode
             ;; helm-company         ; Helm interface for company-mode
             ;; helm-projectile      ; Helm integration for Projectile
-            ;; helm-swoop           ; Efficiently hopping squeezed lines
-            ;; js2-mode             ; Improved JavaScript editing mode
             ;; magit                ; control Git from Emacs
             ;; markdown-mode        ; Emacs Major mode for Markdown-formatted files
             ;; material-theme       ; A Theme based on Google Material Design
-            ;; matlab-mode          ; MATLAB integration with Emacs
             ;; maude-mode           ; Emacs mode for the programming language Maude
             ;; multiple-cursors     ; Multiple cursors for Emacs
             ;; olivetti             ; Minor mode for a nice writing environment
@@ -139,12 +143,19 @@ the tangled file is compiled."
     ;; avoid running hooks when tangling.
     (let ((prog-mode-hook nil))
     (org-babel-tangle)
-    (byte-compile-file (concat user-emacs-directory "init.el")))))
+    (byte-compile-file (concat user-emacs-directory "emacsrc.el")))))
 
 (add-hook 'after-save-hook 'tangle-init)
 #+END_SRC
 
 * general
+
+** load path
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path (expand-file-name
+    (concat user-emacs-directory "other-srcs/lisp")))
+#+END_SRC
 
 ** theme
 
@@ -182,6 +193,15 @@ the tangled file is compiled."
     (global-linum-mode t)
     ;; y & n instead of yes & no
     (fset 'yes-or-no-p 'y-or-n-p)
+    ;; 80-column-ruler
+    (add-to-list 'load-path (expand-file-name
+        (concat user-emacs-directory "other-srcs/Fill-Column-Indicator")))
+    (require 'fill-column-indicator)
+    ;; TODO define list of used programming languages (prog-mode doesn't work with js)
+    (add-hook 'python-mode-hook 'turn-on-fci-mode)
+    (add-hook 'js-mode-hook 'turn-on-fci-mode)
+    ;; highlight current line
+    (global-hl-line-mode)
     #+END_SRC
 
 *** modeline
@@ -403,6 +423,49 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
 (nyan-mode)
 #+END_SRC
 
+** js2-mode
+
+#+BEGIN_SRC emacs-lisp
+(require 'js2-mode)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+#+END_SRC
+
+** js2-mode
+
+#+BEGIN_SRC emacs-lisp
+(require 'web-mode)
+
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+#+END_SRC
+
+** smartparens
+
+#+BEGIN_SRC emacs-lisp
+(require 'smartparens-config)
+(add-hook 'js-mode-hook #'smartparens-mode)
+(add-hook 'python-mode-hook #'smartparens-mode)
+#+END_SRC
+
+** new package
+
+#+BEGIN_SRC emacs-lisp
+(require 'which-key)
+(which-key-mode)
+#+END_SRC
+
+** new package
+
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+
 * require
 
 #+BEGIN_SRC emacs-lisp
@@ -527,12 +590,22 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
   (insert "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC"))
 #+END_SRC
 
+*** TODO dumbjump
+mapping
+Adding (dumb-jump-mode) to your .emacs will enable the key bindings for two interactive Dumb Jump functions:
+
+dumb-jump-go C-M g core functionality. Attempts to jump to the definition for the thing under point
+dumb-jump-back C-M p jumps back to where you were when you jumped. These are chained so if you go down a rabbit hole you can get back out or where you want to be.
+dumb-jump-quick-look C-M q like dumb-jump-go but shows tooltip with file, line, and context
+dumb-jump-go-other-window exactly like dumb-jump-go but uses find-file-other-window instead of find-file
+
 * Meta
 ** Todo
 *** mappings
 **** c-x 1
 *** basics
 **** reproduzierbare package-list
+- [ ] no melpa on startup
 **** Tabs
 - 4 auf einmal löschen
 - 4 auf einmal überspringen
@@ -544,6 +617,8 @@ cmd alt left/right
 ***** git infos
 ***** Sprache
 **** emojis
+**** TODO FIXME BUG highlighten
+http://emacs-fu.blogspot.de/2008/12/highlighting-todo-fixme-and-friends.html
 
 *** flycheck
 - error list für alle source files öffnen
@@ -572,6 +647,14 @@ https://github.com/auto-complete/auto-complete
 - durch params steppen
 **** directories
 
+*** spacemacs
+Anzu shows the number of occurrence when performing a search. Spacemacs integrates nicely the Anzu status by displaying it temporarily when n or N are being pressed. See the 5/6 segment on the screenshot below.
+
+When Flycheck minor mode is enabled, a new element appears in modeline showing the number of errors, warnings and info.
+
+
+
+
 
 *** andere Plugins
 https://www.quora.com/What-are-some-of-the-most-useful-extensions-for-Emacs
@@ -580,6 +663,7 @@ https://news.ycombinator.com/item?id=9395271
 https://www.reddit.com/r/vim/comments/2ezvst/why_cant_vim_to_be_appealing_like_emacs/
 
 https://github.com/mooz/js2-mode
+https://github.com/fxbois/web-mode
 https://github.com/jacktasia/dumb-jump
 https://github.com/ShingoFukuyama/helm-swoop
 https://github.com/Fuco1/smartparens
@@ -589,7 +673,6 @@ https://github.com/abo-abo/hydra
 https://github.com/timcharper/evil-surround
 http://cedet.sourceforge.net/
 https://github.com/repl-electric/view-pane/tree/master/animations
-https://github.com/fxbois/web-mode
 https://github.com/lewang/flx
 https://github.com/Wilfred/ag.el
 https://github.com/skeeto/elfeed
@@ -598,7 +681,6 @@ https://github.com/vermiculus/sx.el
 **** tag
 **** Dash
 **** eclim
-**** 80-Column-Ruler
 **** magit
 **** DB Client
 **** fzf
@@ -632,6 +714,8 @@ https://github.com/gabrielelanaro/emacs-for-python
 http://tuhdo.github.io/helm-intro.html
 https://github.com/larstvei/dot-emacs/blob/master/init.org
 https://www.emacswiki.org/emacs/EmacsNiftyTricks
+http://emacs-fu.blogspot.de/
+http://danmidwood.com/content/2014/11/21/animated-paredit.html
 *** Listen
 http://emacsrocks.com/
 https://github.com/emacs-tw/awesome-emacs
