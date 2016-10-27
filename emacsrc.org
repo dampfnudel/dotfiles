@@ -48,6 +48,8 @@ Setup package archives.
         '(auto-compile              ; automatically compile Emacs Lisp libraries
             evil                    ; extensible vi layer
             evil-leader             ; the <leader> feature from Vim
+            evil-search-highlight-persist             ; highlight the search term in all buffers persistently
+            evil-nerd-commenter     ; comment code efficiently
             helm                    ; Incremental and narrowing framework
             expand-region           ; Increases the selected region by semantic units
             yasnippet               ; template system
@@ -59,7 +61,6 @@ Setup package archives.
             fireplace               ; a cozy fireplace
             jedi                    ; Python auto-completion for Emacs
             idle-require            ; load elisp libraries while Emacs is idle
-            evil-nerd-commenter     ; comment code efficiently
             avy                     ; jumping to visible text using a char-based decision tree
             restclient              ; tool to manually explore and test HTTP REST webservices
             js2-mode                ; Improved JavaScript editing mode
@@ -68,7 +69,10 @@ Setup package archives.
             helm-swoop              ; Efficiently hopping squeezed lines
             smartparens             ; minor mode for dealing with pairs
             which-key               ; minor mode for Emacs that displays the key bindings following your currently entered incomplete command (a prefix) in a popup
+            helm-projectile         ; Helm integration for Projectile
+            magit                   ; control Git from Emacs
             spaceline               ; Spacemacs powerline theme
+            workgroups2             ; session manager
             ;; smart-mode-line         ; sexy mode-line
             ;; smart-mode-line-powerline-theme
             ;; new package
@@ -77,6 +81,7 @@ Setup package archives.
             solarized-theme
             monokai-theme
             zenburn-theme
+            spacemacs-theme
             org                     ; Outline-based notes management and organizer
             org-autolist            ; Automatically insert new list items.
             ;; always load finally
@@ -95,8 +100,6 @@ Setup package archives.
             ;; golden-ratio         ; Automatic resizing windows to golden ratio
             ;; haskell-mode         ; A Haskell editing mode
             ;; helm-company         ; Helm interface for company-mode
-            ;; helm-projectile      ; Helm integration for Projectile
-            ;; magit                ; control Git from Emacs
             ;; markdown-mode        ; Emacs Major mode for Markdown-formatted files
             ;; material-theme       ; A Theme based on Google Material Design
             ;; maude-mode           ; Emacs mode for the programming language Maude
@@ -167,9 +170,10 @@ the tangled file is compiled."
     ;; theme
     ;; trust theme
     (setq custom-safe-themes t)
-    (load-theme 'gruvbox)
-    ;; set font size to 16pt
-    (set-face-attribute 'default nil :height 160)
+    (load-theme 'spacemacs-dark)
+    ;; set font
+    (set-default-font "Envy Code R 16")
+
     #+END_SRC
 
 ** cursor
@@ -188,24 +192,38 @@ the tangled file is compiled."
     #+END_SRC
 
 ** UI
+
     #+BEGIN_SRC emacs-lisp
     ;; disable welcome window
     (setq ns-pop-up-frames nil)
+
     ;; disable tool-bar
     (tool-bar-mode -1)
+
     ;; show line numbers
     (global-linum-mode t)
+
     ;; y & n instead of yes & no
     (fset 'yes-or-no-p 'y-or-n-p)
+
     ;; 80-column-ruler
     (add-to-list 'load-path (expand-file-name
         (concat user-emacs-directory "other-srcs/Fill-Column-Indicator")))
     (require 'fill-column-indicator)
+
     ;; TODO define list of used programming languages (prog-mode doesn't work with js)
     (add-hook 'python-mode-hook 'turn-on-fci-mode)
     (add-hook 'js-mode-hook 'turn-on-fci-mode)
+
     ;; highlight current line
     (global-hl-line-mode)
+
+    ;; wrap long lines
+    (visual-line-mode)
+
+    ;; start fullscreen
+    ;(toggle-frame-maximized)
+    (add-to-list 'default-frame-alist '(fullscreen . maximized))
     #+END_SRC
 
 *** modeline
@@ -296,8 +314,12 @@ the tangled file is compiled."
 ** evil
 
 #+BEGIN_SRC emacs-lisp
+;; use evil search instead of isearch
+(setq evil-search-module 'evil-search)
 (require 'evil)
 (evil-mode 1)
+;; let evil treat _ as part of a word
+(setq-default evil-symbol-word-search t)
 #+END_SRC
 
 ** org-mode
@@ -312,7 +334,7 @@ the tangled file is compiled."
 (setq org-lowest-priority ?Z)
 (setq org-default-priority ?A)
 ;; concat agenda from this files
-(setq org-agenda-files (append '("~/.notes.org") (file-expand-wildcards "~/Documents/org/cal/*\.org")))
+(setq org-agenda-files (append '("~/.notes.org" "~/Documents/org/plan/backlog.org") (file-expand-wildcards "~/Documents/org/cal/*\.org")))
 
 ;; indentation options
 (setq org-startup-folded "showeverything")
@@ -393,6 +415,7 @@ the tangled file is compiled."
 (require 'auto-complete)
 ;; TODO deactivate for minibuffer
 (global-auto-complete-mode t)
+(ac-config-default)
 #+END_SRC
 
 ** jedi                                                             :manual:
@@ -432,6 +455,11 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
 #+BEGIN_SRC emacs-lisp
 (require 'js2-mode)
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+;; TODO test indentation
+(custom-set-variables
+ '(js2-basic-offset 4)
+ '(js2-bounce-indent-p t)
+)
 #+END_SRC
 
 ** js2-mode
@@ -482,6 +510,47 @@ decide
 (spaceline-spacemacs-theme)
 #+END_SRC
 
+** evil-search-highlight-persist                                     :bloat:
+
+#+BEGIN_SRC emacs-lisp
+;; TODO requrie
+(require 'highlight)
+(require 'evil-search-highlight-persist)
+(global-evil-search-highlight-persist t)
+
+;; TODO set highlight color
+;; https://github.com/juanjux/evil-search-highlight-persist/issues/1
+;; (defface evil-search-highlight-persist-highlight-face
+;;   '((((class color))
+;;      (:background "turquoise")))
+;;   "Face for the highlighted text."
+;;   :group 'evil-search-highlight-persist)
+#+END_SRC
+
+** workgroups2
+
+#+BEGIN_SRC emacs-lisp
+(require 'workgroups2)
+(workgroups-mode 1)
+;; change workgroups session file
+(setq wg-session-file (expand-file-name
+    (concat user-emacs-directory "persistence/workgroups")))
+
+#+END_SRC
+
+** recentf                                                         :builtin:
+
+persist mru files
+
+#+BEGIN_SRC emacs-lisp
+(require 'recentf)
+(recentf-mode 1)
+(setq recentf-max-menu-items 50)
+;; set file location
+(setq recentf-save-file (expand-file-name
+    (concat user-emacs-directory "persistence/recentf")))
+#+END_SRC
+
 ** new package
 
 #+BEGIN_SRC emacs-lisp
@@ -521,6 +590,17 @@ decide
 (idle-require-mode 1)
 #+END_SRC
 
+* functions
+
+** open emacsrc.org file
+
+#+BEGIN_SRC emacs-lisp
+;; TODO file as param
+(defun open-emacsrc.org ()
+    (interactive)
+    (find-file "~/Settings/dotfiles/emacsrc.org"))
+#+END_SRC
+
 * keybindings keymappings
 
 #+BEGIN_SRC emacs-lisp
@@ -544,10 +624,6 @@ decide
     (define-key map (kbd "M-s") 'save-buffer)                       ; save
     (define-key map (kbd "M-a") 'mark-whole-buffer)                 ; select all
     (define-key map (kbd "M-x") 'helm-M-x)
-    (define-key map (kbd "M-b") 'helm-buffers-list)
-    (define-key map (kbd "M-o") 'helm-find-files)
-    (define-key map (kbd "M-p") 'helm-projectile)
-    (define-key map (kbd "M-l") 'helm-semantic-or-imenu)
     (define-key map (kbd "\C-cl") 'org-store-link)
     (define-key map (kbd "\C-ca") 'org-agenda)
     (define-key map (kbd "C-+") 'er/expand-region)
@@ -580,10 +656,17 @@ decide
 ;; visual line
 (define-key evil-visual-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
 
-;; evil-leader
+;; evil-leader mappings
 (evil-leader/set-key
-  "f" 'find-file
-  "b" 'helm-buffers-list)
+  "f" 'helm-find-files
+  "b" 'helm-buffers-list
+  "TAB" 'mode-line-other-buffer               ; previous buffer (like 'helm-buffer-list "RET")
+  "d" 'dumb-jump-go
+  "s" 'helm-swoop
+  "ö" 'evil-search-highlight-persist-remove-all
+  "l" 'helm-semantic-or-imenu
+  "p" 'helm-projectile
+  "/" 'find-file-other-window)
 
 ;; macOS
 ;; map command key to meta
@@ -632,15 +715,21 @@ dumb-jump-go-other-window exactly like dumb-jump-go but uses find-file-other-win
 - 4 auf einmal löschen
 - 4 auf einmal überspringen
 - smart tabs
-**** Tab Reiter
-cmd alt left/right
 **** Encryption
 **** mode-line
 ***** git infos
 ***** Sprache
 **** emojis
+https://github.com/iqbalansari/emacs-emojify
 **** TODO FIXME BUG highlighten
 http://emacs-fu.blogspot.de/2008/12/highlighting-todo-fixme-and-friends.html
+**** Code folding
+**** Splits
+**** MRU persistent
+**** Projects
+**** Bookmarks
+**** startify
+**** big file handling
 
 *** flycheck
 - error list für alle source files öffnen
@@ -673,9 +762,13 @@ https://github.com/auto-complete/auto-complete
 **** directories
 
 *** spacemacs
+**** spaceline
 Anzu shows the number of occurrence when performing a search. Spacemacs integrates nicely the Anzu status by displaying it temporarily when n or N are being pressed. See the 5/6 segment on the screenshot below.
-
 When Flycheck minor mode is enabled, a new element appears in modeline showing the number of errors, warnings and info.
+
+*** Vim
+https://github.com/Valloric/MatchTagAlways
+https://github.com/redguardtoo/evil-matchit
 
 *** andere Plugins
 https://www.quora.com/What-are-some-of-the-most-useful-extensions-for-Emacs
@@ -697,6 +790,7 @@ https://github.com/repl-electric/view-pane/tree/master/animations
 https://github.com/lewang/flx
 https://github.com/Wilfred/ag.el
 https://github.com/skeeto/elfeed
+https://github.com/krisajenkins/helm-spotify
 **** stack exchange
 https://github.com/vermiculus/sx.el
 **** tag
@@ -717,6 +811,9 @@ http://danmidwood.com/content/2014/11/21/animated-paredit.html
 **** previews
 **** other
 https://github.com/hlissner/emacs-doom-theme/tree/screenshots
+https://www.slant.co/topics/358/~color-themes-for-text-editors
+facebook
+inkpot
 
 ** Cheatsheet
 *** paredit
@@ -738,6 +835,9 @@ https://www.emacswiki.org/emacs/EmacsNiftyTricks
 http://emacs-fu.blogspot.de/
 http://danmidwood.com/content/2014/11/21/animated-paredit.html
 https://joaotavora.github.io/yasnippet/snippet-development.html
+https://www.youtube.com/watch?v=HKF41ivkBb0
+http://emacsredux.com/
+http://emacs.sexy/
 
 *** Listen
 http://emacsrocks.com/
