@@ -995,7 +995,7 @@ FZF-EOF"
         emacs () {
             if [ $# -eq 0 ]; then
                 open -a Emacs.app
-                exit 0
+                return 0
             fi
             for var in "$@"; do
                 touch "$var"
