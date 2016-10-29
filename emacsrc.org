@@ -17,13 +17,20 @@ ASCII-Art credits: http://patorjk.com/software/taag/#p=testall&h=0&v=0&f=ANSI%20
 
 ** persistence files
 
+#+BEGIN_SRC sh :tangle no
 mkdir ~/.emacs.d/persistence
 touch ~/.emacs.d/persistence/recentf
 touch ~/.emacs.d/persistence/workgroups
+touch ~/.emacs.d/persistence/places
+touch ~/.emacs.d/persistence/bookmarks
+# cp ~/.emacs.d/bookmarks ~/.emacs.d/persistence/bookmarks
+#+END_SRC
 
 ** ag
 
+#+BEGIN_SRC sh :tangle no
 brew install ag
+#+END_SRC
 
 ** jedi
 
@@ -147,13 +154,13 @@ initial init.d content
 ;; require org for tangling
 (require 'org)
 ;; open the configuration
-(find-file (concat user-emacs-directory "init.org"))
+(find-file (concat user-emacs-directory "emacsrc.org"))
 ;; tangle it
 (org-babel-tangle)
 ;; load it
-(load-file (concat user-emacs-directory "init.el"))
+(load-file (concat user-emacs-directory "emacsrc.el"))
 ;; finally byte-compile it
-(byte-compile-file (concat user-emacs-directory "init.el"))
+(byte-compile-file (concat user-emacs-directory "emacsrc.el"))
 #+END_SRC
 
 always tangle and byte-compile the =org=-document after changes.
@@ -163,11 +170,12 @@ always tangle and byte-compile the =org=-document after changes.
 "If the current buffer is 'init.org' the code-blocks are tangled, and
 the tangled file is compiled."
 (when (equal (buffer-file-name)
-    (expand-file-name (concat user-emacs-directory "emacsrc.org")))
+    (expand-file-name "~/Settings/dotfiles/emacsrc.org"))
     ;; avoid running hooks when tangling.
     (let ((prog-mode-hook nil))
     (org-babel-tangle)
-    (byte-compile-file (concat user-emacs-directory "emacsrc.el")))))
+    (byte-compile-file (expand-file-name
+        (concat user-emacs-directory "init.el"))))))
 
 (add-hook 'after-save-hook 'tangle-init)
 #+END_SRC
@@ -205,6 +213,7 @@ the tangled file is compiled."
         (progn
             (require 'saveplace)
       (setq-default save-place t))
+      (setq save-place-file (concat user-emacs-directory "persistence/places"))
       (save-place-mode 1))
     #+END_SRC
 
@@ -302,7 +311,20 @@ the tangled file is compiled."
       version-control t)
     #+END_SRC
 
-** fun
+* packages
+
+** bookmarks                                                       :builtin:
+
+emacs throws the error "Not bookmark format" if the file is empty.
+As a workaround let emacs create the file under the default path
+and copy it over the desired file.
+
+#+BEGIN_SRC emacs-lisp
+;; persist bookmarks in this file
+(setq bookmark-default-file (concat user-emacs-directory "persistence/bookmarks"))
+#+END_SRC
+
+** zone                                                            :builtin:
 
 #+BEGIN_SRC emacs-lisp
 ;; required by require
@@ -316,8 +338,6 @@ the tangled file is compiled."
     (let ((zone-programs (list (intern pgm))))
         (zone)))
 #+END_SRC
-
-* packages
 
 ** evil-leader
 
@@ -339,7 +359,7 @@ the tangled file is compiled."
 (setq-default evil-symbol-word-search t)
 #+END_SRC
 
-** org-mode
+** org-mode                                                        :builtin:
 
 #+BEGIN_SRC emacs-lisp
 ;; org-mode for .org-files
@@ -548,11 +568,11 @@ decide
 
 #+BEGIN_SRC emacs-lisp
 (require 'workgroups2)
-(workgroups-mode 1)
 ;; change workgroups session file
-(setq wg-session-file (expand-file-name
-    (concat user-emacs-directory "persistence/workgroups")))
-
+(setq wg-session-file (concat user-emacs-directory "persistence/workgroups"))
+;; load it on startup
+(workgroups-mode 1)
+(wg-find-session-file (concat user-emacs-directory "persistence/workgroups"))
 #+END_SRC
 
 ** recentf                                                         :builtin:
@@ -697,7 +717,8 @@ prevent losing the selection after a shift operation by re-selecting
 
 ;; evil-leader mappings
 (evil-leader/set-key
-  "f" 'helm-find-files
+  "f" 'helm-for-files
+  "o" 'helm-find-files
   "b" 'helm-buffers-list
   "TAB" 'mode-line-other-buffer               ; previous buffer (like 'helm-buffer-list "RET")
   "d" 'dumb-jump-go
@@ -898,3 +919,4 @@ https://github.com/bbatsov/prelude
 https://github.com/overtone/emacs-live
 https://github.com/technomancy/emacs-starter-kit
 https://github.com/purcell/emacs.d
+
