@@ -759,8 +759,9 @@
             }
 
             org () { (cd ~org && fo "$1") }
-            gist () { (cd ~gists && fo "$1") }
             dotfile () { (cd ~dotfiles && fo "$1") }
+            gist () { (cd ~gists && fo "$1") }
+            gist_search () { (cd ~gists && ag -C 5 "$1") }
 
             # fzf cd - cd to selected directory
             f_cd () {
