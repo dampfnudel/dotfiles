@@ -23,6 +23,7 @@ touch ~/.emacs.d/persistence/recentf
 touch ~/.emacs.d/persistence/workgroups
 touch ~/.emacs.d/persistence/places
 touch ~/.emacs.d/persistence/bookmarks
+touch ~/.emacs.d/persistence/
 # cp ~/.emacs.d/bookmarks ~/.emacs.d/persistence/bookmarks
 #+END_SRC
 
@@ -67,83 +68,87 @@ Setup package archives.
 
 ** install missing packages
 
+add them to the packages list and call package-upgrade
+
 #+BEGIN_SRC emacs-lisp
-(let* ((packages
-        '(auto-compile              ; automatically compile Emacs Lisp libraries
-            evil                    ; extensible vi layer
-            evil-leader             ; the <leader> feature from Vim
-            evil-search-highlight-persist             ; highlight the search term in all buffers persistently
-            evil-nerd-commenter     ; comment code efficiently
-            helm                    ; Incremental and narrowing framework
-            expand-region           ; Increases the selected region by semantic units
-            yasnippet               ; template system
-            flycheck                ; modern on-the-fly syntax checking extension
-            git-gutter              ; icons in the gutter area indicating src ctrl changes
-            undo-tree               ; undo system
-            auto-complete           ; auto completion with popup menu
-            json-snatcher           ; extract the path to a json value, display at modeline
-            fireplace               ; a cozy fireplace
-            jedi                    ; Python auto-completion for Emacs
-            idle-require            ; load elisp libraries while Emacs is idle
-            avy                     ; jumping to visible text using a char-based decision tree
-            restclient              ; tool to manually explore and test HTTP REST webservices
-            js2-mode                ; Improved JavaScript editing mode
-            web-mode                ; major mode for editing web templates aka HTML files
-            dumb-jump               ; "jump to definition" with support for multiple programming languages
-            helm-swoop              ; Efficiently hopping squeezed lines
-            smartparens             ; minor mode for dealing with pairs
-            which-key               ; minor mode for Emacs that displays the key bindings following your currently entered incomplete command (a prefix) in a popup
-            helm-projectile         ; Helm integration for Projectile
-            magit                   ; control Git from Emacs
-            spaceline               ; Spacemacs powerline theme
-            workgroups2             ; session manager
-            ;; smart-mode-line         ; sexy mode-line
-            ;; smart-mode-line-powerline-theme
-            ;; new package
-            ;; themes
-            gruvbox-theme
-            solarized-theme
-            monokai-theme
-            zenburn-theme
-            spacemacs-theme
-            org                     ; Outline-based notes management and organizer
-            org-autolist            ; Automatically insert new list items.
-            ;; always load finally
-            ox-rst                  ; Export reStructuredText
-            ox-odt                  ; Export OpenDocument
-            ox-md                   ; Markdown exporter (from org)
-            ;; cider                ; Clojure Interactive Development Environment
-            ;; company              ; Modular text completion framework
-            ;; define-word          ; display the definition of word at point
-            ;; diminish             ; Diminished modes from modeline
-            ;; drag-stuff           ; Drag stuff around in Emacs
-            ;; expand-region        ; Increase selected region by semantic units
-            ;; focus                ; Dim color of text in surrounding sections
-            ;; geiser               ; GNU Emacs and Scheme talk to each other
-            ;; git-gutter-fringe    ; Fringe version of git-gutter.el
-            ;; golden-ratio         ; Automatic resizing windows to golden ratio
-            ;; haskell-mode         ; A Haskell editing mode
-            ;; helm-company         ; Helm interface for company-mode
-            ;; markdown-mode        ; Emacs Major mode for Markdown-formatted files
-            ;; material-theme       ; A Theme based on Google Material Design
-            ;; maude-mode           ; Emacs mode for the programming language Maude
-            ;; multiple-cursors     ; Multiple cursors for Emacs
-            ;; olivetti             ; Minor mode for a nice writing environment
-            ;; paredit              ; minor mode for editing parentheses
-            ;; pdf-tools            ; Emacs support library for PDF files
-            ;; projectile           ; Manage and navigate projects in Emacs easily
-            ;; slime                ; Superior Lisp Interaction Mode for Emacs
-            ;; try))                ; Try out Emacs packages
-            ))
-        ;; Remove all packages already installed
-        (packages (remove-if 'package-installed-p packages)))
-    ;; TODO only connect if neccessary
-    (when packages
-        (ignore-errors (package-refresh-contents)
-                    (mapcar 'package-install packages)
-                    ;; macOS
-                    (when (memq window-system '(mac ns))
-                        (package-install 'exec-path-from-shell)))))
+(defun package-upgrade ()
+    (interactive)
+    (let* ((packages
+            '(auto-compile              ; automatically compile Emacs Lisp libraries
+                evil                    ; extensible vi layer
+                evil-leader             ; the <leader> feature from Vim
+                evil-search-highlight-persist             ; highlight the search term in all buffers persistently
+                evil-nerd-commenter     ; comment code efficiently
+                helm                    ; Incremental and narrowing framework
+                expand-region           ; Increases the selected region by semantic units
+                yasnippet               ; template system
+                flycheck                ; modern on-the-fly syntax checking extension
+                git-gutter              ; icons in the gutter area indicating src ctrl changes
+                undo-tree               ; undo system
+                auto-complete           ; auto completion with popup menu
+                json-snatcher           ; extract the path to a json value, display at modeline
+                fireplace               ; a cozy fireplace
+                jedi                    ; Python auto-completion for Emacs
+                idle-require            ; load elisp libraries while Emacs is idle
+                avy                     ; jumping to visible text using a char-based decision tree
+                restclient              ; tool to manually explore and test HTTP REST webservices
+                js2-mode                ; Improved JavaScript editing mode
+                web-mode                ; major mode for editing web templates aka HTML files
+                dumb-jump               ; "jump to definition" with support for multiple programming languages
+                helm-swoop              ; Efficiently hopping squeezed lines
+                smartparens             ; minor mode for dealing with pairs
+                which-key               ; minor mode for Emacs that displays the key bindings following your currently entered incomplete command (a prefix) in a popup
+                helm-projectile         ; Helm integration for Projectile
+                magit                   ; control Git from Emacs
+                spaceline               ; Spacemacs powerline theme
+                workgroups2             ; session manager
+                ;; smart-mode-line         ; sexy mode-line
+                ;; smart-mode-line-powerline-theme
+                ;; new package
+                ;; themes
+                gruvbox-theme
+                solarized-theme
+                monokai-theme
+                zenburn-theme
+                spacemacs-theme
+                org                     ; Outline-based notes management and organizer
+                org-autolist            ; Automatically insert new list items.
+                ;; always load finally
+                ox-rst                  ; Export reStructuredText
+                ox-odt                  ; Export OpenDocument
+                ox-md                   ; Markdown exporter (from org)
+                ;; cider                ; Clojure Interactive Development Environment
+                ;; company              ; Modular text completion framework
+                ;; define-word          ; display the definition of word at point
+                ;; diminish             ; Diminished modes from modeline
+                ;; drag-stuff           ; Drag stuff around in Emacs
+                ;; expand-region        ; Increase selected region by semantic units
+                ;; focus                ; Dim color of text in surrounding sections
+                ;; geiser               ; GNU Emacs and Scheme talk to each other
+                ;; git-gutter-fringe    ; Fringe version of git-gutter.el
+                ;; golden-ratio         ; Automatic resizing windows to golden ratio
+                ;; haskell-mode         ; A Haskell editing mode
+                ;; helm-company         ; Helm interface for company-mode
+                ;; markdown-mode        ; Emacs Major mode for Markdown-formatted files
+                ;; material-theme       ; A Theme based on Google Material Design
+                ;; maude-mode           ; Emacs mode for the programming language Maude
+                ;; multiple-cursors     ; Multiple cursors for Emacs
+                ;; olivetti             ; Minor mode for a nice writing environment
+                ;; paredit              ; minor mode for editing parentheses
+                ;; pdf-tools            ; Emacs support library for PDF files
+                ;; projectile           ; Manage and navigate projects in Emacs easily
+                ;; slime                ; Superior Lisp Interaction Mode for Emacs
+                ;; try))                ; Try out Emacs packages
+                ))
+            ;; Remove all packages already installed
+            (packages (remove-if 'package-installed-p packages)))
+        ;; TODO only connect if neccessary
+        (when packages
+            (ignore-errors (package-refresh-contents)
+                        (mapcar 'package-install packages)
+                        ;; macOS
+                        (when (memq window-system '(mac ns))
+                            (package-install 'exec-path-from-shell))))))
 #+END_SRC
 
 * emacsrc.org setup
@@ -629,13 +634,18 @@ persist mru files
 
 * functions
 
-** open emacsrc.org file
+** copy file name to clipboard
 
 #+BEGIN_SRC emacs-lisp
-;; TODO file as param
-(defun open-emacsrc.org ()
-    (interactive)
-    (find-file "~/Settings/dotfiles/emacsrc.org"))
+(defun copy-file-name-to-clipboard ()
+  "Copy the current buffer file name to the clipboard."
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (when filename
+      (kill-new filename)
+      (message "Copied buffer file name '%s' to the clipboard." filename))))
 #+END_SRC
 
 ** evil shifting (< / >)
@@ -653,6 +663,14 @@ prevent losing the selection after a shift operation by re-selecting
   (evil-shift-right (region-beginning) (region-end))
   (evil-normal-state)
   (evil-visual-restore))
+#+END_SRC
+
+** source init.el
+
+#+BEGIN_SRC emacs-lisp
+(defun src-init ()
+    (interactive)
+    (load-file (concat user-emacs-directory "init.el")))
 #+END_SRC
 
 * keybindings keymappings
@@ -717,9 +735,17 @@ prevent losing the selection after a shift operation by re-selecting
 
 ;; evil-leader mappings
 (evil-leader/set-key
+  "k" 'evil-window-up
+  "j" 'evil-window-down
+  "h" 'evil-window-left
+  "l" 'evil-window-right
+  "x" 'delete-other-windows
   "f" 'helm-for-files
   "o" 'helm-find-files
+  "Oh" 'helm-org-in-buffer-headings
+  "Oa" 'helm-org-agenda-files-headings
   "b" 'helm-buffers-list
+  "B" 'bookmark-set
   "TAB" 'mode-line-other-buffer               ; previous buffer (like 'helm-buffer-list "RET")
   "d" 'dumb-jump-go
   "*" 'helm-swoop
@@ -727,6 +753,10 @@ prevent losing the selection after a shift operation by re-selecting
   "l" 'helm-semantic-or-imenu
   "p" 'helm-projectile
   "m" 'magit-status
+  "ss" 'wg-save-session
+  "so" 'wg-open-session
+  "sc" 'wg-save-session-as
+  "S" 'src-init
   "/" 'find-file-other-window)
 
 ;; macOS
@@ -844,6 +874,7 @@ https://www.quora.com/What-are-some-of-the-most-useful-extensions-for-Emacs
 https://www.reddit.com/r/emacs/comments/42g6u9/what_are_some_lesserknown_packages_that_you_love/
 https://news.ycombinator.com/item?id=9395271
 https://www.reddit.com/r/vim/comments/2ezvst/why_cant_vim_to_be_appealing_like_emacs/
+https://www.reddit.com/r/emacs/comments/1xjlrq/emacs_modes_that_are_worth_knowing_about/
 
 https://github.com/mooz/js2-mode
 https://github.com/fxbois/web-mode
