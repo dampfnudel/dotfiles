@@ -85,7 +85,7 @@
     " Plugin 'Keithbsmiley/swift.vim'
     Plugin 'majutsushi/tagbar'                          " brew install ctags
     Plugin 'mhinz/vim-startify'
-    Plugin 'vim-scripts/YankRing.vim'
+    " Plugin 'vim-scripts/YankRing.vim'
     Plugin 'itchyny/screensaver.vim'
     Plugin 'itchyny/thumbnail.vim'
     Plugin 'itchyny/calendar.vim'
@@ -864,10 +864,10 @@
         let g:startify_skiplist = []
     " }
 
-    " YankRing
-    " {
-        nnoremap <silent> <F7> :YRShow<CR>
-    " }
+    " " YankRing
+    " " {
+    "     nnoremap <silent> <F7> :YRShow<CR>
+    " " }
 
     " calendar.vim
     " {
