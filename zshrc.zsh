@@ -129,8 +129,12 @@
           export EDITOR='/usr/local/bin/vim'
         else
           # export EDITOR='/usr/local/Cellar/macvim/7.4-99/bin/mvim'
-          export EDITOR='/usr/local/Cellar/macvim/8.0-110/bin/mvim'
-          export EDITOR_TAB=${EDITOR}' --remote-tab-silent'
+          # export EDITOR='/usr/local/Cellar/macvim/8.0-110/bin/mvim'
+          # export EDITOR_TAB=${EDITOR}' --remote-tab-silent'
+          export EDITOR='open -a Emacs.app'
+          export EDITOR_TAB=${EDITOR}
+          export VIM_EDITOR='/usr/local/Cellar/macvim/8.0-110/bin/mvim'
+          export VIM_EDITOR_TAB=${VIM_EDITOR}' --remote-tab-silent'
         fi
 
         export HOME=/Users/mbayer
@@ -245,7 +249,7 @@
         export PROJECT_HOME=$HOME/Workspace
         export WORKON_HOME=$HOME/Workspace/Envs
         export VIRTUALENV_ROOT=$WORKON_HOME
-        export DEFAULT_PYTHON_INTERPRETER=$WORKON_HOME/python2.7.5/bin/python
+        export DEFAULT_PYTHON_INTERPRETER=$WORKON_HOME/python3.4.1/bin/python
         source /usr/local/bin/virtualenvwrapper.sh
 
         # fix the new tab = virtual_env dir bug
@@ -255,7 +259,7 @@
         # set default virtual_env
         if [[ $(basename "$VIRTUAL_ENV") == "" ]]
         then
-            local virtualenv_default_path="$HOME/Workspace/Envs/python2.7.5/bin/activate"
+            local virtualenv_default_path="$HOME/Workspace/Envs/python3.4.1/bin/activate"
             if [[ -f "$virtualenv_default_path" ]]; then
                 source "$virtualenv_default_path"
             fi
@@ -320,6 +324,7 @@
     hash -d v=/Volumes
     hash -d videos=$HOME/Movies
     hash -d wil=$HOME/Workspace/wil
+    hash -d emacs.d=$HOME/.emacs.d
 
     # files
     hash -d emacs_cheatsheet=$HOME/Workspace/gists/emacs_cheatsheet/emacs.md
@@ -516,18 +521,18 @@
         alias pony='fortune | ponysay'
         alias wttr='curl -s http://wttr.in | tail +8 | head -30'
         alias moon='curl -s wttr.in/Moon|head -25'
-        alias yt3='$WORKON_HOME/python2.7.5/bin/youtube-dl --verbose --extract-audio --audio-format mp3 --no-mtime'
-        alias yt='$WORKON_HOME/python2.7.5/bin/youtube-dl --no-mtime'
+        alias yt3='$WORKON_HOME/python3.4.1/bin/youtube-dl --verbose --extract-audio --audio-format mp3 --no-mtime'
+        alias yt='$WORKON_HOME/python3.4.1/bin/youtube-dl --no-mtime'
         # alias emacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs'
         # alias emacs='open -a Emacs.app'
         alias cemacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs -nw'
         alias bpython='$WORKON_HOME/python3.4.1/bin/bpython'
 
         # vim {
-            alias mvim=${EDITOR}
+            alias mvim=${VIM_EDITOR}
             alias cvim='/usr/local/bin/vim'
-            alias tvim=${EDITOR_TAB}
-            alias vim=${EDITOR_TAB}
+            alias vim=${VIM_EDITOR_TAB}
+
         # }
 
         # git {
@@ -998,6 +1003,10 @@ FZF-EOF"
                 open -a Emacs.app
                 return 0
             fi
+            if [ "$1" = "--debug-init" ]; then
+                open -a Emacs.app --args --debug-init
+                return 0
+            fi
             for var in "$@"; do
                 touch "$var"
                 open -a Emacs.app "$var"
@@ -1286,9 +1295,19 @@ FZF-EOF"
 
         # osx {
             pomodoro () {
-                for i in `seq 1 3`; do
-                    osascript -e 'beep'
-                done
+                # local exercise="situps"
+                # osascript -e 'display notification "Time for some $exercise" with title "Pomodoro" subtitle "timer" sound name "default"'
+
+                local notification="notification"
+                local title="title"
+                local subtitle="subtitle"
+                local soundname="Hero"
+                # Basso.aiff  Blow.aiff  Bottle.aiff  Frog.aiff  Funk.aiff  Glass.aiff  Hero.aiff  Morse.aiff  Ping.aiff  Pop.aiff  Purr.aiff  Sosumi.aiff  Submarine.aiff  Tink.aiff
+                # sleep "$((25 * 60))" && osascript -e "display notification \"$notification\" with title \"$title\" subtitle \"$subtitle\" sound name \"$soundname\""
+                sleep "$((1))" && osascript -e "display notification \"$notification\" with title \"$title\" subtitle \"$subtitle\" sound name \"$soundname\""
+                # for i in `seq 1 3`; do
+                #     # osascript -e 'beep'
+                # done
             }
 
             # say
@@ -1378,7 +1397,9 @@ FZF-EOF"
             # serve wd
             serve () {
                 printip
-                python -m SimpleHTTPServer
+                # python 2
+                # python -m SimpleHTTPServer
+                python3 -m http.server
             }
 
             serve_bash () {
