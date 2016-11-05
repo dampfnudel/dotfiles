@@ -33,6 +33,15 @@ touch ~/.emacs.d/persistence/
 brew install ag
 #+END_SRC
 
+** howdoi
+
+#+BEGIN_SRC sh :tangle no
+;; TODO not required?
+pip install howdoi
+#+END_SRC
+
+** jedi
+
 ** jedi
 
 M-x jedi:install-server
@@ -102,6 +111,8 @@ add them to the packages list and call package-upgrade
                 magit                   ; control Git from Emacs
                 spaceline               ; Spacemacs powerline theme
                 workgroups2             ; session manager
+                howdoi                  ; query Stack Overflow, get the most upvoted answer to the first question
+                markdown-mode           ; major mode for editing markdown
                 ;; smart-mode-line         ; sexy mode-line
                 ;; smart-mode-line-powerline-theme
                 ;; new package
@@ -129,7 +140,6 @@ add them to the packages list and call package-upgrade
                 ;; golden-ratio         ; Automatic resizing windows to golden ratio
                 ;; haskell-mode         ; A Haskell editing mode
                 ;; helm-company         ; Helm interface for company-mode
-                ;; markdown-mode        ; Emacs Major mode for Markdown-formatted files
                 ;; material-theme       ; A Theme based on Google Material Design
                 ;; maude-mode           ; Emacs mode for the programming language Maude
                 ;; multiple-cursors     ; Multiple cursors for Emacs
@@ -250,7 +260,7 @@ the tangled file is compiled."
     (global-hl-line-mode)
 
     ;; wrap long lines
-    (visual-line-mode)
+    (global-visual-line-mode)
 
     ;; start fullscreen
     ;(toggle-frame-maximized)
@@ -407,6 +417,10 @@ and copy it over the desired file.
 
 #+BEGIN_SRC emacs-lisp
 (require 'helm-config)
+;; TODO experimental
+(setq helm-M-x-fuzzy-match t
+      helm-buffers-fuzzy-matching t
+      helm-recentf-fuzzy-match    t)
 #+END_SRC
 
 ** flycheck
@@ -593,6 +607,34 @@ persist mru files
     (concat user-emacs-directory "persistence/recentf")))
 #+END_SRC
 
+** howdoi
+
+become a full StackOverflow developer!
+
+#+BEGIN_SRC emacs-lisp
+(setq helm-howdoi
+  '((name . "howdoi google")
+    (candidates . (lambda ()
+                    (funcall helm-google-suggest-default-function)))
+    (action . (("howdoi" . howdoi-query)))
+    (volatile)
+    (requires-pattern . 3)
+    (delayed)))
+#+END_SRC
+
+** markdown-mode
+
+#+BEGIN_SRC emacs-lisp
+(autoload 'markdown-mode "markdown-mode"
+   "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+
+(autoload 'gfm-mode "markdown-mode"
+   "Major mode for editing GitHub Flavored Markdown files" t)
+(add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+#+END_SRC
+
 ** new package
 
 #+BEGIN_SRC emacs-lisp
@@ -673,11 +715,20 @@ prevent losing the selection after a shift operation by re-selecting
     (load-file (concat user-emacs-directory "init.el")))
 #+END_SRC
 
+** helm-howdoi
+
+#+BEGIN_SRC emacs-lisp
+(defun helm-howdoi ()
+    (interactive)
+    (helm :sources 'helm-howdoi))
+#+END_SRC
+
 * keybindings keymappings
 
 #+BEGIN_SRC emacs-lisp
 ;; macOS
 ;; make use of <Meta-Up> <Meta-Down>
+;; TODO double mapped
 (define-key input-decode-map "\e\eOA" [(meta up)])
 (define-key input-decode-map "\e\eOB" [(meta down)])
 (global-set-key [(meta up)] 'scroll-down-command)
@@ -724,6 +775,8 @@ prevent losing the selection after a shift operation by re-selecting
 (define-key evil-normal-state-map (kbd "ö") 'avy-goto-char)
 (define-key evil-normal-state-map (kbd "Ö") 'avy-goto-line)
 (define-key evil-normal-state-map (kbd "f") 'avy-goto-char-in-line)
+(define-key evil-normal-state-map (kbd "C-j") 'scroll-up-command)
+(define-key evil-normal-state-map (kbd "C-k") 'scroll-down-command)
 
 ;; visual line
 (define-key evil-visual-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
@@ -744,7 +797,7 @@ prevent losing the selection after a shift operation by re-selecting
   "o" 'helm-find-files
   "Oh" 'helm-org-in-buffer-headings
   "Oa" 'helm-org-agenda-files-headings
-  "b" 'helm-buffers-list
+  "SPC" 'helm-buffers-list
   "B" 'bookmark-set
   "TAB" 'mode-line-other-buffer               ; previous buffer (like 'helm-buffer-list "RET")
   "d" 'dumb-jump-go
@@ -757,7 +810,10 @@ prevent losing the selection after a shift operation by re-selecting
   "so" 'wg-open-session
   "sc" 'wg-save-session-as
   "S" 'src-init
-  "/" 'find-file-other-window)
+  "c" 'shell-command
+  "Hh" 'helm-howdoi
+  "Hi" 'howdoi-query-insert-code-snippet-at-point
+  "w/" 'find-file-other-window)
 
 ;; macOS
 ;; map command key to meta
@@ -860,6 +916,9 @@ https://github.com/auto-complete/auto-complete
 - durch params steppen
 **** directories
 
+*** magit
+https://github.com/justbur/evil-magit
+
 *** spacemacs
 **** spaceline
 Anzu shows the number of occurrence when performing a search. Spacemacs integrates nicely the Anzu status by displaying it temporarily when n or N are being pressed. See the 5/6 segment on the screenshot below.
@@ -876,6 +935,8 @@ https://news.ycombinator.com/item?id=9395271
 https://www.reddit.com/r/vim/comments/2ezvst/why_cant_vim_to_be_appealing_like_emacs/
 https://www.reddit.com/r/emacs/comments/1xjlrq/emacs_modes_that_are_worth_knowing_about/
 
+https://github.com/steckerhalter/helm-google
+https://github.com/quelpa/quelpa
 https://github.com/mooz/js2-mode
 https://github.com/fxbois/web-mode
 https://github.com/jacktasia/dumb-jump
@@ -938,6 +999,7 @@ https://joaotavora.github.io/yasnippet/snippet-development.html
 https://www.youtube.com/watch?v=HKF41ivkBb0
 http://emacsredux.com/
 http://emacs.sexy/
+https://tuhdo.github.io/helm-intro.html
 
 *** Listen
 http://emacsrocks.com/
