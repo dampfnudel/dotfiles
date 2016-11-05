@@ -23,7 +23,6 @@ touch ~/.emacs.d/persistence/recentf
 touch ~/.emacs.d/persistence/workgroups
 touch ~/.emacs.d/persistence/places
 touch ~/.emacs.d/persistence/bookmarks
-touch ~/.emacs.d/persistence/
 # cp ~/.emacs.d/bookmarks ~/.emacs.d/persistence/bookmarks
 #+END_SRC
 
@@ -42,10 +41,7 @@ pip install howdoi
 
 ** jedi
 
-** jedi
-
 M-x jedi:install-server
-
 
 * package management
 
@@ -325,6 +321,16 @@ the tangled file is compiled."
       kept-old-versions 2
       version-control t)
     #+END_SRC
+
+** file modes
+
+map files to major-modes
+
+#+BEGIN_SRC emacs-lisp
+;; TODO shebangs, doesn't work
+(add-to-list 'magic-mode-alist '("# vim: set ft=zsh ts=4 sw=4 expandtab :" . sh-mode))
+(add-to-list 'auto-mode-alist '("\\.zsh\\'" . sh-mode))
+#+END_SRC
 
 * packages
 
@@ -723,17 +729,14 @@ prevent losing the selection after a shift operation by re-selecting
     (helm :sources 'helm-howdoi))
 #+END_SRC
 
+** new function
+
+#+BEGIN_SRC emacs-lisp
+#+END_SRC
+
 * keybindings keymappings
 
 #+BEGIN_SRC emacs-lisp
-;; macOS
-;; make use of <Meta-Up> <Meta-Down>
-;; TODO double mapped
-(define-key input-decode-map "\e\eOA" [(meta up)])
-(define-key input-decode-map "\e\eOB" [(meta down)])
-(global-set-key [(meta up)] 'scroll-down-command)
-(global-set-key [(meta down)] 'scroll-up-command)
-
 ;; minor mode for keybindings
 (defvar my-keys-minor-mode-map
   (let ((map (make-sparse-keymap)))
@@ -753,6 +756,75 @@ prevent losing the selection after a shift operation by re-selecting
     ;; TOOD Backspace?
     (define-key map (kbd "DEL") 'backward-delete-char)
     (define-key map (kbd "C--") 'evilnc-comment-or-uncomment-lines)
+
+    ;; evil keymappings
+    ;; normal state
+    (define-key evil-normal-state-map (kbd "M-o") 'helm-find-files)
+    (define-key evil-normal-state-map (kbd "M-b") 'helm-buffers-list)
+    (define-key evil-normal-state-map (kbd "+") 'er/expand-region)
+    (define-key evil-normal-state-map (kbd "f") 'ace-jump-mode)
+    (define-key evil-normal-state-map (kbd "B") 'evil-first-non-blank)
+    (define-key evil-normal-state-map (kbd "E") 'evil-end-of-line)
+    (define-key evil-normal-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
+    (define-key evil-normal-state-map (kbd "ö") 'avy-goto-char)
+    (define-key evil-normal-state-map (kbd "Ö") 'avy-goto-line)
+    (define-key evil-normal-state-map (kbd "f") 'avy-goto-char-in-line)
+    (define-key evil-normal-state-map (kbd "C-j") 'scroll-up-command)
+    (define-key evil-normal-state-map (kbd "C-k") 'scroll-down-command)
+
+    ;; visual line
+    (define-key evil-visual-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
+    ; Overload shifts so that they don't lose the selection
+    (define-key evil-visual-state-map (kbd ">") 'evil-shift-right-visual)
+    (define-key evil-visual-state-map (kbd "<") 'evil-shift-left-visual)
+    (define-key evil-visual-state-map [tab] 'evil-shift-right-visual)
+    (define-key evil-visual-state-map [S-tab] 'evil-shift-left-visual)
+
+    ;; evil-leader mappings
+    (evil-leader/set-key
+    "k" 'evil-window-up
+    "j" 'evil-window-down
+    "h" 'evil-window-left
+    "l" 'evil-window-right
+    "x" 'delete-other-windows
+    "f" 'helm-for-files
+    "O" 'helm-find-files
+    "oh" 'helm-org-in-buffer-headings
+    "oa" 'helm-org-agenda-files-headings
+    "oc" 'org-reset-checkbox-state-subtre
+    "SPC" 'helm-buffers-list
+    "B" 'bookmark-set
+    "TAB" 'mode-line-other-buffer               ; previous buffer (like 'helm-buffer-list "RET")
+    "d" 'dumb-jump-go
+    "*" 'helm-swoop
+    "ö" 'evil-search-highlight-persist-remove-all
+    "l" 'helm-semantic-or-imenu
+    "p" 'helm-projectile
+    "m" 'magit-status
+    "ss" 'wg-save-session
+    "so" 'wg-open-session
+    "sc" 'wg-save-session-as
+    "S" 'src-init
+    "c" 'shell-command
+    "Hh" 'helm-howdoi
+    "Hi" 'howdoi-query-insert-code-snippet-at-point
+    "t" (lambda () (interactive) (evil-ex "%s /foo/bar/g"))
+    "w/" 'find-file-other-window)
+
+    ;; macOS
+    ;; map command key to meta
+    (if (boundp 'ns-command-modifier)
+        (setq ns-command-modifier 'meta))
+    (if (boundp 'ns-option-modifier)
+        (setq ns-option-modifier nil))
+
+    ;; make use of <Meta-Up> <Meta-Down>
+    ;; TODO double mapped
+    (define-key input-decode-map "\e\eOA" [(meta up)])
+    (define-key input-decode-map "\e\eOB" [(meta down)])
+    (global-set-key [(meta up)] 'scroll-down-command)
+    (global-set-key [(meta down)] 'scroll-up-command)
+
     map)
   "my-keys-minor-mode keymap.")
 
@@ -763,64 +835,6 @@ prevent losing the selection after a shift operation by re-selecting
 
 (my-keys-minor-mode 1)
 
-;; evil keymappings
-;; normal state
-(define-key evil-normal-state-map (kbd "M-o") 'helm-find-files)
-(define-key evil-normal-state-map (kbd "M-b") 'helm-buffers-list)
-(define-key evil-normal-state-map (kbd "+") 'er/expand-region)
-(define-key evil-normal-state-map (kbd "f") 'ace-jump-mode)
-(define-key evil-normal-state-map (kbd "B") 'evil-first-non-blank)
-(define-key evil-normal-state-map (kbd "E") 'evil-end-of-line)
-(define-key evil-normal-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
-(define-key evil-normal-state-map (kbd "ö") 'avy-goto-char)
-(define-key evil-normal-state-map (kbd "Ö") 'avy-goto-line)
-(define-key evil-normal-state-map (kbd "f") 'avy-goto-char-in-line)
-(define-key evil-normal-state-map (kbd "C-j") 'scroll-up-command)
-(define-key evil-normal-state-map (kbd "C-k") 'scroll-down-command)
-
-;; visual line
-(define-key evil-visual-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
-; Overload shifts so that they don't lose the selection
-(define-key evil-visual-state-map (kbd ">") 'evil-shift-right-visual)
-(define-key evil-visual-state-map (kbd "<") 'evil-shift-left-visual)
-(define-key evil-visual-state-map [tab] 'evil-shift-right-visual)
-(define-key evil-visual-state-map [S-tab] 'evil-shift-left-visual)
-
-;; evil-leader mappings
-(evil-leader/set-key
-  "k" 'evil-window-up
-  "j" 'evil-window-down
-  "h" 'evil-window-left
-  "l" 'evil-window-right
-  "x" 'delete-other-windows
-  "f" 'helm-for-files
-  "o" 'helm-find-files
-  "Oh" 'helm-org-in-buffer-headings
-  "Oa" 'helm-org-agenda-files-headings
-  "SPC" 'helm-buffers-list
-  "B" 'bookmark-set
-  "TAB" 'mode-line-other-buffer               ; previous buffer (like 'helm-buffer-list "RET")
-  "d" 'dumb-jump-go
-  "*" 'helm-swoop
-  "ö" 'evil-search-highlight-persist-remove-all
-  "l" 'helm-semantic-or-imenu
-  "p" 'helm-projectile
-  "m" 'magit-status
-  "ss" 'wg-save-session
-  "so" 'wg-open-session
-  "sc" 'wg-save-session-as
-  "S" 'src-init
-  "c" 'shell-command
-  "Hh" 'helm-howdoi
-  "Hi" 'howdoi-query-insert-code-snippet-at-point
-  "w/" 'find-file-other-window)
-
-;; macOS
-;; map command key to meta
-(if (boundp 'ns-command-modifier)
-    (setq ns-command-modifier 'meta))
-(if (boundp 'ns-option-modifier)
-    (setq ns-option-modifier nil))
 
 ;; (template insertion
 ;; TODO use yasnippet
@@ -857,15 +871,17 @@ dumb-jump-go-other-window exactly like dumb-jump-go but uses find-file-other-win
 **** auto-complete popup offset
 **** auto-complete orgmode
 **** undo-tree + fireplace
+**** first reload errors
+**** source init.el org theme
 **** .#file files
 **** git gutter lag
+**** indentation
+**** magit exit
 *** mappings
 **** C-x 1
 **** M-<left/right>
 **** magit
 *** basics
-**** reproduzierbare package-list
-- [ ] no melpa on startup
 **** Tabs
 - 4 auf einmal löschen
 - 4 auf einmal überspringen
@@ -885,6 +901,27 @@ http://emacs-fu.blogspot.de/2008/12/highlighting-todo-fixme-and-friends.html
 **** Bookmarks
 **** startify
 **** big file handling
+**** named regexes
+  "t" (lambda () (interactive) (evil-ex "%s /foo/bar/g"))
+  as helm list
+***** store commands
+I generally like writing custom commands, here's the one for your first replacement:
+
+(defun replace-plus-minus ()
+  (interactive)
+  (replace-string "±" "\\pm" nil (point-min) (point-max)))
+But, you can also use keyboard macros. Check out the wiki and docs.
+
+Basically, you'd do:
+
+C-x ( M-x replace-string ± RET \pm RET C-x )
+Then you can name it, and save it to your .emacs:
+
+M-x name-last-kbd-macro
+M-x insert-kbd-macro
+
+**** zooming
+http://oremacs.com/2015/01/14/repeatable-commands/
 
 *** flycheck
 - error list für alle source files öffnen
@@ -892,12 +929,20 @@ http://emacs-fu.blogspot.de/2008/12/highlighting-todo-fixme-and-friends.html
 
 *** yasnippet
 https://www.emacswiki.org/emacs/Yasnippet
+- [ ] todo
+- [ ] ipdb
+- [ ] python
+- [ ] js
+- [ ] org-checkbox
+- [ ] org-minimal-theme
+- [ ] org-title
+- [ ] emacs-lisp src
 
 *** evil
 **** g; persistieren
-**** leader key
-***** key chains
-**** Visual selection beim Einrücken selektiert lassen
+**** P insert with \n
+**** Defining your own escape
+https://www.emacswiki.org/emacs/Evil#toc16
 
 *** org-mode
 **** archive
@@ -929,6 +974,7 @@ https://github.com/Valloric/MatchTagAlways
 https://github.com/redguardtoo/evil-matchit
 
 *** andere Plugins
+https://github.com/skeeto/skewer-mode
 https://www.quora.com/What-are-some-of-the-most-useful-extensions-for-Emacs
 https://www.reddit.com/r/emacs/comments/42g6u9/what_are_some_lesserknown_packages_that_you_love/
 https://news.ycombinator.com/item?id=9395271
@@ -937,11 +983,7 @@ https://www.reddit.com/r/emacs/comments/1xjlrq/emacs_modes_that_are_worth_knowin
 
 https://github.com/steckerhalter/helm-google
 https://github.com/quelpa/quelpa
-https://github.com/mooz/js2-mode
 https://github.com/fxbois/web-mode
-https://github.com/jacktasia/dumb-jump
-https://github.com/ShingoFukuyama/helm-swoop
-https://github.com/Fuco1/smartparens
 https://github.com/nonsequitur/smex/
 https://github.com/konr/tomatinho
 https://github.com/abo-abo/hydra
@@ -954,15 +996,13 @@ https://github.com/skeeto/elfeed
 https://github.com/krisajenkins/helm-spotify
 **** stack exchange
 https://github.com/vermiculus/sx.el
-**** tag
+**** ctags
 **** Dash
 **** eclim
-**** magit
 **** DB Client
 **** fzf
 **** elpy?
 https://github.com/jorgenschaefer/elpy
-**** pomodoro
 **** Gcal
 **** rainbow parens
 **** paredit
@@ -975,6 +1015,7 @@ https://github.com/hlissner/emacs-doom-theme/tree/screenshots
 https://www.slant.co/topics/358/~color-themes-for-text-editors
 facebook
 inkpot
+spacedust
 
 ** Cheatsheet
 *** paredit
@@ -982,29 +1023,38 @@ inkpot
 *** Dired
 
 ** Resourcen
+chrome-extension://chphlpgkkbolifaimnlloiipkdnihall/onetab.html
 *** Lernen
 http://tuhdo.github.io/emacs-tutor.html
 http://emacs-doctor.com/learn-emacs-lisp-in-15-minutes.html
 https://github.com/redguardtoo/mastering-emacs-in-one-year-guide
 https://github.com/noctuid/evil-guide
+
 http://www.howardism.org/Technical/Emacs/emacs-init.html
-http://bling.github.io/blog/2015/01/06/emacs-as-my-leader-1-year-later/
 https://github.com/gabrielelanaro/emacs-for-python
 http://tuhdo.github.io/helm-intro.html
 https://github.com/larstvei/dot-emacs/blob/master/init.org
 https://www.emacswiki.org/emacs/EmacsNiftyTricks
-http://emacs-fu.blogspot.de/
 http://danmidwood.com/content/2014/11/21/animated-paredit.html
 https://joaotavora.github.io/yasnippet/snippet-development.html
 https://www.youtube.com/watch?v=HKF41ivkBb0
+https://tuhdo.github.io/helm-intro.html
+
+*** Sites
+https://www.gnu.org/software/emacs/
+https://www.reddit.com/r/emacs/
+http://ergoemacs.org/
+https://emacswiki.org/
+http://wikemacs.org/wiki/Main_Page
+http://emacs-fu.blogspot.de/
 http://emacsredux.com/
 http://emacs.sexy/
-https://tuhdo.github.io/helm-intro.html
 
 *** Listen
 http://emacsrocks.com/
 https://github.com/emacs-tw/awesome-emacs
 https://github.com/search?o=desc&q=emacs&s=stars&type=Repositories&utf8=%E2%9C%93
+http://emacsrocks.com/
 
 *** Distros
 http://spacemacs.org/
@@ -1012,4 +1062,5 @@ https://github.com/bbatsov/prelude
 https://github.com/overtone/emacs-live
 https://github.com/technomancy/emacs-starter-kit
 https://github.com/purcell/emacs.d
+http://aquamacs.org/
 
