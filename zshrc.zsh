@@ -1295,19 +1295,33 @@ FZF-EOF"
 
         # osx {
             pomodoro () {
+                # TODO: tags, exercises, postpone
                 # local exercise="situps"
                 # osascript -e 'display notification "Time for some $exercise" with title "Pomodoro" subtitle "timer" sound name "default"'
-
-                local notification="notification"
-                local title="title"
-                local subtitle="subtitle"
+                local title="Pomodoro"
+                local subtitle="time for a break"
                 local soundname="Hero"
+                if [[ "$1" == "" ]]; then
+                    local notification="a task"
+                else
+                    local notification="$1"
+                fi
+                local timestamp=$(date +%d.%m.%Y-%H:%M:%S)
+                echo "$timestamp\t$notification""\r" >> ~/.pomodoro
+
                 # Basso.aiff  Blow.aiff  Bottle.aiff  Frog.aiff  Funk.aiff  Glass.aiff  Hero.aiff  Morse.aiff  Ping.aiff  Pop.aiff  Purr.aiff  Sosumi.aiff  Submarine.aiff  Tink.aiff
                 # sleep "$((25 * 60))" && osascript -e "display notification \"$notification\" with title \"$title\" subtitle \"$subtitle\" sound name \"$soundname\""
-                sleep "$((1))" && osascript -e "display notification \"$notification\" with title \"$title\" subtitle \"$subtitle\" sound name \"$soundname\""
+                sleep "$((25 * 60))" && osascript -e "display notification \"$notification\" with title \"$title\" subtitle \"$subtitle\" sound name \"$soundname\""
                 # for i in `seq 1 3`; do
                 #     # osascript -e 'beep'
                 # done
+            }
+            alias pom='pomodoro'
+
+            pomodoro_today () {
+                local pomodoros=$(grep -o "$(date +%d.%m.%Y)" ~/.pomodoro | wc -l|awk '{print $1}')
+                echo "$pomodoros pomodoros today: ${(l:$pomodoros::🍅:)}\n"
+                cat ~/.pomodoro | grep "$(date +%d.%m.%Y)" --color=never | cut -c 12-
             }
 
             # say
