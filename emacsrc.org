@@ -24,6 +24,10 @@ touch ~/.emacs.d/persistence/workgroups
 touch ~/.emacs.d/persistence/places
 touch ~/.emacs.d/persistence/bookmarks
 # cp ~/.emacs.d/bookmarks ~/.emacs.d/persistence/bookmarks
+
+git clone https://github.com/TeMPOraL/nyan-mode.git ~/.emacs.d/other-srcs
+git clone https://github.com/alpaker/Fill-Column-Indicator.git ~/.emacs.d/other-srcs
+git clone https://github.com/philiparvidsson/zweilight-emacs.git ~/.emacs.d/other-srcs
 #+END_SRC
 
 ** ag
@@ -113,11 +117,41 @@ add them to the packages list and call package-upgrade
                 ;; smart-mode-line-powerline-theme
                 ;; new package
                 ;; themes
-                gruvbox-theme
-                solarized-theme
-                monokai-theme
-                zenburn-theme
-                spacemacs-theme
+                gruvbox-theme           ; light & dark
+                solarized-theme         ; light & dark
+                spacemacs-theme         ; light & dark
+                moe-theme               ; light & dark
+                material-theme          ; light & dark
+                color-theme-sanityinc-tomorrow ; light & dark
+                darcula-theme           ; dark
+                leuven-theme            ; light
+                organic-green-theme     ; light
+                monokai-theme           ; dark
+                zenburn-theme           ; dark
+                cyberpunk-theme         ; dark
+                subatomic-theme         ; dark
+                grandshell-theme        ; dark
+                afternoon-theme         ; dark
+                noctilux-theme          ; dark
+                darktooth-theme         ; dark
+                gotham-theme            ; dark
+                doom-themes             ; light & dark
+                spacegray-theme         ; dark
+                obsidian-theme          ; dark
+                metalheart-theme        ; dark
+                badwolf-theme           ; light & dark
+                inkpot-theme            ; dark
+                seoul256-theme          ; dark
+                suscolors-theme         ; dark
+                avk-emacs-themes        ; collection
+                quasi-monochrome-theme  ; dark
+                hemisu-theme            ; light & dark
+                cherry-blossom-theme    ; theme
+                darkburn-theme          ; dark
+                clues-theme             ; dark
+                reykjavik-theme         ; dark
+                sublime-themes          ; collection
+
                 org                     ; Outline-based notes management and organizer
                 org-autolist            ; Automatically insert new list items.
                 ;; always load finally
@@ -136,7 +170,6 @@ add them to the packages list and call package-upgrade
                 ;; golden-ratio         ; Automatic resizing windows to golden ratio
                 ;; haskell-mode         ; A Haskell editing mode
                 ;; helm-company         ; Helm interface for company-mode
-                ;; material-theme       ; A Theme based on Google Material Design
                 ;; maude-mode           ; Emacs mode for the programming language Maude
                 ;; multiple-cursors     ; Multiple cursors for Emacs
                 ;; olivetti             ; Minor mode for a nice writing environment
@@ -206,7 +239,8 @@ the tangled file is compiled."
     ;; theme
     ;; trust theme
     (setq custom-safe-themes t)
-    (load-theme 'spacemacs-dark)
+    ;; (load-theme 'spacemacs-dark)
+    (load-theme 'reykjavik)
     ;; set font
     (set-default-font "Envy Code R 16")
 
@@ -228,7 +262,7 @@ the tangled file is compiled."
       (save-place-mode 1))
     #+END_SRC
 
-** UI
+** UI                                                               :manual:
 
     #+BEGIN_SRC emacs-lisp
     ;; disable welcome window
@@ -1009,6 +1043,10 @@ https://github.com/jorgenschaefer/elpy
 http://danmidwood.com/content/2014/11/21/animated-paredit.html
 
 *** Themes
+https://github.com/joedf/PlasticCodeWrap
+https://github.com/rakr/vim-two-firewatch
+https://github.com/raphamorim/lucario
+https://github.com/tyrannicaltoucan/vim-deep-space
 **** previews
 **** other
 https://github.com/hlissner/emacs-doom-theme/tree/screenshots
@@ -1055,6 +1093,11 @@ http://emacsrocks.com/
 https://github.com/emacs-tw/awesome-emacs
 https://github.com/search?o=desc&q=emacs&s=stars&type=Repositories&utf8=%E2%9C%93
 http://emacsrocks.com/
+
+*** Themes
+https://emacsthemes.com/
+https://pawelbx.github.io/emacs-theme-gallery/
+https://github.com/owainlewis/emacs-color-themes
 
 *** Distros
 http://spacemacs.org/
