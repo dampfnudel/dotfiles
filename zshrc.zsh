@@ -797,7 +797,7 @@
 
             # search for file contents
             f_ag () {
-                ag --nobreak --nonumbers --noheading . | fzf
+                ag "$1" --nobreak --nonumbers --noheading . | fzf
             }
             alias fag='f_ag'
 
@@ -1012,6 +1012,7 @@ FZF-EOF"
                 open -a Emacs.app "$var"
             done
         }
+        alias e='emacs'
     # }
 
     # git {
@@ -1252,9 +1253,9 @@ FZF-EOF"
         }
 
         # lookup dict.cc
-        de () { $DEFAULT_PYTHON_INTERPRETER $HOME/Utils/dict.cc.py/dict.cc.py de en "$1"; }
+        de () { dict.cc.py de en "$1"; }
         # lookup dict.cc for english words
-        en () { $DEFAULT_PYTHON_INTERPRETER $HOME/Utils/dict.cc.py/dict.cc.py en de "$1"; }
+        en () { dict.cc.py en de "$1"; }
 
         # copy the current working dir to clipboard
         copy_pwd () { pwd | pbcopy }
@@ -1296,8 +1297,7 @@ FZF-EOF"
         # osx {
             pomodoro () {
                 # TODO: tags, exercises, postpone
-                # local exercise="situps"
-                # osascript -e 'display notification "Time for some $exercise" with title "Pomodoro" subtitle "timer" sound name "default"'
+                # Basso.aiff  Blow.aiff  Bottle.aiff  Frog.aiff  Funk.aiff  Glass.aiff  Hero.aiff  Morse.aiff  Ping.aiff  Pop.aiff  Purr.aiff  Sosumi.aiff  Submarine.aiff  Tink.aiff
                 local title="Pomodoro"
                 local subtitle="time for a break"
                 local soundname="Hero"
@@ -1307,16 +1307,26 @@ FZF-EOF"
                     local notification="$1"
                 fi
                 local timestamp=$(date +%d.%m.%Y-%H:%M:%S)
+                # TODO: display end time
+                echo "$timestamp\t$notification""\r"
                 echo "$timestamp\t$notification""\r" >> ~/.pomodoro
 
-                # Basso.aiff  Blow.aiff  Bottle.aiff  Frog.aiff  Funk.aiff  Glass.aiff  Hero.aiff  Morse.aiff  Ping.aiff  Pop.aiff  Purr.aiff  Sosumi.aiff  Submarine.aiff  Tink.aiff
-                # sleep "$((25 * 60))" && osascript -e "display notification \"$notification\" with title \"$title\" subtitle \"$subtitle\" sound name \"$soundname\""
-                sleep "$((25 * 60))" && osascript -e "display notification \"$notification\" with title \"$title\" subtitle \"$subtitle\" sound name \"$soundname\""
-                # for i in `seq 1 3`; do
-                #     # osascript -e 'beep'
-                # done
+                local secs=$((25 * 60))
+                # display a timer
+                while [ $secs -gt 0 ]; do
+                    # TODO: format minutes
+                    echo -ne "$secs\033[0K\r"
+                    sleep 1
+                    : $((secs--))
+                done
+                osascript -e "display notification \"$notification\" with title \"$title\" subtitle \"$subtitle\" sound name \"$soundname\""
             }
             alias pom='pomodoro'
+            pomo () {
+                blocks
+                pomodoro "$1"
+                blocks
+            }
 
             pomodoro_today () {
                 local pomodoros=$(grep -o "$(date +%d.%m.%Y)" ~/.pomodoro | wc -l|awk '{print $1}')
