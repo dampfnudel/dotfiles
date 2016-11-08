@@ -94,7 +94,9 @@ add them to the packages list and call package-upgrade
                 flycheck                ; modern on-the-fly syntax checking extension
                 git-gutter              ; icons in the gutter area indicating src ctrl changes
                 undo-tree               ; undo system
-                auto-complete           ; auto completion with popup menu
+                ;; auto-complete           ; auto completion with popup menu
+                company                 ; auto completion with popup menu
+                helm-c-yasnippet        ; helm completion for company-mode
                 json-snatcher           ; extract the path to a json value, display at modeline
                 fireplace               ; a cozy fireplace
                 jedi                    ; Python auto-completion for Emacs
@@ -151,7 +153,8 @@ add them to the packages list and call package-upgrade
                 clues-theme             ; dark
                 reykjavik-theme         ; dark
                 sublime-themes          ; collection
-
+                silkworm-theme          ; dark
+                labburn-theme           ; dark
                 org                     ; Outline-based notes management and organizer
                 org-autolist            ; Automatically insert new list items.
                 ;; always load finally
@@ -241,6 +244,7 @@ the tangled file is compiled."
     (setq custom-safe-themes t)
     ;; (load-theme 'spacemacs-dark)
     (load-theme 'reykjavik)
+    ;; (load-theme 'darktooth)
     ;; set font
     (set-default-font "Envy Code R 16")
 
@@ -309,6 +313,14 @@ the tangled file is compiled."
 #+BEGIN_SRC emacs-lisp
 ;; switch frames with <Shift-Left/Right/Up/Down>
 (windmove-default-keybindings)
+#+END_SRC
+
+** lines
+
+no forced new line
+
+#+BEGIN_SRC emacs-lisp
+(setq-default indent-tabs-mode nil)
 #+END_SRC
 
 ** whitespace
@@ -478,7 +490,7 @@ and copy it over the desired file.
 ;; snippet direcories
 ;; required by require
 (setq yas-snippet-dirs
-        '("~/.emacs.d/snippets/yasnippet-snippets"
+        '("~/.emacs.d/yasnippet-snippets"
         ))
 ;; yasnippet everywhere
 (yas-global-mode 1)
@@ -505,13 +517,35 @@ and copy it over the desired file.
 (global-undo-tree-mode)
 #+END_SRC
 
+** company-mode
+
+Basically it sets up the yasnippet backend with every other backend you have activated, so you get the proper completion for the corresponding backend as well as your snippets.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'after-init-hook 'global-company-mode)
+
+;; ;; Add yasnippet support for all company backends
+;; ;; https://github.com/syl20bnr/spacemacs/pull/179
+;; (defvar company-mode/enable-yas t
+;;   "Enable yasnippet for all backends.")
+;;
+;; (defun company-mode/backend-with-yas (backend)
+;;   (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+;;       backend
+;;     (append (if (consp backend) backend (list backend))
+;;             '(:with company-yasnippet))))
+;;
+;; (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+#+END_SRC
+
 ** auto-complete
 
 #+BEGIN_SRC emacs-lisp
-(require 'auto-complete)
-;; TODO deactivate for minibuffer
-(global-auto-complete-mode t)
+;; (require 'auto-complete)
+;; ;; TODO deactivate for minibuffer
+;; (global-auto-complete-mode t)
 ;; (ac-config-default)
+;; (setq ac-sources (append '(ac-source-yasnippet) ac-sources))
 #+END_SRC
 
 ** jedi                                                             :manual:
@@ -683,6 +717,8 @@ become a full StackOverflow developer!
 
 * require
 
+lazy require packages
+
 #+BEGIN_SRC emacs-lisp
 (require 'idle-require)             ; Needed in order to use idle-require
 
@@ -695,6 +731,8 @@ become a full StackOverflow developer!
            json-snatcher
            undo-tree
            yasnippet
+           helm-c-yasnippet
+           ;; auto-complete-config
            git-gutter
            org-mode
            org-autolist
@@ -800,6 +838,8 @@ prevent losing the selection after a shift operation by re-selecting
     (define-key evil-normal-state-map (kbd "B") 'evil-first-non-blank)
     (define-key evil-normal-state-map (kbd "E") 'evil-end-of-line)
     (define-key evil-normal-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
+    (define-key evil-normal-state-map (kbd "ä") 'delete-other-windows)
+    (define-key evil-normal-state-map (kbd "Ä") 'evil-search-highlight-persist-remove-all)
     (define-key evil-normal-state-map (kbd "ö") 'avy-goto-char)
     (define-key evil-normal-state-map (kbd "Ö") 'avy-goto-line)
     (define-key evil-normal-state-map (kbd "f") 'avy-goto-char-in-line)
@@ -820,7 +860,8 @@ prevent losing the selection after a shift operation by re-selecting
     "j" 'evil-window-down
     "h" 'evil-window-left
     "l" 'evil-window-right
-    "x" 'delete-other-windows
+    "x" 'delete-other-windows    ; duplicated
+    "y" 'helm-yas-complete
     "f" 'helm-for-files
     "O" 'helm-find-files
     "oh" 'helm-org-in-buffer-headings
@@ -831,7 +872,7 @@ prevent losing the selection after a shift operation by re-selecting
     "TAB" 'mode-line-other-buffer               ; previous buffer (like 'helm-buffer-list "RET")
     "d" 'dumb-jump-go
     "*" 'helm-swoop
-    "ö" 'evil-search-highlight-persist-remove-all
+    "ö" 'evil-search-highlight-persist-remove-all        ; duplicated
     "l" 'helm-semantic-or-imenu
     "p" 'helm-projectile
     "m" 'magit-status
@@ -902,6 +943,7 @@ dumb-jump-go-other-window exactly like dumb-jump-go but uses find-file-other-win
 * Meta
 ** Todo
 *** bugs
+**** default persistence files
 **** auto-complete popup offset
 **** auto-complete orgmode
 **** undo-tree + fireplace
@@ -991,9 +1033,13 @@ https://github.com/auto-complete/auto-complete
 **** python
 - jedi
 **** javascript
-**** Yasnippet
-- durch params steppen
 **** directories
+
+*** Yasnippet
+- [ ] <---
+- [ ] comment
+- [ ] ipdb
+- [ ] debugger
 
 *** magit
 https://github.com/justbur/evil-magit
@@ -1043,17 +1089,14 @@ https://github.com/jorgenschaefer/elpy
 http://danmidwood.com/content/2014/11/21/animated-paredit.html
 
 *** Themes
+**** unported vim themes
 https://github.com/joedf/PlasticCodeWrap
 https://github.com/rakr/vim-two-firewatch
 https://github.com/raphamorim/lucario
 https://github.com/tyrannicaltoucan/vim-deep-space
 **** previews
-**** other
-https://github.com/hlissner/emacs-doom-theme/tree/screenshots
-https://www.slant.co/topics/358/~color-themes-for-text-editors
-facebook
-inkpot
-spacedust
+**** own
+https://github.com/emacsfodder/emacs-theme-editor
 
 ** Cheatsheet
 *** paredit
