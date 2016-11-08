@@ -212,7 +212,6 @@
 
     # fzf {
         source ~/.oh-my-zsh/custom/plugins/fzf/completion.zsh
-        source ~/.oh-my-zsh/custom/plugins/fzf/key-bindings.zsh
 
                 # ag -g "" --path-to-agignore ~/.agignore'
         export FZF_DEFAULT_COMMAND='
@@ -420,6 +419,8 @@
             _git_status_files () {
                 local files
                 files=$(git status --porcelain | awk '{print $2 }')
+                # sleep?
+                sleep 1
                 set -A flist ${(@s/
 /)files}
                 compadd - ${flist}
@@ -429,6 +430,76 @@
             # usage
             # $ git add <Escape>g<Tab>
             bindkey '\eg' git-files
+        # }
+
+        # tab completion for git status files {
+            if [[ $- == *i* ]]; then
+
+                # CTRL-f - Paste the selected file path(s) into the command line
+                __fsel() {
+                  local cmd="${FZF_CTRL_T_COMMAND:-"command find -L . \\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -prune \
+                    -o -type f -print \
+                    -o -type d -print \
+                    -o -type l -print 2> /dev/null | sed 1d | cut -b3-"}"
+                  eval "$cmd" | $(__fzfcmd) -m | while read item; do
+                    printf '%q ' "$item"
+                  done
+                  echo
+                }
+
+                # CTRL-p - Paste the selected directory path(s) into the command line
+                __fsel-dir() {
+                  local cmd="${FZF_ALT_C_COMMAND:-"command find -L . \\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -prune \
+                    -o -type d -print 2> /dev/null | sed 1d | cut -b3-"}"
+                  eval "$cmd" | $(__fzfcmd) -m | while read item; do
+                    printf '%q ' "$item"
+                  done
+                  echo
+                }
+
+                __fzfcmd() {
+                  [ ${FZF_TMUX:-1} -eq 1 ] && echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}" || echo "fzf"
+                }
+
+                fzf-file-widget() {
+                  LBUFFER="${LBUFFER}$(__fsel)"
+                  zle redisplay
+                }
+                zle     -N   fzf-file-widget
+                bindkey '^F' fzf-file-widget
+
+                fzf-dir-widget() {
+                  LBUFFER="${LBUFFER}$(__fsel-dir)"
+                  zle redisplay
+                }
+                zle     -N   fzf-dir-widget
+                bindkey '^P' fzf-dir-widget
+
+                # Ctrl-g - cd into the selected directory
+                fzf-cd-widget() {
+                  local cmd="${FZF_ALT_C_COMMAND:-"command find -L . \\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -prune \
+                    -o -type d -print 2> /dev/null | sed 1d | cut -b3-"}"
+                  cd "${$(eval "$cmd" | $(__fzfcmd) +m):-.}" && pwd
+                  zle reset-prompt
+                }
+                zle     -N    fzf-cd-widget
+                bindkey '^G' fzf-cd-widget
+
+                # CTRL-r - Paste the selected command from history into the command line
+                fzf-history-widget() {
+                  local selected num
+                  selected=( $(fc -l 1 | $(__fzfcmd) +s --tac +m -n2..,.. --tiebreak=index --toggle-sort=ctrl-r -q "${LBUFFER//$/\\$}") )
+                  if [ -n "$selected" ]; then
+                    num=$selected[1]
+                    if [ -n "$num" ]; then
+                      zle vi-fetch-history -n $num
+                    fi
+                  fi
+                  zle redisplay
+                }
+                zle     -N   fzf-history-widget
+                bindkey '^R' fzf-history-widget
+            fi
         # }
 
         # magic enter = ls && git status {
@@ -472,7 +543,7 @@
 
     bindkey -e
     export WORDCHARS=''                                 # do not jump over whole POSIX path
-    bindkey 'å' accept-and-hold                         # alt a.......................multiselect in menu complete
+    bindkey '^N' accept-and-hold                        # ctrl n .................... multiselect in menu complete
     bindkey '^[^[[D' backward-word                      # alt <arrow-left>............move a word backward
     bindkey '^[^[[C' forward-word                       # alt <arrow-right>...........move a word forward
     bindkey '^[^H' backward-kill-word                   # cmd <del>...................delete the word left of the cursor
@@ -499,7 +570,7 @@
         alias -g _vim="| eval ${EDITOR_TAB}"
         alias -g _copy='| pbcopy'
 
-        alias -g õrg='~org'
+        # alias -g õrg='~org'
     # }
 
     # list {
@@ -1356,13 +1427,28 @@ FZF-EOF"
             # set alarm clock with say
             alarm_msg () {
                 echo "alarm in ""$1""m"
-                sleep "$(($1 * 60))" && say -v Zarvox "$2"
-                # sleep "$(($1 * 60))" && mp3blaster ~/Music/gong.mp3
+                local secs=$(($1 * 60))
+                # display a timer
+                while [ $secs -gt 0 ]; do
+                    # TODO: format minutes
+                    echo -ne "$secs\033[0K\r"
+                    sleep 1
+                    : $((secs--))
+                done
+
+                say -v Zarvox "$2"
             }
             alarm () {
                 echo "alarm in ""$1""m"
-                sleep "$(($1 * 60))" && sing_song 2
-                # sleep "$(($1 * 60))" && mp3blaster ~/Music/gong.mp3
+                local secs=$(($1 * 60))
+                # display a timer
+                while [ $secs -gt 0 ]; do
+                    # TODO: format minutes
+                    echo -ne "$secs\033[0K\r"
+                    sleep 1
+                    : $((secs--))
+                done
+                sing_song 2
             }
             # eject all mountable volumes
             eject () {
