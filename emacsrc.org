@@ -243,7 +243,9 @@ the tangled file is compiled."
     ;; trust theme
     (setq custom-safe-themes t)
     ;; (load-theme 'spacemacs-dark)
-    (load-theme 'reykjavik)
+    ;; (load-theme 'reykjavik)
+    (load-theme 'darcula)
+    (load-theme 'monokai)
     ;; (load-theme 'darktooth)
     ;; set font
     (set-default-font "Envy Code R 16")
@@ -1074,6 +1076,8 @@ https://github.com/lewang/flx
 https://github.com/Wilfred/ag.el
 https://github.com/skeeto/elfeed
 https://github.com/krisajenkins/helm-spotify
+**** ispell
+https://www.emacswiki.org/emacs/InteractiveSpell
 **** stack exchange
 https://github.com/vermiculus/sx.el
 **** ctags
