@@ -11,29 +11,26 @@
 # ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.zshrc
 
 # TODO {{{
+    # smart_open
+        # multiselect
+        # for itermopen
+    # fzf hashes
+    # https://github.com/supercrabtree/k
+        # LSCOLORS
+    # fzf m-x
+# {ls ~scripts/*(.x) in $PATH & cat zshrc.zsh|grep " () {"|awk '{print $1}'|sed '/#/d'|sort}
+
+
     # pbpaste | vim
     # impure `docker-machine active 2> /dev/null`
-    # dir consts
-        # python
     # https://github.com/unixorn/git-extra-commands
-    # https://github.com/supercrabtree/k
     # better imgls
-    # f_dirs
-    # modes hist, cd...
     # iterm2 drag files to cmd
     # global aliases
-    # http://www.wunderline.rocks/
-    # num block
-    # git add without """
     # fzf
-        # spotlight open
-        # git add
         # fo multiple files
         # docker unify docker cmds
-        # ctrl-t for dirs
-        # clipboard
         # commands
-        # BOOKMARKS!
         # -m
         # workon
         # context starting points
@@ -46,6 +43,7 @@
             # editor
             # oh-my-zsh
             # dotfiles
+            # python
     # init script
 # }}}
 
@@ -200,6 +198,7 @@
         zsh-completions
         zsh-syntax-highlighting
         zsh-history-substring-search
+        k
         impure)
 
     source $ZSH/oh-my-zsh.sh
@@ -434,6 +433,9 @@
 
         # tab completion for git status files {
             if [[ $- == *i* ]]; then
+
+                # CTRL-h - Paste the selected hash(s) into the command line
+                # hash -d | grep -v '_'|awk -F = '{print "~"$1"/""\t\t"$2}'
 
                 # CTRL-f - Paste the selected file path(s) into the command line
                 __fsel() {

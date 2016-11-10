@@ -333,7 +333,8 @@ no forced new line
     ;;; use 4 spaces instead of tabs
     (setq-default indent-tabs-mode nil)
     (setq-default tab-width 4)
-    (setq indent-line-function 'insert-tab)
+
+    ;; (setq indent-line-function 'insert-tab)
     #+END_SRC
 
 ** encoding
@@ -489,11 +490,11 @@ and copy it over the desired file.
 ** yasnippet
 
 #+BEGIN_SRC emacs-lisp
-;; snippet direcories
 ;; required by require
+;; snippet direcories
 (setq yas-snippet-dirs
-        '("~/.emacs.d/yasnippet-snippets"
-        ))
+         '("~/.emacs.d/user-snippets"
+         ))
 ;; yasnippet everywhere
 (yas-global-mode 1)
 #+END_SRC
