@@ -1,0 +1,4 @@
+# -*- mode: snippet -*-
+# name: colorlog
+# --
+console.log('%c $0', 'background: #c4c4c4; color: orange);

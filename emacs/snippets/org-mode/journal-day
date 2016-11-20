@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: journal-day
+# key: day
+# --
+* `(format-time-string "<%Y-%m-%d %a>")`
+** gestern :-${1:\)}
+*** positiv
+- $2
+*** negativ
+- $3
+** heute
+- [ ] $4
+

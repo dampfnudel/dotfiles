@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: agenda-week
+# key: week
+# --
+* Woche `(format-time-string "<%Y-%m-%d %a>")` - `(format "<%s>" (org-read-date nil nil "+7"))`
+
+** Fokus
+*** $1
+
+** Sozialleben
+*** $2
+
+** Tasks
+*** $3
+
+** Termine
+*** $4
