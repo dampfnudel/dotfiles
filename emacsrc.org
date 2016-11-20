@@ -115,6 +115,9 @@ add them to the packages list and call package-upgrade
                 workgroups2             ; session manager
                 howdoi                  ; query Stack Overflow, get the most upvoted answer to the first question
                 markdown-mode           ; major mode for editing markdown
+                helm-ag                 ; use ag with helm
+                focus                   ; Focus provides focus-mode that dims the text of surrounding sections
+
                 ;; smart-mode-line         ; sexy mode-line
                 ;; smart-mode-line-powerline-theme
                 ;; new package
@@ -244,8 +247,9 @@ the tangled file is compiled."
     (setq custom-safe-themes t)
     ;; (load-theme 'spacemacs-dark)
     ;; (load-theme 'reykjavik)
-    (load-theme 'darcula)
-    (load-theme 'monokai)
+    ;; (load-theme 'darcula)
+    ;; (load-theme 'monokai)
+    (load-theme 'subatomic)
     ;; (load-theme 'darktooth)
     ;; set font
     (set-default-font "Envy Code R 16")
@@ -369,6 +373,17 @@ no forced new line
       kept-new-versions 6
       kept-old-versions 2
       version-control t)
+
+    ;;TOTRY
+    ;;(setq savehist-file "~/.emacs.d/savehist")
+    ;;(savehist-mode 1)
+    ;;(setq history-length t)
+    ;;(setq history-delete-duplicates t)
+    ;;(setq savehist-save-minibuffer-history 1)
+    ;;(setq savehist-additional-variables
+    ;;'(kill-ring
+    ;;    search-ring
+    ;;    regexp-search-ring))
     #+END_SRC
 
 ** file modes
@@ -490,13 +505,13 @@ and copy it over the desired file.
 ** yasnippet
 
 #+BEGIN_SRC emacs-lisp
-;; required by require
-;; snippet direcories
-(setq yas-snippet-dirs
-         '("~/.emacs.d/user-snippets"
-         ))
 ;; yasnippet everywhere
 (yas-global-mode 1)
+
+;; required by require
+;; snippet direcories
+;; ~/emacs.d/elpa/yasnippet-20161022.646/snippets
+;; ~/emacs.d/snippets
 #+END_SRC
 
 ** git-gutter
@@ -526,6 +541,13 @@ Basically it sets up the yasnippet backend with every other backend you have act
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'after-init-hook 'global-company-mode)
+
+;; complete with tab
+(defun complete-or-indent ()
+    (interactive)
+    (if (company-manual-begin)
+        (company-complete-common)
+        (indent-according-to-mode)))
 
 ;; ;; Add yasnippet support for all company backends
 ;; ;; https://github.com/syl20bnr/spacemacs/pull/179
@@ -608,6 +630,16 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
 (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+
+;; highlight matching tags
+;; TODO: do it like vims match-tag-always
+(setq web-mode-enable-current-element-highlight t)
+
+(defun my-web-mode-hook ()
+  "Hooks for Web mode."
+  (setq web-mode-markup-indent-offset 2)
+)
+(add-hook 'web-mode-hook  'my-web-mode-hook)
 #+END_SRC
 
 ** smartparens
@@ -710,6 +742,34 @@ become a full StackOverflow developer!
 (autoload 'gfm-mode "markdown-mode"
    "Major mode for editing GitHub Flavored Markdown files" t)
 (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+#+END_SRC
+
+** eshell
+fancy eshell prompt with different colors, time, pwd, version control info and horizontal line after each command.
+
+#+BEGIN_SRC emacs-lisp
+;; prompt with colors, time, pwd, vc info and horizontal line after cmds
+(defmacro with-face (str &rest properties)
+    `(propertize ,str 'face (list ,@properties)))
+
+(defun shk-eshell-prompt ()
+    (let ((header-bg "#fff"))
+    (concat
+    (with-face (concat (eshell/pwd) " ") :background header-bg)
+    (with-face (format-time-string "(%Y-%m-%d %H:%M) " (current-time)) :background header-bg :foreground "#888")
+    (with-face
+        (or (ignore-errors (format "(%s)" (vc-responsible-backend default-directory))) "")
+        :background header-bg)
+    (with-face "\n" :background header-bg)
+    (with-face user-login-name :foreground "blue")
+    "@"
+    (with-face "localhost" :foreground "green")
+    (if (= (user-uid) 0)
+        (with-face " #" :foreground "red")
+        " $")
+    " ")))
+(setq eshell-prompt-function 'shk-eshell-prompt)
+(setq eshell-highlight-prompt nil)
 #+END_SRC
 
 ** new package
@@ -815,6 +875,9 @@ prevent losing the selection after a shift operation by re-selecting
 ;; minor mode for keybindings
 (defvar my-keys-minor-mode-map
   (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "M-+") 'text-scale-adjust)
+    (define-key map (kbd "M--") 'text-scale-adjust)
+    (define-key map (kbd "M-0") 'text-scale-adjust)
     (define-key map (kbd "M-e") 'move-end-of-line)
     (define-key map (kbd "M-b") 'move-beginning-of-line)
     ;; macOS
@@ -866,6 +929,7 @@ prevent losing the selection after a shift operation by re-selecting
     "x" 'delete-other-windows    ; duplicated
     "y" 'helm-yas-complete
     "f" 'helm-for-files
+    "a" 'helm-ag-project-root
     "O" 'helm-find-files
     "oh" 'helm-org-in-buffer-headings
     "oa" 'helm-org-agenda-files-headings
@@ -883,6 +947,7 @@ prevent losing the selection after a shift operation by re-selecting
     "so" 'wg-open-session
     "sc" 'wg-save-session-as
     "S" 'src-init
+    "r" 'revert-buffer
     "c" 'shell-command
     "Hh" 'helm-howdoi
     "Hi" 'howdoi-query-insert-code-snippet-at-point
@@ -947,12 +1012,12 @@ dumb-jump-go-other-window exactly like dumb-jump-go but uses find-file-other-win
 ** Todo
 *** bugs
 **** default persistence files
+**** #-files
 **** auto-complete popup offset
 **** auto-complete orgmode
 **** undo-tree + fireplace
 **** first reload errors
 **** source init.el org theme
-**** .#file files
 **** git gutter lag
 **** indentation
 **** magit exit
@@ -1058,25 +1123,35 @@ https://github.com/redguardtoo/evil-matchit
 
 *** andere Plugins
 https://github.com/skeeto/skewer-mode
+https://github.com/darksmile/cheatsheet
+https://github.com/soutaro/hungry-delete.el
+https://github.com/mrkkrp/fix-word
+https://github.com/areina/helm-dash
+
+
 https://www.quora.com/What-are-some-of-the-most-useful-extensions-for-Emacs
 https://www.reddit.com/r/emacs/comments/42g6u9/what_are_some_lesserknown_packages_that_you_love/
 https://news.ycombinator.com/item?id=9395271
 https://www.reddit.com/r/vim/comments/2ezvst/why_cant_vim_to_be_appealing_like_emacs/
 https://www.reddit.com/r/emacs/comments/1xjlrq/emacs_modes_that_are_worth_knowing_about/
 
-https://github.com/steckerhalter/helm-google
-https://github.com/quelpa/quelpa
-https://github.com/fxbois/web-mode
-https://github.com/nonsequitur/smex/
-https://github.com/konr/tomatinho
-https://github.com/abo-abo/hydra
-https://github.com/timcharper/evil-surround
 http://cedet.sourceforge.net/
-https://github.com/repl-electric/view-pane/tree/master/animations
-https://github.com/lewang/flx
-https://github.com/Wilfred/ag.el
-https://github.com/skeeto/elfeed
+http://js-comint-el.sourceforge.net/
+https://github.com/abo-abo/hydra
+https://github.com/fniessen/org-html-themes
+https://github.com/konr/tomatinho
 https://github.com/krisajenkins/helm-spotify
+https://github.com/lewang/flx
+https://github.com/mrkkrp/zzz-to-char
+https://github.com/nonsequitur/smex/
+https://github.com/quelpa/quelpa
+https://github.com/rejeep/prodigy.el
+https://github.com/repl-electric/view-pane/tree/master/animations
+https://github.com/skeeto/elfeed
+https://github.com/steckerhalter/helm-google
+https://github.com/timcharper/evil-surround
+https://github.com/zk-phi/indent-guide
+https://www.emacswiki.org/emacs/ElDoc
 **** ispell
 https://www.emacswiki.org/emacs/InteractiveSpell
 **** stack exchange
