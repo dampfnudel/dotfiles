@@ -140,6 +140,10 @@
         export LC_ALL=de_DE.UTF-8
     # }
 
+    # ls --color
+    # LS_COLORS='di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
+    # LSCOLORS='gxfxcxdxbxegedabagacad'
+
     # gnu dircolors
     alias dircolors='gdircolors'
     eval `dircolors /Users/mbayer/Settings/dotfiles/monobay.256dark`
@@ -199,6 +203,7 @@
         zsh-syntax-highlighting
         zsh-history-substring-search
         k
+        ztrace
         impure)
 
     source $ZSH/oh-my-zsh.sh
@@ -583,6 +588,7 @@
         alias ls_today='find . -maxdepth 1 -type f -mtime 1'
         # numFiles: number of (non-hidden) files in current directory
         alias ls_count='echo $(ls -1 | wc -l)'
+        alias k='k -h'     # human readable sizes
     # }
 
     # tools {
@@ -718,8 +724,11 @@
         # showTimes: show the modification, metadata-change, and access times of a file
         showtimes () { stat -f "%N:   %m %c %a" "$@" ; }
 
-        # ff:  to find a file under the current directory
+        # ff:  find a file under the current directory
         ff () { /usr/bin/find . -name "$@" ; }
+
+        # ff:  fuzzy find file under the current directory
+        fff () { /usr/bin/find . -name "*$@*" ; }
 
         # ffs: to find a file whose name starts with a given string
         ffs () { /usr/bin/find . -name "$@"'*' ; }
@@ -1417,8 +1426,8 @@ FZF-EOF"
 
             sing_song () {
                 songs=(
-                    "say -v Pipe Organ Dum dum dee dum dum dum dum dee Dum dum dee dum dum dum dum dee dum dee dum dum dum de dum dum dum dee dum dee dum dum dee dummmmmmmmmmmmmmmmm" \
-                    "say -v Cellos di di di di di di di di di di di di di di di di di di di di di di di di di di" \
+                    "say -v Alex Dum dum dee dum dum dum dum dee Dum dum dee dum dum dum dum dee dum dee dum dum dum de dum dum dum dee dum dee dum dum dee dummmmmmmmmmmmmmmmm" \
+                    "say -v Anna di di di di di di di di di di di di di di di di di di di di di di di di di di" \
                     "say -v Cellos oh This is a ponci song ponci song ponci song this is the ponsiano song ive ever ever heard So why keep you listening listening listening while you are supposed to hack to hack to hack to hack its because i hate bill gates hate bill gates hate bill gates its because i hate bill gates more than anything else No its because windows life windows life windows life and you better get a macintosh and iPod now" \
                     "say -v Good oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooo" \
                     "say -v Bad oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooo")
@@ -1450,7 +1459,7 @@ FZF-EOF"
                     sleep 1
                     : $((secs--))
                 done
-                sing_song 2
+                sing_song 1
             }
             # eject all mountable volumes
             eject () {
