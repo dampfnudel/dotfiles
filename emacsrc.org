@@ -28,6 +28,7 @@ touch ~/.emacs.d/persistence/bookmarks
 git clone https://github.com/TeMPOraL/nyan-mode.git ~/.emacs.d/other-srcs
 git clone https://github.com/alpaker/Fill-Column-Indicator.git ~/.emacs.d/other-srcs
 git clone https://github.com/philiparvidsson/zweilight-emacs.git ~/.emacs.d/other-srcs
+git clone https://github.com/dunn/company-emoji.git ~/.emacs.d/other-srcs
 #+END_SRC
 
 ** ag
@@ -77,10 +78,10 @@ Setup package archives.
 
 ** install missing packages
 
-add them to the packages list and call package-upgrade
+add them to the packages list and call package-install-from-ini
 
 #+BEGIN_SRC emacs-lisp
-(defun package-upgrade ()
+(defun package-install-from-ini ()
     (interactive)
     (let* ((packages
             '(auto-compile              ; automatically compile Emacs Lisp libraries
@@ -365,7 +366,7 @@ no forced new line
               `((".*" ,(concat user-emacs-directory "tmp/auto-save/") t)))
     (setq backup-directory-alist
           `(("." . ,(expand-file-name
-                     (concat user-emacs-directory "tmp/backup")))))
+                     (concat user-emacs-directory "tmp/backup/")))))
     ;; backup method
     (setq backup-by-copying t)
     ;; backup frequency
@@ -772,6 +773,21 @@ fancy eshell prompt with different colors, time, pwd, version control info and h
 (setq eshell-highlight-prompt nil)
 #+END_SRC
 
+** company-emoji
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path (expand-file-name
+    (concat user-emacs-directory "other-srcs/company-emoji")))
+(require 'company-emoji)
+
+(add-to-list 'company-backends 'company-emoji)
+
+;; macOS font
+(set-fontset-font
+ t 'symbol
+ (font-spec :family "Apple Color Emoji") nil 'prepend)
+#+END_SRC
+
 ** new package
 
 #+BEGIN_SRC emacs-lisp
@@ -919,6 +935,8 @@ prevent losing the selection after a shift operation by re-selecting
     (define-key evil-visual-state-map (kbd "<") 'evil-shift-left-visual)
     (define-key evil-visual-state-map [tab] 'evil-shift-right-visual)
     (define-key evil-visual-state-map [S-tab] 'evil-shift-left-visual)
+    (define-key evil-visual-state-map (kbd "B") 'evil-first-non-blank)
+    (define-key evil-visual-state-map (kbd "E") 'evil-end-of-line)
 
     ;; evil-leader mappings
     (evil-leader/set-key
@@ -999,17 +1017,8 @@ prevent losing the selection after a shift operation by re-selecting
   (insert "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC"))
 #+END_SRC
 
-*** TODO dumbjump
-mapping
-Adding (dumb-jump-mode) to your .emacs will enable the key bindings for two interactive Dumb Jump functions:
-
-dumb-jump-go C-M g core functionality. Attempts to jump to the definition for the thing under point
-dumb-jump-back C-M p jumps back to where you were when you jumped. These are chained so if you go down a rabbit hole you can get back out or where you want to be.
-dumb-jump-quick-look C-M q like dumb-jump-go but shows tooltip with file, line, and context
-dumb-jump-go-other-window exactly like dumb-jump-go but uses find-file-other-window instead of find-file
-
 * Meta
-** Todo
+** Todos
 *** bugs
 **** default persistence files
 **** #-files
@@ -1072,7 +1081,7 @@ http://oremacs.com/2015/01/14/repeatable-commands/
 - error list buffer style darf keine anderen minibuffer betreffen
 
 *** yasnippet
-https://www.emacswiki.org/emacs/Yasnippet
+- [ ] <---
 - [ ] todo
 - [ ] ipdb
 - [ ] python
@@ -1103,12 +1112,6 @@ https://github.com/auto-complete/auto-complete
 **** javascript
 **** directories
 
-*** Yasnippet
-- [ ] <---
-- [ ] comment
-- [ ] ipdb
-- [ ] debugger
-
 *** magit
 https://github.com/justbur/evil-magit
 
@@ -1121,7 +1124,7 @@ When Flycheck minor mode is enabled, a new element appears in modeline showing t
 https://github.com/Valloric/MatchTagAlways
 https://github.com/redguardtoo/evil-matchit
 
-*** andere Plugins
+*** other
 https://github.com/skeeto/skewer-mode
 https://github.com/darksmile/cheatsheet
 https://github.com/soutaro/hungry-delete.el
@@ -1185,7 +1188,7 @@ https://github.com/emacsfodder/emacs-theme-editor
 
 ** Resourcen
 chrome-extension://chphlpgkkbolifaimnlloiipkdnihall/onetab.html
-*** Lernen
+*** Learn
 http://tuhdo.github.io/emacs-tutor.html
 http://emacs-doctor.com/learn-emacs-lisp-in-15-minutes.html
 https://github.com/redguardtoo/mastering-emacs-in-one-year-guide
@@ -1200,6 +1203,7 @@ http://danmidwood.com/content/2014/11/21/animated-paredit.html
 https://joaotavora.github.io/yasnippet/snippet-development.html
 https://www.youtube.com/watch?v=HKF41ivkBb0
 https://tuhdo.github.io/helm-intro.html
+http://sachachua.com/blog/wp-content/uploads/2013/05/How-to-Learn-Emacs-v2-Large.png
 
 *** Sites
 https://www.gnu.org/software/emacs/
@@ -1210,8 +1214,9 @@ http://wikemacs.org/wiki/Main_Page
 http://emacs-fu.blogspot.de/
 http://emacsredux.com/
 http://emacs.sexy/
+http://sachachua.com/blog/
 
-*** Listen
+*** Lists
 http://emacsrocks.com/
 https://github.com/emacs-tw/awesome-emacs
 https://github.com/search?o=desc&q=emacs&s=stars&type=Repositories&utf8=%E2%9C%93
@@ -1229,4 +1234,4 @@ https://github.com/overtone/emacs-live
 https://github.com/technomancy/emacs-starter-kit
 https://github.com/purcell/emacs.d
 http://aquamacs.org/
-
+https://github.com/sachac/.emacs.d/blob/gh-pages/Sacha.org
