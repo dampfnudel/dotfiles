@@ -250,7 +250,7 @@ the tangled file is compiled."
     ;; (load-theme 'reykjavik)
     ;; (load-theme 'darcula)
     ;; (load-theme 'monokai)
-    (load-theme 'subatomic)
+    (load-theme 'sanityinc-tomorrow-blue)
     ;; (load-theme 'darktooth)
     ;; set font
     (set-default-font "Envy Code R 16")
@@ -335,11 +335,12 @@ no forced new line
     #+BEGIN_SRC emacs-lisp
     ;; show trailing whitespace
     (setq-default show-trailing-whitespace t)
+
     ;;; use 4 spaces instead of tabs
     (setq-default indent-tabs-mode nil)
     (setq-default tab-width 4)
 
-    ;; (setq indent-line-function 'insert-tab)
+   ;; (setq indent-line-function 'insert-tab)
     #+END_SRC
 
 ** encoding
@@ -457,7 +458,7 @@ and copy it over the desired file.
 (setq org-lowest-priority ?Z)
 (setq org-default-priority ?A)
 ;; concat agenda from this files
-(setq org-agenda-files (append '("~/.notes.org" "~/Documents/org/plan/backlog.org") (file-expand-wildcards "~/Documents/org/cal/*\.org")))
+(setq org-agenda-files (append '("~/.notes.org" "~/Documents/org/plan/agenda.org") (file-expand-wildcards "~/Documents/org/cal/*\.org")))
 
 ;; indentation options
 (setq org-startup-folded "showeverything")
@@ -484,6 +485,13 @@ and copy it over the desired file.
 (add-hook 'org-mode-hook (lambda () (org-autolist-mode)))
 #+END_SRC
 
+** python
+
+#+begin_src emacs-lisp :tangle yes
+ (setq python-shell-interpreter "ipython"
+       python-shell-interpreter-args "-i")
+#+end_src
+
 ** helm
 
 #+BEGIN_SRC emacs-lisp
@@ -491,7 +499,7 @@ and copy it over the desired file.
 ;; TODO experimental
 (setq helm-M-x-fuzzy-match t
       helm-buffers-fuzzy-matching t
-      helm-recentf-fuzzy-match    t)
+      helm-recentf-fuzzy-match t)
 #+END_SRC
 
 ** flycheck
@@ -788,6 +796,13 @@ fancy eshell prompt with different colors, time, pwd, version control info and h
  (font-spec :family "Apple Color Emoji") nil 'prepend)
 #+END_SRC
 
+** projectile
+
+#+BEGIN_SRC emacs-lisp
+(require 'projectile)
+(projectile-global-mode)
+#+END_SRC
+
 ** new package
 
 #+BEGIN_SRC emacs-lisp
@@ -952,14 +967,21 @@ prevent losing the selection after a shift operation by re-selecting
     "oh" 'helm-org-in-buffer-headings
     "oa" 'helm-org-agenda-files-headings
     "oc" 'org-reset-checkbox-state-subtre
+    "oe" 'org-export-dispatch
     "SPC" 'helm-buffers-list
-    "B" 'bookmark-set
+    "bb" 'bookmark-set
+    "bp" 'projectile-add-known-project
+    "g" 'helm-google-suggest
     "TAB" 'mode-line-other-buffer               ; previous buffer (like 'helm-buffer-list "RET")
     "d" 'dumb-jump-go
     "*" 'helm-swoop
     "ö" 'evil-search-highlight-persist-remove-all        ; duplicated
     "l" 'helm-semantic-or-imenu
     "p" 'helm-projectile
+    "P" 'helm-projectile-find-file-in-known-projects
+    "sp" 'projectile-switch-project
+    ;; TOTEST
+    "A" 'helm-projectile-ag
     "m" 'magit-status
     "ss" 'wg-save-session
     "so" 'wg-open-session
@@ -1020,21 +1042,22 @@ prevent losing the selection after a shift operation by re-selecting
 * Meta
 ** Todos
 *** bugs
+**** Whitespace!!!!!
+**** projectile persist known projects
+**** python ipdb snippet
 **** default persistence files
 **** #-files
 **** auto-complete popup offset
-**** auto-complete orgmode
 **** undo-tree + fireplace
 **** first reload errors
-**** source init.el org theme
 **** git gutter lag
-**** indentation
-**** magit exit
 *** mappings
 **** C-x 1
 **** M-<left/right>
 **** magit
 *** basics
+**** jumplist prestist
+**** jumplist helm
 **** Tabs
 - 4 auf einmal löschen
 - 4 auf einmal überspringen
@@ -1130,6 +1153,7 @@ https://github.com/darksmile/cheatsheet
 https://github.com/soutaro/hungry-delete.el
 https://github.com/mrkkrp/fix-word
 https://github.com/areina/helm-dash
+https://github.com/cadadr/forecast.el
 
 
 https://www.quora.com/What-are-some-of-the-most-useful-extensions-for-Emacs
@@ -1155,6 +1179,8 @@ https://github.com/steckerhalter/helm-google
 https://github.com/timcharper/evil-surround
 https://github.com/zk-phi/indent-guide
 https://www.emacswiki.org/emacs/ElDoc
+https://github.com/skeeto/joymacs
+https://github.com/yati-sagade/orch
 **** ispell
 https://www.emacswiki.org/emacs/InteractiveSpell
 **** stack exchange
@@ -1189,6 +1215,7 @@ https://github.com/emacsfodder/emacs-theme-editor
 ** Resourcen
 chrome-extension://chphlpgkkbolifaimnlloiipkdnihall/onetab.html
 *** Learn
+https://www.emacswiki.org/emacs/KeyboardMacros
 http://tuhdo.github.io/emacs-tutor.html
 http://emacs-doctor.com/learn-emacs-lisp-in-15-minutes.html
 https://github.com/redguardtoo/mastering-emacs-in-one-year-guide
@@ -1235,3 +1262,4 @@ https://github.com/technomancy/emacs-starter-kit
 https://github.com/purcell/emacs.d
 http://aquamacs.org/
 https://github.com/sachac/.emacs.d/blob/gh-pages/Sacha.org
+https://ogbe.net/emacsconfig.html
