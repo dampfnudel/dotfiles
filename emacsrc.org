@@ -44,6 +44,10 @@ brew install ag
 pip install howdoi
 #+END_SRC
 
+** elpy
+
+pip install jedi flake8 importmagic autopep8
+
 ** jedi
 
 M-x jedi:install-server
@@ -71,7 +75,9 @@ Setup package archives.
         '(("gnu" . "http://elpa.gnu.org/packages/")
          ("org" . "http://orgmode.org/elpa/")
          ("melpa" . "https://melpa.org/packages/")
-         ("melpa-stable" . "https://stable.melpa.org/packages/")))
+         ("melpa-stable" . "https://stable.melpa.org/packages/")
+         ("elpy" . "https://jorgenschaefer.github.io/packages/")
+))
 
 ;; (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
 #+END_SRC
@@ -95,12 +101,10 @@ add them to the packages list and call package-install-from-ini
                 flycheck                ; modern on-the-fly syntax checking extension
                 git-gutter              ; icons in the gutter area indicating src ctrl changes
                 undo-tree               ; undo system
-                ;; auto-complete           ; auto completion with popup menu
                 company                 ; auto completion with popup menu
                 helm-c-yasnippet        ; helm completion for company-mode
                 json-snatcher           ; extract the path to a json value, display at modeline
                 fireplace               ; a cozy fireplace
-                jedi                    ; Python auto-completion for Emacs
                 idle-require            ; load elisp libraries while Emacs is idle
                 avy                     ; jumping to visible text using a char-based decision tree
                 restclient              ; tool to manually explore and test HTTP REST webservices
@@ -109,7 +113,7 @@ add them to the packages list and call package-install-from-ini
                 dumb-jump               ; "jump to definition" with support for multiple programming languages
                 helm-swoop              ; Efficiently hopping squeezed lines
                 smartparens             ; minor mode for dealing with pairs
-                which-key               ; minor mode for Emacs that displays the key bindings following your currently entered incomplete command (a prefix) in a popup
+                which-key               ; displays the key bindings following your currently entered incomplete command (a prefix) in a popup
                 helm-projectile         ; Helm integration for Projectile
                 magit                   ; control Git from Emacs
                 spaceline               ; Spacemacs powerline theme
@@ -118,9 +122,8 @@ add them to the packages list and call package-install-from-ini
                 markdown-mode           ; major mode for editing markdown
                 helm-ag                 ; use ag with helm
                 focus                   ; Focus provides focus-mode that dims the text of surrounding sections
-
-                ;; smart-mode-line         ; sexy mode-line
-                ;; smart-mode-line-powerline-theme
+                anaconda-mode           ; Code navigation, documentation lookup and completion for Python
+                company-anaconda        ; Anaconda backend for company-mode
                 ;; new package
                 ;; themes
                 gruvbox-theme           ; light & dark
@@ -184,14 +187,14 @@ add them to the packages list and call package-install-from-ini
                 ;; pdf-tools            ; Emacs support library for PDF files
                 ;; projectile           ; Manage and navigate projects in Emacs easily
                 ;; slime                ; Superior Lisp Interaction Mode for Emacs
-                ;; try))                ; Try out Emacs packages
+                ; try))                ; Try out Emacs packages
                 ))
             ;; Remove all packages already installed
             (packages (remove-if 'package-installed-p packages)))
         ;; TODO only connect if neccessary
         (when packages
             (ignore-errors (package-refresh-contents)
-                        (mapcar 'package-install packages)
+                        (mapc 'package-install packages)
                         ;; macOS
                         (when (memq window-system '(mac ns))
                             (package-install 'exec-path-from-shell))))))
@@ -247,13 +250,14 @@ the tangled file is compiled."
     ;; trust theme
     (setq custom-safe-themes t)
     ;; (load-theme 'spacemacs-dark)
+    (load-theme 'spacemacs-light)
     ;; (load-theme 'reykjavik)
     ;; (load-theme 'darcula)
     ;; (load-theme 'monokai)
-    (load-theme 'sanityinc-tomorrow-blue)
+    ;; (load-theme 'sanityinc-tomorrow-blue)
     ;; (load-theme 'darktooth)
     ;; set font
-    (set-default-font "Envy Code R 16")
+    (set-frame-font "Envy Code R 16")
 
     #+END_SRC
 
@@ -488,8 +492,44 @@ and copy it over the desired file.
 ** python
 
 #+begin_src emacs-lisp :tangle yes
- (setq python-shell-interpreter "ipython"
-       python-shell-interpreter-args "-i")
+(setq python-shell-interpreter "ipython"
+      python-shell-interpreter-args "--simple-prompt --pprint")
+
+(defun python-shell ()
+        "Start and/or switch to the REPL."
+        (interactive)
+        (let ((shell-process
+               (or (python-shell-get-process)
+                   ;; `run-python' has different return values and different
+                   ;; errors in different emacs versions. In 24.4, it throws an
+                   ;; error when the process didn't start, but in 25.1 it
+                   ;; doesn't throw an error, so we demote errors here and
+                   ;; check the process later
+                   (with-demoted-errors "Error: %S"
+                     ;; in Emacs 24.5 and 24.4, `run-python' doesn't return the
+                     ;; shell process
+                     (call-interactively #'run-python)
+                     (python-shell-get-process)))))
+          (unless shell-process
+            (error "Failed to start python shell properly"))
+          (pop-to-buffer (process-buffer shell-process))
+          (evil-insert-state)))
+#+end_src
+
+** anaconda-mode
+
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'python-mode-hook 'anaconda-mode)
+(add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+#+end_src
+
+** company-anaconda
+
+#+begin_src emacs-lisp :tangle yes
+(eval-after-load "company"
+ '(add-to-list 'company-backends 'company-anaconda))
+
+(add-hook 'python-mode-hook 'anaconda-mode)
 #+end_src
 
 ** helm
@@ -551,12 +591,21 @@ Basically it sets up the yasnippet backend with every other backend you have act
 #+BEGIN_SRC emacs-lisp
 (add-hook 'after-init-hook 'global-company-mode)
 
+;; fix the company popup (80-column-ruler break it)
+(defun on-off-fci-before-company(command)
+  (when (string= "show" command)
+    (turn-off-fci-mode))
+  (when (string= "hide" command)
+    (turn-on-fci-mode)))
+
+(advice-add 'company-call-frontends :before #'on-off-fci-before-company)
+
 ;; complete with tab
-(defun complete-or-indent ()
-    (interactive)
-    (if (company-manual-begin)
-        (company-complete-common)
-        (indent-according-to-mode)))
+;(defun complete-or-indent ()
+;    (interactive)
+;    (if (company-manual-begin)
+;        (company-complete-common)
+;        (indent-according-to-mode)))
 
 ;; ;; Add yasnippet support for all company backends
 ;; ;; https://github.com/syl20bnr/spacemacs/pull/179
@@ -586,8 +635,8 @@ Basically it sets up the yasnippet backend with every other backend you have act
 M-x jedi:install-server
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'python-mode-hook 'jedi:setup)
-(setq jedi:complete-on-dot t)
+;(add-hook 'python-mode-hook 'jedi:setup)
+;(setq jedi:complete-on-dot t)
 #+END_SRC
 
 ** json-snatcher
@@ -626,7 +675,7 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
 )
 #+END_SRC
 
-** js2-mode
+** web-mode
 
 #+BEGIN_SRC emacs-lisp
 (require 'web-mode)
@@ -764,7 +813,6 @@ fancy eshell prompt with different colors, time, pwd, version control info and h
 (defun shk-eshell-prompt ()
     (let ((header-bg "#fff"))
     (concat
-    (with-face (concat (eshell/pwd) " ") :background header-bg)
     (with-face (format-time-string "(%Y-%m-%d %H:%M) " (current-time)) :background header-bg :foreground "#888")
     (with-face
         (or (ignore-errors (format "(%s)" (vc-responsible-backend default-directory))) "")
@@ -800,7 +848,7 @@ fancy eshell prompt with different colors, time, pwd, version control info and h
 
 #+BEGIN_SRC emacs-lisp
 (require 'projectile)
-(projectile-global-mode)
+(projectile-mode)
 #+END_SRC
 
 ** new package
@@ -818,7 +866,7 @@ lazy require packages
 
 (dolist (feature
          '(auto-compile             ; auto-compile .el files
-           jedi                     ; auto-completion for python
+           ;; jedi                     ; auto-completion for python
            zone
            expand-region
            fireplace
@@ -973,7 +1021,8 @@ prevent losing the selection after a shift operation by re-selecting
     "bp" 'projectile-add-known-project
     "g" 'helm-google-suggest
     "TAB" 'mode-line-other-buffer               ; previous buffer (like 'helm-buffer-list "RET")
-    "d" 'dumb-jump-go
+    "D" 'dumb-jump-go
+    "d" 'anaconda-mode-show-doc
     "*" 'helm-swoop
     "ö" 'evil-search-highlight-persist-remove-all        ; duplicated
     "l" 'helm-semantic-or-imenu
@@ -1194,6 +1243,8 @@ https://github.com/vermiculus/sx.el
 https://github.com/jorgenschaefer/elpy
 **** Gcal
 **** rainbow parens
+**** artistmode
+https://www.emacswiki.org/emacs/ArtistMode
 **** paredit
 http://danmidwood.com/content/2014/11/21/animated-paredit.html
 
@@ -1215,6 +1266,7 @@ https://github.com/emacsfodder/emacs-theme-editor
 ** Resourcen
 chrome-extension://chphlpgkkbolifaimnlloiipkdnihall/onetab.html
 *** Learn
+https://juanjoalvarez.net/es/detail/2014/sep/19/vim-emacsevil-chaotic-migration-guide/
 https://www.emacswiki.org/emacs/KeyboardMacros
 http://tuhdo.github.io/emacs-tutor.html
 http://emacs-doctor.com/learn-emacs-lisp-in-15-minutes.html
