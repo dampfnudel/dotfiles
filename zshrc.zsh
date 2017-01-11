@@ -129,7 +129,8 @@
           # export EDITOR='/usr/local/Cellar/macvim/7.4-99/bin/mvim'
           # export EDITOR='/usr/local/Cellar/macvim/8.0-110/bin/mvim'
           # export EDITOR_TAB=${EDITOR}' --remote-tab-silent'
-          export EDITOR='open -a Emacs.app'
+          # export EDITOR='open -a Emacs.app'
+          export EDITOR='open -a /usr/local/Cellar/emacs/25.1/Emacs.app'
           export EDITOR_TAB=${EDITOR}
           export VIM_EDITOR='/usr/local/Cellar/macvim/8.0-110/bin/mvim'
           export VIM_EDITOR_TAB=${VIM_EDITOR}' --remote-tab-silent'
@@ -138,6 +139,11 @@
         export HOME=/Users/mbayer
         export LANG=de_DE.UTF-8
         export LC_ALL=de_DE.UTF-8
+    # }
+    # imagemagick {
+        export MAGICK_HOME="$HOME/bin/ImageMagick-7.0.3"
+        export PATH="$MAGICK_HOME/bin:$PATH"
+        export DYLD_LIBRARY_PATH="$MAGICK_HOME/lib/"
     # }
 
     # ls --color
@@ -280,6 +286,7 @@
 
 # hashes / named directories {{{
     hash -d ai=$HOME/Workspace/ai
+    hash -d ast=$HOME/Workspace/fba/ast
     hash -d bay=$HOME/Workspace/bay
     hash -d bin=$HOME/bin
     hash -d colors=$HOME/Settings/colors
@@ -328,6 +335,7 @@
     hash -d videos=$HOME/Movies
     hash -d wil=$HOME/Workspace/wil
     hash -d emacs.d=$HOME/.emacs.d
+    hash -d snippets=$HOME/.emacs.d/snippets
 
     # files
     hash -d emacs_cheatsheet=$HOME/Workspace/gists/emacs_cheatsheet/emacs.md
@@ -600,8 +608,8 @@
         alias pony='fortune | ponysay'
         alias wttr='curl -s http://wttr.in | tail +8 | head -30'
         alias moon='curl -s wttr.in/Moon|head -25'
-        alias yt3='$WORKON_HOME/python3.4.1/bin/youtube-dl --verbose --extract-audio --audio-format mp3 --no-mtime'
-        alias yt='$WORKON_HOME/python3.4.1/bin/youtube-dl --no-mtime'
+        alias yt3='$WORKON_HOME/python3.4.1/bin/youtube-dl --verbose --extract-audio --audio-format mp3 --no-mtime --no-cache-dir'
+        alias yt='$WORKON_HOME/python3.4.1/bin/youtube-dl --no-mtime --no-cache-dir'
         # alias emacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs'
         # alias emacs='open -a Emacs.app'
         alias cemacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs -nw'
@@ -665,6 +673,7 @@
         alias dirs='dirs -vp'
         # substitute windows linebreak with unix linebreak
         alias fix_linebreaks="/usr/bin/perl -i -pe's/\r$//'"
+        alias pip_update_all="pip freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U"
 
         # osx {
             alias osx_show_hidden='defaults write com.apple.Finder AppleShowAllFiles YES && killall Finder'
@@ -690,6 +699,12 @@
 # }}}
 
 # functions {{{
+    # echo {
+        echo_timestamp () {
+            echo $(date +%Y-%m-%d-%H-%M-%S)
+        }
+    # }
+
     # list {
         starcat () {
             for i in *; do
@@ -738,6 +753,9 @@
 
         # fd: find a directory
         fd () { /usr/bin/find . -type d -name '*'"$@" ; }
+
+        # ffd: fuzzy find a directory
+        ffd () { /usr/bin/find . -type d -name "*$@*" ; }
 
         # ffg:  to find a file under the current git directory
         ffg () { /usr/bin/find `git rev-parse --show-toplevel` -name "$@" ; }
@@ -818,7 +836,7 @@
             #   - CTRL-E or Enter key to open with the $EDITOR
             f_open () {
                 local out file key
-                out=$(fzf --query="$1" --exit-0 --select-1 --exit-0 --cycle --expect=ctrl-o,ctrl-e)
+                out=$(fzf --query="$1" --exit-0 --select-1 --exit-0 --cycle --expect=ctrl-o,ctrl-e --preview "head -$LINES {}")
                 key=$(head -1 <<< "$out")
                 file=$(head -2 <<< "$out" | tail -1)
                 if [ -n "$file" ]; then
@@ -1082,16 +1100,18 @@ FZF-EOF"
     # emacs {
         emacs () {
             if [ $# -eq 0 ]; then
-                open -a Emacs.app
+                # open -a Emacs.app
+                open -a /usr/local/Cellar/emacs/25.1/Emacs.app
+                eval ${EDITOR}
                 return 0
             fi
             if [ "$1" = "--debug-init" ]; then
-                open -a Emacs.app --args --debug-init
+                eval ${EDITOR} --args --debug-init
                 return 0
             fi
             for var in "$@"; do
                 touch "$var"
-                open -a Emacs.app "$var"
+                eval ${EDITOR} "$var"
             done
         }
         alias e='emacs'
