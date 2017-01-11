@@ -31,22 +31,21 @@ git clone https://github.com/philiparvidsson/zweilight-emacs.git ~/.emacs.d/othe
 git clone https://github.com/dunn/company-emoji.git ~/.emacs.d/other-srcs
 #+END_SRC
 
-** ag
+** external dependencies
 
 #+BEGIN_SRC sh :tangle no
+# silver searcher
 brew install ag
-#+END_SRC
-
-** howdoi
-
-#+BEGIN_SRC sh :tangle no
-;; TODO not required?
+# howdoi
 pip install howdoi
-#+END_SRC
-
-** elpy
-
+# elpy
 pip install jedi flake8 importmagic autopep8
+# tern
+npm install -g tern
+# js2-mode
+npm install -g jshint
+npm install -g eslint
+#+END_SRC
 
 ** jedi
 
@@ -76,7 +75,7 @@ Setup package archives.
          ("org" . "http://orgmode.org/elpa/")
          ("melpa" . "https://melpa.org/packages/")
          ("melpa-stable" . "https://stable.melpa.org/packages/")
-         ("elpy" . "https://jorgenschaefer.github.io/packages/")
+         ; ("elpy" . "https://jorgenschaefer.github.io/packages/")
 ))
 
 ;; (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
@@ -124,8 +123,11 @@ add them to the packages list and call package-install-from-ini
                 focus                   ; Focus provides focus-mode that dims the text of surrounding sections
                 anaconda-mode           ; Code navigation, documentation lookup and completion for Python
                 company-anaconda        ; Anaconda backend for company-mode
+                skewer-mode             ; Live web development
+                company-tern            ; Tern backend for company-mode.
                 ;; new package
                 ;; themes
+                rebecca-theme           ; dark
                 gruvbox-theme           ; light & dark
                 solarized-theme         ; light & dark
                 spacemacs-theme         ; light & dark
@@ -250,7 +252,9 @@ the tangled file is compiled."
     ;; trust theme
     (setq custom-safe-themes t)
     ;; (load-theme 'spacemacs-dark)
-    (load-theme 'spacemacs-light)
+    ;; (load-theme 'spacemacs-light)
+    (load-theme 'rebecca)
+
     ;; (load-theme 'reykjavik)
     ;; (load-theme 'darcula)
     ;; (load-theme 'monokai)
@@ -295,6 +299,7 @@ the tangled file is compiled."
     ;; 80-column-ruler
     (add-to-list 'load-path (expand-file-name
         (concat user-emacs-directory "other-srcs/Fill-Column-Indicator")))
+    (setq fci-rule-column 81)
     (require 'fill-column-indicator)
 
     ;; TODO define list of used programming languages (prog-mode doesn't work with js)
@@ -492,8 +497,9 @@ and copy it over the desired file.
 ** python
 
 #+begin_src emacs-lisp :tangle yes
-(setq python-shell-interpreter "ipython"
-      python-shell-interpreter-args "--simple-prompt --pprint")
+;(setq python-shell-interpreter "ipython"
+;      python-shell-interpreter-args "--simple-prompt --pprint")
+(setq python-shell-interpreter "ipython")
 
 (defun python-shell ()
         "Start and/or switch to the REPL."
@@ -513,6 +519,8 @@ and copy it over the desired file.
           (unless shell-process
             (error "Failed to start python shell properly"))
           (pop-to-buffer (process-buffer shell-process))
+          'anaconda-mode
+          'anaconda-eldoc-mode
           (evil-insert-state)))
 #+end_src
 
@@ -530,6 +538,14 @@ and copy it over the desired file.
  '(add-to-list 'company-backends 'company-anaconda))
 
 (add-hook 'python-mode-hook 'anaconda-mode)
+#+end_src
+
+** company-tern
+
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'js2-mode-hook 'tern-mode)
+(eval-after-load "company"
+ '(add-to-list 'company-backends 'company-tern))
 #+end_src
 
 ** helm
@@ -674,6 +690,14 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
  '(js2-bounce-indent-p t)
 )
 #+END_SRC
+
+** skewer-mode
+
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'js2-mode-hook 'skewer-mode)
+(add-hook 'css-mode-hook 'skewer-css-mode)
+(add-hook 'html-mode-hook 'skewer-html-mode)
+#+end_src
 
 ** web-mode
 
@@ -1038,6 +1062,7 @@ prevent losing the selection after a shift operation by re-selecting
     "S" 'src-init
     "r" 'revert-buffer
     "c" 'shell-command
+    "i" 'python-shell
     "Hh" 'helm-howdoi
     "Hi" 'howdoi-query-insert-code-snippet-at-point
     "t" (lambda () (interactive) (evil-ex "%s /foo/bar/g"))
@@ -1093,17 +1118,10 @@ prevent losing the selection after a shift operation by re-selecting
 *** bugs
 **** Whitespace!!!!!
 **** projectile persist known projects
-**** python ipdb snippet
 **** default persistence files
 **** #-files
-**** auto-complete popup offset
 **** undo-tree + fireplace
-**** first reload errors
 **** git gutter lag
-*** mappings
-**** C-x 1
-**** M-<left/right>
-**** magit
 *** basics
 **** jumplist prestist
 **** jumplist helm
