@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: ipdb debugger
+# key: ipdb
+# --
+from ipdb import set_trace; set_trace()$0
