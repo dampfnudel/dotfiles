@@ -1,4 +1,3 @@
-#+TITLE: Emacs configuration file
 #+AUTHOR: Markus Bayer
 #+BABEL: :cache yes
 #+DATE: <2016-06-03 Fr 18:35>
@@ -212,6 +211,12 @@ initial init.d content
 ;; open the configuration
 (find-file (concat user-emacs-directory "emacsrc.org"))
 ;; tangle it
+#+TITLE: Emacs configuration file
+#+AUTHOR: Markus Bayer
+#+BABEL: :cache yes
+#+DATE: <2016-06-03 Fr 18:35>
+#+PROPERTY: header-args
+#+BEGIN_SRC emacs-lisp: tangle no
 (org-babel-tangle)
 ;; load it
 (load-file (concat user-emacs-directory "emacsrc.el"))
@@ -253,8 +258,8 @@ the tangled file is compiled."
     (setq custom-safe-themes t)
     ;; (load-theme 'spacemacs-dark)
     ;; (load-theme 'spacemacs-light)
-    (load-theme 'rebecca)
-
+    ;; (load-theme 'rebecca)
+    (load-theme 'zenburn)
     ;; (load-theme 'reykjavik)
     ;; (load-theme 'darcula)
     ;; (load-theme 'monokai)
@@ -262,7 +267,13 @@ the tangled file is compiled."
     ;; (load-theme 'darktooth)
     ;; set font
     (set-frame-font "Envy Code R 16")
+    #+END_SRC
 
+** symlinks
+
+    #+BEGIN_SRC emacs-lisp
+    ;; follow symbolic links
+    ;; (setq vc-follow-symlinks t)
     #+END_SRC
 
 ** cursor
@@ -311,6 +322,7 @@ the tangled file is compiled."
 
     ;; wrap long lines
     (global-visual-line-mode)
+    ;(set-default 'truncate-lines t)
 
     ;; start fullscreen
     ;(toggle-frame-maximized)
@@ -366,6 +378,7 @@ no forced new line
     (set-face-background 'show-paren-match (face-background 'default))
     (set-face-foreground 'show-paren-match "#FF0097")
     (set-face-attribute 'show-paren-match nil :weight 'extra-bold)
+    (electric-pair-mode)
     #+END_SRC
 
 ** temporary files
@@ -466,6 +479,9 @@ and copy it over the desired file.
 (setq org-highest-priority ?A)
 (setq org-lowest-priority ?Z)
 (setq org-default-priority ?A)
+;; define states
+(setq org-todo-keywords
+       '((sequence "TODO" "NEXT" "BLOCKED" "|" "DONE")))
 ;; concat agenda from this files
 (setq org-agenda-files (append '("~/.notes.org" "~/Documents/org/plan/agenda.org") (file-expand-wildcards "~/Documents/org/cal/*\.org")))
 
@@ -496,7 +512,7 @@ and copy it over the desired file.
 
 ** python
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
 ;(setq python-shell-interpreter "ipython"
 ;      python-shell-interpreter-args "--simple-prompt --pprint")
 (setq python-shell-interpreter "ipython")
@@ -522,31 +538,31 @@ and copy it over the desired file.
           'anaconda-mode
           'anaconda-eldoc-mode
           (evil-insert-state)))
-#+end_src
+#+END_SRC
 
 ** anaconda-mode
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
 (add-hook 'python-mode-hook 'anaconda-mode)
 (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
-#+end_src
+#+END_SRC
 
 ** company-anaconda
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
 (eval-after-load "company"
  '(add-to-list 'company-backends 'company-anaconda))
 
 (add-hook 'python-mode-hook 'anaconda-mode)
-#+end_src
+#+END_SRC
 
 ** company-tern
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
 (add-hook 'js2-mode-hook 'tern-mode)
 (eval-after-load "company"
  '(add-to-list 'company-backends 'company-tern))
-#+end_src
+#+END_SRC
 
 ** helm
 
@@ -693,11 +709,11 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
 
 ** skewer-mode
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
 (add-hook 'js2-mode-hook 'skewer-mode)
 (add-hook 'css-mode-hook 'skewer-css-mode)
 (add-hook 'html-mode-hook 'skewer-html-mode)
-#+end_src
+#+END_SRC
 
 ** web-mode
 
@@ -724,12 +740,11 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
 (add-hook 'web-mode-hook  'my-web-mode-hook)
 #+END_SRC
 
-** smartparens
+** evil-surround
 
 #+BEGIN_SRC emacs-lisp
-(require 'smartparens-config)
-(add-hook 'js-mode-hook #'smartparens-mode)
-(add-hook 'python-mode-hook #'smartparens-mode)
+(require 'evil-surround)
+(global-evil-surround-mode 1)
 #+END_SRC
 
 ** which-key
@@ -875,10 +890,25 @@ fancy eshell prompt with different colors, time, pwd, version control info and h
 (projectile-mode)
 #+END_SRC
 
+** google-translate
+
+#+BEGIN_SRC emacs-lisp
+(setq google-translate-default-source-language "en"
+      google-translate-default-target-language "de")
+#+END_SRC
+
+** smartparens
+
+replaced by electric-pair-mode
+#+BEGIN_SRC emacs-lisp
+;; (require 'smartparens-config)
+;; (add-hook 'js-mode-hook #'smartparens-mode)
+;; (add-hook 'python-mode-hook #'smartparens-mode)
+#+END_SRC+END_SRC
+
 ** new package
 
 #+BEGIN_SRC emacs-lisp
-
 #+END_SRC
 
 * require
@@ -890,7 +920,8 @@ lazy require packages
 
 (dolist (feature
          '(auto-compile             ; auto-compile .el files
-           ;; jedi                     ; auto-completion for python
+           google-translate
+           google-translate-default-ui
            zone
            expand-region
            fireplace
@@ -919,6 +950,48 @@ lazy require packages
 #+END_SRC
 
 * functions
+
+** toggle word case
+#+begin_src elisp
+(defun toggle-word-case ()
+  "Toggle the letter case of current word or text selection.
+Always cycle in this order: Init Caps, ALL CAPS, all lower.
+
+URL `http://ergoemacs.org/emacs/modernization_upcase-word.html'
+Version 2016-01-08"
+  (interactive)
+  (let (
+        (deactivate-mark nil)
+        -p1 -p2)
+    (if (use-region-p)
+        (setq -p1 (region-beginning)
+              -p2 (region-end))
+      (save-excursion
+        (skip-chars-backward "[:alnum:]")
+        (setq -p1 (point))
+        (skip-chars-forward "[:alnum:]")
+        (setq -p2 (point))))
+    (when (not (eq last-command this-command))
+      (put this-command 'state 0))
+    (cond
+     ((equal 0 (get this-command 'state))
+      (upcase-initials-region -p1 -p2)
+      (put this-command 'state 1))
+     ((equal 1  (get this-command 'state))
+      (upcase-region -p1 -p2)
+      (put this-command 'state 2))
+     ((equal 2 (get this-command 'state))
+      (downcase-region -p1 -p2)
+      (put this-command 'state 0)))))
+#+end_src
+** recreate scratch buffer
+#+BEGIN_SRC emacs-lisp
+(defun create-scratch-buffer nil
+    "create a scratch buffer"
+    (interactive)
+    (switch-to-buffer (get-buffer-create "*scratch*"))
+    (lisp-interaction-mode))
+#+END_SRC
 
 ** copy file name to clipboard
 
@@ -975,147 +1048,165 @@ prevent losing the selection after a shift operation by re-selecting
 * keybindings keymappings
 
 #+BEGIN_SRC emacs-lisp
-;; minor mode for keybindings
-(defvar my-keys-minor-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "M-+") 'text-scale-adjust)
-    (define-key map (kbd "M--") 'text-scale-adjust)
-    (define-key map (kbd "M-0") 'text-scale-adjust)
-    (define-key map (kbd "M-e") 'move-end-of-line)
-    (define-key map (kbd "M-b") 'move-beginning-of-line)
-    ;; macOS
-    (define-key map (kbd "M-q") 'save-buffers-kill-terminal)        ; quit
-    (define-key map (kbd "M-w") 'kill-buffer)                       ; close
-    (define-key map (kbd "M-c") 'kill-ring-save)                    ; copy
-    (define-key map (kbd "M-v") 'yank)                              ; paste
-    (define-key map (kbd "M-s") 'save-buffer)                       ; save
-    (define-key map (kbd "M-a") 'mark-whole-buffer)                 ; select all
-    (define-key map (kbd "M-x") 'helm-M-x)
-    (define-key map (kbd "\C-cl") 'org-store-link)
-    (define-key map (kbd "\C-ca") 'org-agenda)
-    (define-key map (kbd "C-+") 'er/expand-region)
-    ;; TOOD Backspace?
-    (define-key map (kbd "DEL") 'backward-delete-char)
-    (define-key map (kbd "C--") 'evilnc-comment-or-uncomment-lines)
+  ;; minor mode for keybindings
+  (
+   defvar my-keys-minor-mode-map
+    (let ((map (make-sparse-keymap)))
+      (define-key map (kbd "M-+") 'text-scale-adjust)
+      (define-key map (kbd "M--") 'text-scale-adjust)
+      (define-key map (kbd "M-0") 'text-scale-adjust)
+      (define-key map (kbd "M-e") 'move-end-of-line)
+      (define-key map (kbd "M-b") 'move-beginning-of-line)
+      ;; macOS
+      (define-key map (kbd "M-q") 'save-buffers-kill-terminal)        ; quit
+      (define-key map (kbd "M-w") 'kill-buffer)                       ; close
+      (define-key map (kbd "M-c") 'kill-ring-save)                    ; copy
+      (define-key map (kbd "M-v") 'yank)                              ; paste
+      (define-key map (kbd "M-s") 'save-buffer)                       ; save
+      (define-key map (kbd "M-a") 'mark-whole-buffer)                 ; select all
+      (define-key map (kbd "M-x") 'helm-M-x)
+      (define-key map (kbd "\C-cl") 'org-store-link)
+      (define-key map (kbd "\C-ca") 'org-agenda)
+      (define-key map (kbd "C-+") 'er/expand-region)
+      ;; TOOD Backspace?
+      (define-key map (kbd "DEL") 'backward-delete-char)
+      (define-key map (kbd "C--") 'evilnc-comment-or-uncomment-lines)
 
-    ;; evil keymappings
-    ;; normal state
-    (define-key evil-normal-state-map (kbd "M-o") 'helm-find-files)
-    (define-key evil-normal-state-map (kbd "M-b") 'helm-buffers-list)
-    (define-key evil-normal-state-map (kbd "+") 'er/expand-region)
-    (define-key evil-normal-state-map (kbd "f") 'ace-jump-mode)
-    (define-key evil-normal-state-map (kbd "B") 'evil-first-non-blank)
-    (define-key evil-normal-state-map (kbd "E") 'evil-end-of-line)
-    (define-key evil-normal-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
-    (define-key evil-normal-state-map (kbd "ä") 'delete-other-windows)
-    (define-key evil-normal-state-map (kbd "Ä") 'evil-search-highlight-persist-remove-all)
-    (define-key evil-normal-state-map (kbd "ö") 'avy-goto-char)
-    (define-key evil-normal-state-map (kbd "Ö") 'avy-goto-line)
-    (define-key evil-normal-state-map (kbd "f") 'avy-goto-char-in-line)
-    (define-key evil-normal-state-map (kbd "C-j") 'scroll-up-command)
-    (define-key evil-normal-state-map (kbd "C-k") 'scroll-down-command)
+      ;; evil keymappings
+      ;; normal state
+      (define-key evil-normal-state-map (kbd "M-o") 'helm-find-files)
+      (define-key evil-normal-state-map (kbd "M-b") 'helm-buffers-list)
+      (define-key evil-normal-state-map (kbd "+") 'er/expand-region)
+      (define-key evil-normal-state-map (kbd "f") 'ace-jump-mode)
+      (define-key evil-normal-state-map (kbd "B") 'evil-first-non-blank)
+      (define-key evil-normal-state-map (kbd "E") 'evil-end-of-line)
+      (define-key evil-normal-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
+      (define-key evil-normal-state-map (kbd "ä") 'delete-other-windows)
+      (define-key evil-normal-state-map (kbd "Ä") 'evil-search-highlight-persist-remove-all)
+      (define-key evil-normal-state-map (kbd "ö") 'avy-goto-char)
+      (define-key evil-normal-state-map (kbd "Ö") 'avy-goto-line)
+      (define-key evil-normal-state-map (kbd "f") 'avy-goto-char-in-line)
+      (define-key evil-normal-state-map (kbd "C-j") 'scroll-up-command)
+      (define-key evil-normal-state-map (kbd "C-k") 'scroll-down-command)
+      (define-key evil-normal-state-map (kbd "~") 'toggle-word-case)
+      (define-key evil-normal-state-map (kbd "º") 'evil-forward-paragraph)      ;; <alt-j>
+      (define-key evil-normal-state-map (kbd "∆") 'evil-backward-paragraph)     ;; <alt-k>
 
-    ;; visual line
-    (define-key evil-visual-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
-    ; Overload shifts so that they don't lose the selection
-    (define-key evil-visual-state-map (kbd ">") 'evil-shift-right-visual)
-    (define-key evil-visual-state-map (kbd "<") 'evil-shift-left-visual)
-    (define-key evil-visual-state-map [tab] 'evil-shift-right-visual)
-    (define-key evil-visual-state-map [S-tab] 'evil-shift-left-visual)
-    (define-key evil-visual-state-map (kbd "B") 'evil-first-non-blank)
-    (define-key evil-visual-state-map (kbd "E") 'evil-end-of-line)
+      ;; visual line
+      (define-key evil-visual-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
+      ; Overload shifts so that they don't lose the selection
+      (define-key evil-visual-state-map (kbd ">") 'evil-shift-right-visual)
+      (define-key evil-visual-state-map (kbd "<") 'evil-shift-left-visual)
+      (define-key evil-visual-state-map [tab] 'evil-shift-right-visual)
+      (define-key evil-visual-state-map [S-tab] 'evil-shift-left-visual)
+      (define-key evil-visual-state-map (kbd "B") 'evil-first-non-blank)
+      (define-key evil-visual-state-map (kbd "E") 'evil-end-of-line)
 
-    ;; evil-leader mappings
-    (evil-leader/set-key
-    "k" 'evil-window-up
-    "j" 'evil-window-down
-    "h" 'evil-window-left
-    "l" 'evil-window-right
-    "x" 'delete-other-windows    ; duplicated
-    "y" 'helm-yas-complete
-    "f" 'helm-for-files
-    "a" 'helm-ag-project-root
-    "O" 'helm-find-files
-    "oh" 'helm-org-in-buffer-headings
-    "oa" 'helm-org-agenda-files-headings
-    "oc" 'org-reset-checkbox-state-subtre
-    "oe" 'org-export-dispatch
-    "SPC" 'helm-buffers-list
-    "bb" 'bookmark-set
-    "bp" 'projectile-add-known-project
-    "g" 'helm-google-suggest
-    "TAB" 'mode-line-other-buffer               ; previous buffer (like 'helm-buffer-list "RET")
-    "D" 'dumb-jump-go
-    "d" 'anaconda-mode-show-doc
-    "*" 'helm-swoop
-    "ö" 'evil-search-highlight-persist-remove-all        ; duplicated
-    "l" 'helm-semantic-or-imenu
-    "p" 'helm-projectile
-    "P" 'helm-projectile-find-file-in-known-projects
-    "sp" 'projectile-switch-project
-    ;; TOTEST
-    "A" 'helm-projectile-ag
-    "m" 'magit-status
-    "ss" 'wg-save-session
-    "so" 'wg-open-session
-    "sc" 'wg-save-session-as
-    "S" 'src-init
-    "r" 'revert-buffer
-    "c" 'shell-command
-    "i" 'python-shell
-    "Hh" 'helm-howdoi
-    "Hi" 'howdoi-query-insert-code-snippet-at-point
-    "t" (lambda () (interactive) (evil-ex "%s /foo/bar/g"))
-    "w/" 'find-file-other-window)
+      ;; evil-leader mappings
+      (evil-leader/set-key
+      "/" 'evil-command-window-search-forward
+      "k" 'evil-window-up
+      "j" 'evil-window-down
+      "h" 'evil-window-left
+      "l" 'evil-window-right
+      "x" 'delete-other-windows    ; duplicated
+      "y" 'helm-yas-complete
+      "f" 'helm-for-files
+      "a" 'helm-ag-project-root
+      "O" 'helm-find-files
+      "oh" 'helm-org-in-buffer-headings
+      "oa" 'helm-org-agenda-files-headings
+      "oc" 'org-reset-checkbox-state-subtree
+      "oe" 'org-export-dispatch
+      "ota" 'org-time-stamp
+      "oti" 'org-time-stamp-inactive
+      "SPC" 'helm-buffers-list
+      "bb" 'bookmark-set
+      "bp" 'projectile-add-known-project
+      "gn" 'git-gutter:next-hunk
+      "gp" 'git-gutter:previous-hunk
+      "gs" 'helm-google-suggest
+      "TAB" 'mode-line-other-buffer               ; previous buffer (like 'helm-buffer-list "RET")
+      "D" 'dumb-jump-go
+      "d" 'anaconda-mode-show-doc
+      "*" 'helm-swoop
+      "ö" 'evil-search-highlight-persist-remove-all        ; duplicated
+      "p" 'helm-projectile
+      "P" 'helm-projectile-find-file-in-known-projects
+      "sp" 'projectile-switch-project
+      ;; TOTEST
+      "A" 'helm-projectile-ag
+      "m" 'magit-status
+      "nn" 'find-file
+      "ns" 'create-scratch-buffer
+      "ss" 'wg-save-session
+      "so" 'wg-open-session
+      "sc" 'wg-save-session-as
+      "S" 'src-init
+      "r" 'revert-buffer
+      "C" 'shell-command
+      "ci" 'org-clock-in
+      "co" 'org-clock-out
+      "cl" 'org-clock-in-last
+      "cs" 'org-clock-select-task
+      "i" 'python-shell
+      "Hh" 'helm-howdoi
+      "Hi" 'howdoi-query-insert-code-snippet-at-point
+      "tl" 'helm-semantic-or-imenu
+      "tt" 'google-translate-at-point
+      "tq" 'google-translate-query-translate
+      ;; "t" (lambda () (interactive) (evil-ex "%s /foo/bar/g"))
+      "w/" 'find-file-other-window)
 
-    ;; macOS
-    ;; map command key to meta
-    (if (boundp 'ns-command-modifier)
-        (setq ns-command-modifier 'meta))
-    (if (boundp 'ns-option-modifier)
-        (setq ns-option-modifier nil))
+      ;; macOS
+      ;; map command key to meta
+      (if (boundp 'ns-command-modifier)
+          (setq ns-command-modifier 'meta))
+      (if (boundp 'ns-option-modifier)
+          (setq ns-option-modifier nil))
 
-    ;; make use of <Meta-Up> <Meta-Down>
-    ;; TODO double mapped
-    (define-key input-decode-map "\e\eOA" [(meta up)])
-    (define-key input-decode-map "\e\eOB" [(meta down)])
-    (global-set-key [(meta up)] 'scroll-down-command)
-    (global-set-key [(meta down)] 'scroll-up-command)
+      ;; make use of <Meta-Up> <Meta-Down>
+      ;; TODO double mapped
+      (define-key input-decode-map "\e\eOA" [(meta up)])
+      (define-key input-decode-map "\e\eOB" [(meta down)])
+      (global-set-key [(meta up)] 'scroll-down-command)
+      (global-set-key [(meta down)] 'scroll-up-command)
 
-    map)
-  "my-keys-minor-mode keymap.")
+      map)
+    "my-keys-minor-mode keymap.")
 
-(define-minor-mode my-keys-minor-mode
-  "A minor mode so that my key settings override annoying major modes."
-  :init-value t
-  :lighter " my-keys")
+  (define-minor-mode my-keys-minor-mode
+    "A minor mode so that my key settings override annoying major modes."
+    :init-value t
+    :lighter " my-keys")
 
-(my-keys-minor-mode 1)
+  (my-keys-minor-mode 1)
 
 
-;; (template insertion
-;; TODO use yasnippet
-(defun insert-org-checkbox ()
-  (interactive)
-  (insert "- [ ] "))
-(global-set-key (kbd "M--") 'insert-checkbox)
+  ;; (template insertion
+  ;; TODO use yasnippet
+  (defun insert-org-checkbox ()
+    (interactive)
+    (insert "- [ ] "))
+  (global-set-key (kbd "M--") 'insert-checkbox)
 
-(defun insert-org-minimal-theme ()
-  (interactive)
-    (insert "#+SETUPFILE: ~/Settings/dotfiles/org-minimal-theme.setup"))
+  (defun insert-org-minimal-theme ()
+    (interactive)
+      (insert "#+SETUPFILE: ~/Settings/dotfiles/org-minimal-theme.setup"))
 
-(defun insert-org-title ()
-  (interactive)
-  (insert "#+TITLE: "))
+  (defun insert-org-title ()
+    (interactive)
+    (insert "#+TITLE: "))
 
-(defun insert-src ()
-  (interactive)
-  (insert "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC"))
+  (defun insert-src ()
+    (interactive)
+    (insert "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC"))
 #+END_SRC
 
 * Meta
 ** Todos
 *** bugs
+**** evil paste into /
 **** Whitespace!!!!!
 **** projectile persist known projects
 **** default persistence files
@@ -1167,19 +1258,8 @@ M-x insert-kbd-macro
 http://oremacs.com/2015/01/14/repeatable-commands/
 
 *** flycheck
-- error list für alle source files öffnen
-- error list buffer style darf keine anderen minibuffer betreffen
 
 *** yasnippet
-- [ ] <---
-- [ ] todo
-- [ ] ipdb
-- [ ] python
-- [ ] js
-- [ ] org-checkbox
-- [ ] org-minimal-theme
-- [ ] org-title
-- [ ] emacs-lisp src
 
 *** evil
 **** g; persistieren
@@ -1215,12 +1295,17 @@ https://github.com/Valloric/MatchTagAlways
 https://github.com/redguardtoo/evil-matchit
 
 *** other
-https://github.com/skeeto/skewer-mode
+php auto yasnippet
+auto-yasnippet
+https://github.com/pidu/git-timemachine
+https://org-trello.github.io/
 https://github.com/darksmile/cheatsheet
 https://github.com/soutaro/hungry-delete.el
 https://github.com/mrkkrp/fix-word
 https://github.com/areina/helm-dash
 https://github.com/cadadr/forecast.el
+
+https://github.com/redguardtoo/cliphist
 
 
 https://www.quora.com/What-are-some-of-the-most-useful-extensions-for-Emacs
@@ -1248,6 +1333,7 @@ https://github.com/zk-phi/indent-guide
 https://www.emacswiki.org/emacs/ElDoc
 https://github.com/skeeto/joymacs
 https://github.com/yati-sagade/orch
+https://github.com/zk-phi/phi-grep
 **** ispell
 https://www.emacswiki.org/emacs/InteractiveSpell
 **** stack exchange
@@ -1265,6 +1351,7 @@ https://github.com/jorgenschaefer/elpy
 https://www.emacswiki.org/emacs/ArtistMode
 **** paredit
 http://danmidwood.com/content/2014/11/21/animated-paredit.html
+
 
 *** Themes
 **** unported vim themes
@@ -1301,6 +1388,8 @@ https://joaotavora.github.io/yasnippet/snippet-development.html
 https://www.youtube.com/watch?v=HKF41ivkBb0
 https://tuhdo.github.io/helm-intro.html
 http://sachachua.com/blog/wp-content/uploads/2013/05/How-to-Learn-Emacs-v2-Large.png
+
+http://www.gigamonkeys.com/book/
 
 *** Sites
 https://www.gnu.org/software/emacs/

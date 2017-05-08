@@ -285,6 +285,8 @@
 # }}}
 
 # hashes / named directories {{{
+    hash -d mobile_org=root@192.168.178.41:/storage/sdcard0/org_m/
+    hash -d tmp=$HOME/tmp
     hash -d ai=$HOME/Workspace/ai
     hash -d ast=$HOME/Workspace/fba/ast
     hash -d bay=$HOME/Workspace/bay
@@ -299,9 +301,6 @@
     hash -d dropbox=$HOME/Dropbox
     hash -d firma=$HOME/Documents/firma
     hash -d fzf_marks=$HOME/Workspace/fzf_marks
-    hash -d gist_vim=$HOME/Workspace/gists/vim_cheatsheet
-    hash -d gist_zsh=$HOME/Workspace/gists/emacs_cheatsheet
-    hash -d gist_zsh=$HOME/Workspace/gists/zsh_cheatsheet
     hash -d gists=$HOME/Workspace/gists
     hash -d hackedHN=$HOME/Workspace/hackedHN
     hash -d i32=/Volumes/INGOT32
@@ -336,13 +335,11 @@
     hash -d wil=$HOME/Workspace/wil
     hash -d emacs.d=$HOME/.emacs.d
     hash -d snippets=$HOME/.emacs.d/snippets
+    hash -d amazin=$HOME/Workspace/fba/amazin
 
     # files
-    hash -d emacs_cheatsheet=$HOME/Workspace/gists/emacs_cheatsheet/emacs.md
-    hash -d emacsrc=$HOME/Settings/dotfiles/emacsrc.el
-    hash -d vim_cheatsheet=$HOME/Workspace/gists/vim_cheatsheet/vim.md
+    hash -d emacsrc=$HOME/Settings/dotfiles/emacsrc.org
     hash -d vimrc=$HOME/Settings/dotfiles/vimrc.vim
-    hash -d zsh_cheatsheet=$HOME/Workspace/gists/zsh_cheatsheet/zsh.md
     hash -d zsh_history=$HOME/.zsh_history
     hash -d zshrc=$HOME/Settings/dotfiles/zshrc.zsh
 # }}}
@@ -616,9 +613,7 @@
         alias bpython='$WORKON_HOME/python3.4.1/bin/bpython'
 
         # vim {
-            alias mvim=${VIM_EDITOR}
             alias cvim='/usr/local/bin/vim'
-            alias vim=${VIM_EDITOR_TAB}
 
         # }
 
@@ -699,6 +694,20 @@
 # }}}
 
 # functions {{{
+    # fileoperations {
+        rename_prefix_iterator () {
+            local prefix=$1
+            local pattern=$2
+            i=1
+            for file in *$pattern*; do
+                filename=$(basename "$file")
+                extension="${filename##*.}"
+                filename="${filename%.*}"
+                cp $file $(printf "$prefix-%0.3d.$extension" $i)
+                i=$((i + 1))
+            done
+        }
+    # }
     # echo {
         echo_timestamp () {
             echo $(date +%Y-%m-%d-%H-%M-%S)
@@ -1100,6 +1109,7 @@ FZF-EOF"
     # emacs {
         emacs () {
             if [ $# -eq 0 ]; then
+                # echo "open -a /usr/local/Cellar/emacs/25.1/Emacs.app"
                 # open -a Emacs.app
                 open -a /usr/local/Cellar/emacs/25.1/Emacs.app
                 eval ${EDITOR}
@@ -1110,17 +1120,32 @@ FZF-EOF"
                 return 0
             fi
             for var in "$@"; do
+                echo "creating file: $var"
+                # echo "${EDITOR} $var"
+
                 touch "$var"
-                eval ${EDITOR} "$var"
+                eval "${EDITOR} $var"
             done
         }
         alias e='emacs'
     # }
 
+    # vim {
+        vim () {
+            if [ $# -eq 0 ]; then
+                # open -a Emacs.app
+                eval ${VIM_EDITOR}
+                return 0
+            fi
+
+            eval ${VIM_EDITOR_TAB} "$@"
+        }
+    # }
+
     # git {
         # git diff
         gd () {
-            git diff $1 $2
+            git diff --color $1 $2|diff-so-fancy
         }
 
         # git add
@@ -1173,7 +1198,7 @@ FZF-EOF"
         # open a gist repository in the browser
         git_gist_remote_url () {
             local gist_url
-            gist_url="https://gist.github.com/embayer/"$(git config --get remote.origin.url | cut -c21- | sed 's/\.git$//')
+            gist_url="https://gist.github.com/embayer/"$(git config --get remote.origin.url | cut -c24- | sed 's/\.git$//')
             echo "$gist_url"
             open "$gist_url"
         }
@@ -1413,7 +1438,7 @@ FZF-EOF"
                 echo "$timestamp\t$notification""\r"
                 echo "$timestamp\t$notification""\r" >> ~/.pomodoro
 
-                local secs=$((25 * 60))
+                local secs=$((1))
                 # display a timer
                 while [ $secs -gt 0 ]; do
                     # TODO: format minutes
@@ -1421,6 +1446,7 @@ FZF-EOF"
                     sleep 1
                     : $((secs--))
                 done
+                echo "display notification \"$notification\" with title \"$title\" subtitle \"$subtitle\" sound name \"$soundname\""
                 osascript -e "display notification \"$notification\" with title \"$title\" subtitle \"$subtitle\" sound name \"$soundname\""
             }
             alias pom='pomodoro'
@@ -1513,6 +1539,7 @@ FZF-EOF"
             zipf () { zip -r "$1".zip "$1" ; }
 
             # extract an archive
+            # TODO target
             extract () {
                 if [ -f $1 ] ; then
                     case $1 in

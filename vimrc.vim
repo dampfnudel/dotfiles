@@ -123,7 +123,6 @@
     Plugin 'junegunn/vim-journal'
     Plugin 'godlygeek/csapprox'
     Plugin 'davidhalter/jedi-vim'
-    Plugin 'jceb/vim-orgmode'
 
     " plugin examples
     " {
@@ -425,6 +424,7 @@
 
     " clear highlights
     map <silent> ö :nohl<Enter>
+    map <silent> <Leader>ö :nohl<Enter>
 
     " splits {
         " max out the height of the current split
@@ -635,6 +635,11 @@
 " }}}
 
 " plugin settings {{{
+    " TComment
+    " {
+        nnoremap <Leader>- :TComment<CR>
+    " }
+
     " Airline
     " {
         if has('gui_running')
@@ -792,7 +797,6 @@
     " {
         nnoremap <Leader>gu :GundoToggle<CR>
     " }
-
 
     " tabbar
     " {
