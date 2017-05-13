@@ -508,6 +508,13 @@ and copy it over the desired file.
 ;; automatically insert list items
 ;; required by require
 (add-hook 'org-mode-hook (lambda () (org-autolist-mode)))
+
+;; org-capture
+(setq org-default-notes-file "~/Documents/org/backlog.org")
+
+(setq org-capture-templates
+'(("t" "Todo" entry (file "~/Documents/org/backlog.org")
+        "* TODO %?")))
 #+END_SRC
 
 ** python
@@ -1116,7 +1123,8 @@ prevent losing the selection after a shift operation by re-selecting
       "O" 'helm-find-files
       "oh" 'helm-org-in-buffer-headings
       "oa" 'helm-org-agenda-files-headings
-      "oc" 'org-reset-checkbox-state-subtree
+      "oc" 'org-capture
+      "or" 'org-reset-checkbox-state-subtree
       "oe" 'org-export-dispatch
       "ota" 'org-time-stamp
       "oti" 'org-time-stamp-inactive
