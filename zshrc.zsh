@@ -1307,6 +1307,11 @@ FZF-EOF"
 
     # actions {
 
+        # convert all xlsx files in pwd to csv
+        # pip install xlsx2csv required
+        xlsx2csv_in_dir () {
+             for filename in ./*.xlsx; do xlsx2csv $filename ${filename:r}.csv; done
+        }
         # colored man pages
         man () {
             env \
