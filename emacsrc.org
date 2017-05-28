@@ -1134,6 +1134,7 @@ prevent losing the selection after a shift operation by re-selecting
       "gn" 'git-gutter:next-hunk
       "gp" 'git-gutter:previous-hunk
       "gs" 'helm-google-suggest
+      "v" 'visual-line-mode
       "TAB" 'mode-line-other-buffer               ; previous buffer (like 'helm-buffer-list "RET")
       "D" 'dumb-jump-go
       "d" 'anaconda-mode-show-doc
@@ -1376,8 +1377,7 @@ https://github.com/emacsfodder/emacs-theme-editor
 *** Yasnippet
 *** Dired
 
-** Resourcen
-chrome-extension://chphlpgkkbolifaimnlloiipkdnihall/onetab.html
+** Ressources
 *** Learn
 https://juanjoalvarez.net/es/detail/2014/sep/19/vim-emacsevil-chaotic-migration-guide/
 https://www.emacswiki.org/emacs/KeyboardMacros
@@ -1409,6 +1409,7 @@ http://emacs-fu.blogspot.de/
 http://emacsredux.com/
 http://emacs.sexy/
 http://sachachua.com/blog/
+http://endlessparentheses.com/
 
 *** Lists
 http://emacsrocks.com/
