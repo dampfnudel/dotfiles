@@ -913,6 +913,13 @@ replaced by electric-pair-mode
 ;; (add-hook 'python-mode-hook #'smartparens-mode)
 #+END_SRC+END_SRC
 
+** avy
+
+only use the current window for candidates.
+#+BEGIN_SRC emacs-lisp
+    (setq avy-all-windows nil)
+#+END_SRC
+
 ** new package
 
 #+BEGIN_SRC emacs-lisp
@@ -958,6 +965,20 @@ lazy require packages
 
 * functions
 
+** daily journal
+#+begin_src elisp
+(defun daily ()
+    "setup journal windows and buffers"
+    (interactive)
+    (delete-other-windows)
+    (find-file "~/Documents/org/journal/journal.org")
+    (split-window-right)
+    (evil-window-right 1)
+    (find-file "~/Documents/org/plan/agenda.org")
+    (evil-window-left 1)
+    (evil-goto-first-line))
+#+end_src
+
 ** toggle word case
 #+begin_src elisp
 (defun toggle-word-case ()
@@ -991,6 +1012,7 @@ Version 2016-01-08"
       (downcase-region -p1 -p2)
       (put this-command 'state 0)))))
 #+end_src
+
 ** recreate scratch buffer
 #+BEGIN_SRC emacs-lisp
 (defun create-scratch-buffer nil
@@ -1088,11 +1110,12 @@ prevent losing the selection after a shift operation by re-selecting
       (define-key evil-normal-state-map (kbd "B") 'evil-first-non-blank)
       (define-key evil-normal-state-map (kbd "E") 'evil-end-of-line)
       (define-key evil-normal-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
-      (define-key evil-normal-state-map (kbd "ä") 'delete-other-windows)
-      (define-key evil-normal-state-map (kbd "Ä") 'evil-search-highlight-persist-remove-all)
-      (define-key evil-normal-state-map (kbd "ö") 'avy-goto-char)
-      (define-key evil-normal-state-map (kbd "Ö") 'avy-goto-line)
-      (define-key evil-normal-state-map (kbd "f") 'avy-goto-char-in-line)
+      ;; (define-key evil-normal-state-map (kbd "ä") 'delete-other-windows)
+      ;; (define-key evil-normal-state-map (kbd "Ä") 'evil-search-highlight-persist-remove-all)
+      (define-key evil-normal-state-map (kbd "ö") 'avy-goto-line)
+      (define-key evil-normal-state-map (kbd "Ö") 'avy-goto-char)
+      (define-key evil-normal-state-map (kbd "f") 'avy-goto-char-timer)
+      (define-key evil-normal-state-map (kbd "F") 'avy-goto-char-in-line)
       (define-key evil-normal-state-map (kbd "C-j") 'scroll-up-command)
       (define-key evil-normal-state-map (kbd "C-k") 'scroll-down-command)
       (define-key evil-normal-state-map (kbd "~") 'toggle-word-case)
@@ -1112,6 +1135,8 @@ prevent losing the selection after a shift operation by re-selecting
       ;; evil-leader mappings
       (evil-leader/set-key
       "/" 'evil-command-window-search-forward
+      "|" 'split-window-right
+      "-" 'split-window-below
       "k" 'evil-window-up
       "j" 'evil-window-down
       "h" 'evil-window-left
