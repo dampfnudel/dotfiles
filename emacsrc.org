@@ -292,6 +292,14 @@ the tangled file is compiled."
       (save-place-mode 1))
     #+END_SRC
 
+** encryption
+
+#+BEGIN_SRC elisp
+    (require 'epa-file)
+    (custom-set-variables '(epg-gpg-program  "/usr/local/bin/gpg"))
+    (epa-file-enable)
+#+END_SRC
+
 ** UI                                                               :manual:
 
     #+BEGIN_SRC emacs-lisp
@@ -965,18 +973,30 @@ lazy require packages
 
 * functions
 
+** yank line without newline
+#+BEGIN_SRC elisp
+    (defun yank-line-content ()
+        "yank line without newline"
+        (interactive)
+        (evil-yank 1 5))
+#+END_SRC
+
 ** daily journal
 #+begin_src elisp
-(defun daily ()
-    "setup journal windows and buffers"
-    (interactive)
-    (delete-other-windows)
-    (find-file "~/Documents/org/journal/journal.org")
-    (split-window-right)
-    (evil-window-right 1)
-    (find-file "~/Documents/org/plan/agenda.org")
-    (evil-window-left 1)
-    (evil-goto-first-line))
+    (defun daily ()
+        "setup journal windows and buffers"
+        (interactive)
+        (delete-other-windows)
+        (find-file "~/Documents/org/journal.org")
+        (split-window-right)
+        (evil-window-right 1)
+        (find-file "~/Documents/org/agenda.org")
+        (evil-window-left 1)
+        (evil-goto-first-line)
+        (evil-open-above 0)
+        (evil-open-above 0)
+        (insert "day")
+        (yas-expand))
 #+end_src
 
 ** toggle word case
@@ -1121,6 +1141,9 @@ prevent losing the selection after a shift operation by re-selecting
       (define-key evil-normal-state-map (kbd "~") 'toggle-word-case)
       (define-key evil-normal-state-map (kbd "º") 'evil-forward-paragraph)      ;; <alt-j>
       (define-key evil-normal-state-map (kbd "∆") 'evil-backward-paragraph)     ;; <alt-k>
+      (define-key evil-normal-state-map (kbd "u") 'delete-backward-char)
+      (define-key evil-normal-state-map (kbd "U") 'undo-tree-undo)
+      (define-key evil-normal-state-map (kbd "Y") 'yank-line-content)
 
       ;; visual line
       (define-key evil-visual-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
@@ -1242,8 +1265,9 @@ prevent losing the selection after a shift operation by re-selecting
 *** bugs
 **** evil paste into /
 **** Whitespace!!!!!
-**** projectile persist known projects
-**** default persistence files
+**** persistence
+***** projectile persist known projects
+***** default persistence files
 **** #-files
 **** undo-tree + fireplace
 **** git gutter lag
@@ -1329,6 +1353,7 @@ https://github.com/Valloric/MatchTagAlways
 https://github.com/redguardtoo/evil-matchit
 
 *** other
+https://github.com/edkolev/evil-goggles
 php auto yasnippet
 auto-yasnippet
 https://github.com/pidu/git-timemachine
