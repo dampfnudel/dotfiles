@@ -293,10 +293,8 @@ the tangled file is compiled."
     #+END_SRC
 
 ** encryption
-https://www.emacswiki.org/emacs/mc-auto-encrypt.el
 
 #+BEGIN_SRC elisp
-   (require 'epa-file)
    (custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
 #+END_SRC
 
