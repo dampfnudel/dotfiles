@@ -975,10 +975,14 @@ lazy require packages
 
 ** yank line without newline
 #+BEGIN_SRC elisp
-    (defun yank-line-content ()
-        "yank line without newline"
+    (defun copy-line ()
         (interactive)
-        (evil-yank 1 5))
+            (save-excursion
+              (back-to-indentation)
+              (kill-ring-save
+               (point)
+               (line-end-position)))
+               (message "1 line copied"))
 #+END_SRC
 
 ** daily journal
@@ -1141,9 +1145,9 @@ prevent losing the selection after a shift operation by re-selecting
       (define-key evil-normal-state-map (kbd "~") 'toggle-word-case)
       (define-key evil-normal-state-map (kbd "º") 'evil-forward-paragraph)      ;; <alt-j>
       (define-key evil-normal-state-map (kbd "∆") 'evil-backward-paragraph)     ;; <alt-k>
-      (define-key evil-normal-state-map (kbd "u") 'delete-backward-char)
-      (define-key evil-normal-state-map (kbd "U") 'undo-tree-undo)
-      (define-key evil-normal-state-map (kbd "Y") 'yank-line-content)
+      (define-key evil-normal-state-map (kbd "U") 'delete-backward-char)
+      (define-key evil-normal-state-map (kbd "u") 'undo-tree-undo)
+      (define-key evil-normal-state-map (kbd "Y") 'copy-line)
 
       ;; visual line
       (define-key evil-visual-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
