@@ -95,6 +95,11 @@
     #     autoload -U compinit && compinit
     # #}
 
+    # encryption {
+        GPG_TTY=$(tty)
+        export GPG_TTY
+    # }
+
     # dirstack {
         # usage:
         # $ dirs
@@ -694,6 +699,16 @@
 # }}}
 
 # functions {{{
+            # tools {
+            list_background_images () {
+                local url=$1
+                curl $url|awk -F\" '{for(i=0;++i<=NF;){if($i ~ /^http/ && $i !~ "google\|cache:"){print $i}}}'|grep '.*\.\(jpg\|JPG\|png\|PNG\|gif\|GIF\)'
+            }
+            list_urls () {
+                local url=$1
+                curl $url|sed -n 's/.*href="\([^"]*\).*/\1/p'
+            }
+            # }
     # fileoperations {
         rename_prefix_iterator () {
             local prefix=$1
