@@ -292,7 +292,7 @@ the tangled file is compiled."
       (save-place-mode 1))
     #+END_SRC
 
-** encryption
+** gpg encryption
 
 #+BEGIN_SRC elisp
    (custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
@@ -1103,6 +1103,7 @@ prevent losing the selection after a shift operation by re-selecting
   (
    defvar my-keys-minor-mode-map
     (let ((map (make-sparse-keymap)))
+      (define-key map (kbd "M-t") 'toggle-word-case)
       (define-key map (kbd "M-+") 'text-scale-adjust)
       (define-key map (kbd "M--") 'text-scale-adjust)
       (define-key map (kbd "M-0") 'text-scale-adjust)
@@ -1125,6 +1126,8 @@ prevent losing the selection after a shift operation by re-selecting
 
       ;; evil keymappings
       ;; normal state
+      ;; (define-key evil-normal-state-map (kbd "C-h") 'delete-forward-char)
+      (define-key evil-normal-state-map (kbd "C-d") 'delete-backward-char)
       (define-key evil-normal-state-map (kbd "M-o") 'helm-find-files)
       (define-key evil-normal-state-map (kbd "M-b") 'helm-buffers-list)
       (define-key evil-normal-state-map (kbd "+") 'er/expand-region)
@@ -1178,6 +1181,7 @@ prevent losing the selection after a shift operation by re-selecting
       "oe" 'org-export-dispatch
       "ota" 'org-time-stamp
       "oti" 'org-time-stamp-inactive
+      "odc" 'org-table-blank-field
       "SPC" 'helm-buffers-list
       "bb" 'bookmark-set
       "bp" 'projectile-add-known-project
@@ -1395,8 +1399,11 @@ https://www.emacswiki.org/emacs/ElDoc
 https://github.com/skeeto/joymacs
 https://github.com/yati-sagade/orch
 https://github.com/zk-phi/phi-grep
+https://github.com/alphapapa/helm-org-rifle
+https://github.com/areina/helm-dash
 **** ispell
 https://www.emacswiki.org/emacs/InteractiveSpell
+http://blog.binchen.org/posts/what-s-the-best-spell-check-set-up-in-emacs.html
 **** stack exchange
 https://github.com/vermiculus/sx.el
 **** ctags
@@ -1412,6 +1419,13 @@ https://github.com/jorgenschaefer/elpy
 https://www.emacswiki.org/emacs/ArtistMode
 **** paredit
 http://danmidwood.com/content/2014/11/21/animated-paredit.html
+**** JSON
+http://wikemacs.org/wiki/Json#json-navigator_-_navigate_json_presented_as_a_tree
+https://www.reddit.com/r/emacs/comments/6hdsjm/jsonnavigator_xpathwalker_jsonsnatcher_and_all/
+**** Help
+https://github.com/Wilfred/helpful
+**** Modeline
+https://www.masteringemacs.org/article/hiding-replacing-modeline-strings
 
 
 *** Themes
