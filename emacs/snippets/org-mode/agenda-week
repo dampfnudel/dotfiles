@@ -2,16 +2,17 @@
 # name: agenda-week
 # key: week
 # --
-* Woche `(format-time-string "<%Y-%m-%d %a>")` - `(format "<%s>" (org-read-date nil nil "+7"))`
-
+* Woche `(format-time-string "[%Y-%m-%d %a]")` - `(format "[%s Mo]" (org-read-date nil nil "+7"))`
 ** Fokus
 *** $1
-
-** Sozialleben
-*** $2
-
-** Tasks
+** Aufgaben
+*** TODO $2
+** Verabredungen
 *** $3
-
 ** Termine
 *** $4
+** Lernen
+*** $5
+** Review
+*** Erfolge
+

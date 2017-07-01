@@ -1,5 +1,7 @@
 # Created by https://www.gitignore.io/api/macos,emacs,python,jetbrains,vim
 
+project.org
+
 ### Emacs ###
 .yas-compiled-snippets.el
 # -*- mode: gitignore; -*-
