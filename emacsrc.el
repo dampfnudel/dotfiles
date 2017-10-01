@@ -1,5 +1,16 @@
 (custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
 
+(defun kill-ring-save-until (x)
+  "kill-ring-save the line at point until the linenumber you pass."
+  (interactive "nUntil: ")
+  (setq offset (- x (line-number-at-pos)))
+  (save-excursion
+    (move-beginning-of-line nil)
+    (set-mark-command nil)
+    (forward-line offset)
+    (move-end-of-line nil)
+    (kill-ring-save (region-beginning) (region-end)))
+  (message "yanked %i lines" (1+ offset)))
 
 (defun copy-line ()
     (interactive)
@@ -66,6 +77,7 @@ Version 2016-01-08"
          ("org" . "http://orgmode.org/elpa/")
          ("melpa" . "https://melpa.org/packages/")
          ("melpa-stable" . "https://stable.melpa.org/packages/")
+         ("melpa-milkbox-stable" . "http://melpa-stable.milkbox.net/packages/")
          ; ("elpy" . "https://jorgenschaefer.github.io/packages/")
 ))
 
@@ -110,6 +122,7 @@ Version 2016-01-08"
                 company-anaconda        ; Anaconda backend for company-mode
                 skewer-mode             ; Live web development
                 company-tern            ; Tern backend for company-mode.
+                org-trello              ; 2-way sync org & trello
                 ;; new package
                 ;; themes
                 rebecca-theme           ; dark
@@ -187,15 +200,14 @@ Version 2016-01-08"
                             (package-install 'exec-path-from-shell))))))
 
 (defun tangle-init ()
-"If the current buffer is 'init.org' the code-blocks are tangled, and
+"If the current buffer is 'emacsrc.org' the code-blocks are tangled, and
 the tangled file is compiled."
 (when (equal (buffer-file-name)
     (expand-file-name "~/Settings/dotfiles/emacsrc.org"))
     ;; avoid running hooks when tangling.
     (let ((prog-mode-hook nil))
     (org-babel-tangle)
-    (byte-compile-file (expand-file-name
-        (concat user-emacs-directory "init.el"))))))
+    (byte-compile-file (expand-file-name "~/Settings/dotfiles/emacsrc.el")))))
 
 (add-hook 'after-save-hook 'tangle-init)
 
@@ -205,15 +217,17 @@ the tangled file is compiled."
 ;; theme
 ;; trust theme
 (setq custom-safe-themes t)
+(load-theme 'labburn)
 ;; (load-theme 'spacemacs-dark)
 ;; (load-theme 'spacemacs-light)
 ;; (load-theme 'rebecca)
-(load-theme 'zenburn)
 ;; (load-theme 'reykjavik)
 ;; (load-theme 'darcula)
 ;; (load-theme 'monokai)
 ;; (load-theme 'sanityinc-tomorrow-blue)
 ;; (load-theme 'darktooth)
+;; (load-theme 'challenger-deep)
+;; (load-theme 'avk-darkblue-yellow)
 ;; set font
 (set-frame-font "Envy Code R 16")
 
@@ -283,6 +297,7 @@ the tangled file is compiled."
 ;; (setq indent-line-function 'insert-tab)
 
 (set-language-environment "UTF-8")
+(prefer-coding-system 'utf-8)
 
 (show-paren-mode 1)
 (require 'paren)
@@ -292,21 +307,27 @@ the tangled file is compiled."
 (electric-pair-mode)
 
 ;; paths
-(setq auto-save-file-name-transforms
-          `((".*" ,(concat user-emacs-directory "tmp/auto-save/") t)))
-(setq backup-directory-alist
-      `(("." . ,(expand-file-name
-                 (concat user-emacs-directory "tmp/backup/")))))
-;; backup method
-(setq backup-by-copying t)
-;; backup frequency
-(setq delete-old-versions t
-  kept-new-versions 6
-  kept-old-versions 2
-  version-control t)
+;disable backup
+(setq backup-inhibited t)
+;disable auto save
+(setq make-backup-files nil) ; stop creating backup~ files
+(setq auto-save-default nil) ; stop creating #autosave# files
 
-;;TOTRY
-;;(setq savehist-file "~/.emacs.d/savehist")
+;; (setq auto-save-file-name-transforms
+;;           `((".*" ,(concat user-emacs-directory "tmp/auto-save/") t)))
+;; (setq backup-directory-alist
+;;       `(("." . ,(expand-file-name
+;;                  (concat user-emacs-directory "tmp/backup/")))))
+;; ;; backup method
+;; (setq backup-by-copying t)
+;; ;; backup frequency
+;; (setq delete-old-versions t
+;;   kept-new-versions 6
+;;   kept-old-versions 2
+;;   version-control t)
+
+;; ;;TOTRY
+;; ;;(setq savehist-file "~/.emacs.d/savehist")
 ;;(savehist-mode 1)
 ;;(setq history-length t)
 ;;(setq history-delete-duplicates t)
@@ -624,11 +645,11 @@ the tangled file is compiled."
 (setq eshell-prompt-function 'shk-eshell-prompt)
 (setq eshell-highlight-prompt nil)
 
-(add-to-list 'load-path (expand-file-name
-    (concat user-emacs-directory "other-srcs/company-emoji")))
-(require 'company-emoji)
+; (add-to-list 'load-path (expand-file-name
+ ;     (concat user-emacs-directory "other-srcs/company-emoji")))
+ ; (require 'company-emoji)
 
-(add-to-list 'company-backends 'company-emoji)
+ ; (add-to-list 'company-backends 'company-emoji)
 
 ;; macOS font
 (set-fontset-font
@@ -642,6 +663,8 @@ the tangled file is compiled."
       google-translate-default-target-language "de")
 
 (setq avy-all-windows nil)
+
+(custom-set-variables '(org-trello-files '("/Users/mbayer/Documents/org/liversa/backlog.org")))
 
 
 

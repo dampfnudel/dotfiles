@@ -74,6 +74,7 @@ Setup package archives.
          ("org" . "http://orgmode.org/elpa/")
          ("melpa" . "https://melpa.org/packages/")
          ("melpa-stable" . "https://stable.melpa.org/packages/")
+         ("melpa-milkbox-stable" . "http://melpa-stable.milkbox.net/packages/")
          ; ("elpy" . "https://jorgenschaefer.github.io/packages/")
 ))
 
@@ -124,6 +125,7 @@ add them to the packages list and call package-install-from-ini
                 company-anaconda        ; Anaconda backend for company-mode
                 skewer-mode             ; Live web development
                 company-tern            ; Tern backend for company-mode.
+                org-trello              ; 2-way sync org & trello
                 ;; new package
                 ;; themes
                 rebecca-theme           ; dark
@@ -202,6 +204,7 @@ add them to the packages list and call package-install-from-ini
 #+END_SRC
 
 * emacsrc.org setup
+https://github.com/larstvei/dot-emacs
 
 initial init.d content
 
@@ -226,17 +229,17 @@ initial init.d content
 
 always tangle and byte-compile the =org=-document after changes.
 
+
 #+BEGIN_SRC emacs-lisp
 (defun tangle-init ()
-"If the current buffer is 'init.org' the code-blocks are tangled, and
+"If the current buffer is 'emacsrc.org' the code-blocks are tangled, and
 the tangled file is compiled."
 (when (equal (buffer-file-name)
     (expand-file-name "~/Settings/dotfiles/emacsrc.org"))
     ;; avoid running hooks when tangling.
     (let ((prog-mode-hook nil))
     (org-babel-tangle)
-    (byte-compile-file (expand-file-name
-        (concat user-emacs-directory "init.el"))))))
+    (byte-compile-file (expand-file-name "~/Settings/dotfiles/emacsrc.el")))))
 
 (add-hook 'after-save-hook 'tangle-init)
 #+END_SRC
@@ -256,15 +259,17 @@ the tangled file is compiled."
     ;; theme
     ;; trust theme
     (setq custom-safe-themes t)
+    (load-theme 'labburn)
     ;; (load-theme 'spacemacs-dark)
     ;; (load-theme 'spacemacs-light)
     ;; (load-theme 'rebecca)
-    (load-theme 'zenburn)
     ;; (load-theme 'reykjavik)
     ;; (load-theme 'darcula)
     ;; (load-theme 'monokai)
     ;; (load-theme 'sanityinc-tomorrow-blue)
     ;; (load-theme 'darktooth)
+    ;; (load-theme 'challenger-deep)
+    ;; (load-theme 'avk-darkblue-yellow)
     ;; set font
     (set-frame-font "Envy Code R 16")
     #+END_SRC
@@ -374,6 +379,7 @@ no forced new line
 
     #+BEGIN_SRC emacs-lisp
     (set-language-environment "UTF-8")
+    (prefer-coding-system 'utf-8)
     #+END_SRC
 
 ** paranthesis
@@ -390,30 +396,36 @@ no forced new line
 ** temporary files
 
     #+BEGIN_SRC emacs-lisp
-    ;; paths
-    (setq auto-save-file-name-transforms
-              `((".*" ,(concat user-emacs-directory "tmp/auto-save/") t)))
-    (setq backup-directory-alist
-          `(("." . ,(expand-file-name
-                     (concat user-emacs-directory "tmp/backup/")))))
-    ;; backup method
-    (setq backup-by-copying t)
-    ;; backup frequency
-    (setq delete-old-versions t
-      kept-new-versions 6
-      kept-old-versions 2
-      version-control t)
+      ;; paths
+      ;disable backup
+      (setq backup-inhibited t)
+      ;disable auto save
+      (setq make-backup-files nil) ; stop creating backup~ files
+      (setq auto-save-default nil) ; stop creating #autosave# files
 
-    ;;TOTRY
-    ;;(setq savehist-file "~/.emacs.d/savehist")
-    ;;(savehist-mode 1)
-    ;;(setq history-length t)
-    ;;(setq history-delete-duplicates t)
-    ;;(setq savehist-save-minibuffer-history 1)
-    ;;(setq savehist-additional-variables
-    ;;'(kill-ring
-    ;;    search-ring
-    ;;    regexp-search-ring))
+      ;; (setq auto-save-file-name-transforms
+      ;;           `((".*" ,(concat user-emacs-directory "tmp/auto-save/") t)))
+      ;; (setq backup-directory-alist
+      ;;       `(("." . ,(expand-file-name
+      ;;                  (concat user-emacs-directory "tmp/backup/")))))
+      ;; ;; backup method
+      ;; (setq backup-by-copying t)
+      ;; ;; backup frequency
+      ;; (setq delete-old-versions t
+      ;;   kept-new-versions 6
+      ;;   kept-old-versions 2
+      ;;   version-control t)
+
+      ;; ;;TOTRY
+      ;; ;;(setq savehist-file "~/.emacs.d/savehist")
+      ;;(savehist-mode 1)
+      ;;(setq history-length t)
+      ;;(setq history-delete-duplicates t)
+      ;;(setq savehist-save-minibuffer-history 1)
+      ;;(setq savehist-additional-variables
+      ;;'(kill-ring
+      ;;    search-ring
+      ;;    regexp-search-ring))
     #+END_SRC
 
 ** file modes
@@ -884,11 +896,11 @@ fancy eshell prompt with different colors, time, pwd, version control info and h
 ** company-emoji
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path (expand-file-name
-    (concat user-emacs-directory "other-srcs/company-emoji")))
-(require 'company-emoji)
+ ; (add-to-list 'load-path (expand-file-name
+ ;     (concat user-emacs-directory "other-srcs/company-emoji")))
+ ; (require 'company-emoji)
 
-(add-to-list 'company-backends 'company-emoji)
+ ; (add-to-list 'company-backends 'company-emoji)
 
 ;; macOS font
 (set-fontset-font
@@ -924,6 +936,12 @@ replaced by electric-pair-mode
 only use the current window for candidates.
 #+BEGIN_SRC emacs-lisp
     (setq avy-all-windows nil)
+#+END_SRC
+
+** org-trello
+
+#+BEGIN_SRC emacs-lisp
+    (custom-set-variables '(org-trello-files '("/Users/mbayer/Documents/org/liversa/backlog.org")))
 #+END_SRC
 
 ** new package
@@ -970,6 +988,21 @@ lazy require packages
 #+END_SRC
 
 * functions
+
+** yank from current line to x
+#+BEGIN_SRC elisp
+(defun kill-ring-save-until (x)
+  "kill-ring-save the line at point until the linenumber you pass."
+  (interactive "nUntil: ")
+  (setq offset (- x (line-number-at-pos)))
+  (save-excursion
+    (move-beginning-of-line nil)
+    (set-mark-command nil)
+    (forward-line offset)
+    (move-end-of-line nil)
+    (kill-ring-save (region-beginning) (region-end)))
+  (message "yanked %i lines" (1+ offset)))
+#+END_SRC
 
 ** yank line without newline
 #+BEGIN_SRC elisp
@@ -1426,6 +1459,7 @@ https://www.reddit.com/r/emacs/comments/6hdsjm/jsonnavigator_xpathwalker_jsonsna
 https://github.com/Wilfred/helpful
 **** Modeline
 https://www.masteringemacs.org/article/hiding-replacing-modeline-strings
+**** CSV-Mode
 
 
 *** Themes
