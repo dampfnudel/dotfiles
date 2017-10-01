@@ -135,7 +135,7 @@
           # export EDITOR='/usr/local/Cellar/macvim/8.0-110/bin/mvim'
           # export EDITOR_TAB=${EDITOR}' --remote-tab-silent'
           # export EDITOR='open -a Emacs.app'
-          export EDITOR='open -a /usr/local/Cellar/emacs/25.1/Emacs.app'
+          export EDITOR='open -a /usr/local/Cellar/emacs/25.2/Emacs.app'
           export EDITOR_TAB=${EDITOR}
           export VIM_EDITOR='/usr/local/Cellar/macvim/8.0-110/bin/mvim'
           export VIM_EDITOR_TAB=${VIM_EDITOR}' --remote-tab-silent'
@@ -290,7 +290,11 @@
 # }}}
 
 # hashes / named directories {{{
-    hash -d mobile_org=root@192.168.178.41:/storage/sdcard0/org_m/
+    hash -d mobile_storage=root@192.168.178.41:/storage/sdcard0
+    hash -d mobile_sd=root@192.168.178.41:/storage/extSDCard
+    hash -d mobile_org=root@192.168.178.41:/storage/sdcard0/org_m
+    hash -d mobile_images=root@192.168.178.41:/storage/extSdCard/DCIM
+    hash -d mobile_audiobooks=root@192.168.178.41:/storage/extSdCard/Audiobooks
     hash -d tmp=$HOME/tmp
     hash -d ai=$HOME/Workspace/ai
     hash -d ast=$HOME/Workspace/fba/ast
@@ -700,6 +704,9 @@
 
 # functions {{{
             # tools {
+            mk_zip_bomb () {
+                dd if=/dev/zero bs=1M count=10240 | gzip > 10G.gzip
+            }
             list_background_images () {
                 local url=$1
                 curl $url|awk -F\" '{for(i=0;++i<=NF;){if($i ~ /^http/ && $i !~ "google\|cache:"){print $i}}}'|grep '.*\.\(jpg\|JPG\|png\|PNG\|gif\|GIF\)'
@@ -726,6 +733,9 @@
     # echo {
         echo_timestamp () {
             echo $(date +%Y-%m-%d-%H-%M-%S)
+        }
+        echo_datestamp () {
+            echo $(date +%Y-%m-%d)
         }
     # }
 
@@ -1124,9 +1134,7 @@ FZF-EOF"
     # emacs {
         emacs () {
             if [ $# -eq 0 ]; then
-                # echo "open -a /usr/local/Cellar/emacs/25.1/Emacs.app"
-                # open -a Emacs.app
-                open -a /usr/local/Cellar/emacs/25.1/Emacs.app
+                # open -a /usr/local/Cellar/emacs/25.2/Emacs.app/
                 eval ${EDITOR}
                 return 0
             fi
@@ -1135,9 +1143,6 @@ FZF-EOF"
                 return 0
             fi
             for var in "$@"; do
-                echo "creating file: $var"
-                # echo "${EDITOR} $var"
-
                 touch "$var"
                 eval "${EDITOR} $var"
             done
