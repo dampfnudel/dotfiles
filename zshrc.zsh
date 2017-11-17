@@ -144,6 +144,9 @@
         export HOME=/Users/mbayer
         export LANG=de_DE.UTF-8
         export LC_ALL=de_DE.UTF-8
+
+     	export DJANGO_SETTINGS_MODULE=amber.settings
+
     # }
     # imagemagick {
         export MAGICK_HOME="$HOME/bin/ImageMagick-7.0.3"
@@ -300,6 +303,7 @@
     hash -d ast=$HOME/Workspace/fba/ast
     hash -d bay=$HOME/Workspace/bay
     hash -d bin=$HOME/bin
+    hash -d utils=$HOME/utils
     hash -d colors=$HOME/Settings/colors
     hash -d custom=$HOME/.oh-my-zsh/custom
     hash -d desktop=$HOME/Desktop
@@ -314,7 +318,6 @@
     hash -d hackedHN=$HOME/Workspace/hackedHN
     hash -d i32=/Volumes/INGOT32
     hash -d i64=/Volumes/INGOT64
-    hash -d import=$HOME/Workspace/regiobot/regiobot/import
     hash -d impure=$HOME/Workspace/impure
     hash -d jason=$HOME/Workspace/moment/jason
     hash -d library=$HOME/Library
@@ -324,15 +327,11 @@
     hash -d org=$HOME/Documents/org
     hash -d pictures=$HOME/Pictures
     hash -d plan=$HOME/Documents/org/plan
-    hash -d regiobot=$HOME/Workspace/regioyal/regiobot
+    hash -d regiobot=$HOME/Workspace/project-inquant/gitlab
     hash -d rezepte=$HOME/Documents/org/rezepte
-    hash -d rg=$HOME/Workspace/regioyal
-    hash -d rgs=$HOME/Workspace/regioyal/rgsite
-    hash -d rgsr=$HOME/Workspace/regioyal/rgsite/web/regiobot
-    hash -d rgi=$HOME/Workspace/regioyal/rgimport
-    hash -d rgir=$HOME/Workspace/regioyal/rgimport/web/regiobot
     hash -d scripts=$HOME/Workspace/scripts
     hash -d sd=/Volumes/sd
+    hash -d sd2=/Volumes/sd2
     hash -d settings=$HOME/Settings
     hash -d termxplorer=$HOME/Workspace/termxplorer
     hash -d test=$HOME/Workspace/test_repo
@@ -345,6 +344,7 @@
     hash -d emacs.d=$HOME/.emacs.d
     hash -d snippets=$HOME/.emacs.d/snippets
     hash -d amazin=$HOME/Workspace/fba/amazin
+    hash -d amber=$HOME/Workspace/amber
 
     # files
     hash -d emacsrc=$HOME/Settings/dotfiles/emacsrc.org
@@ -591,6 +591,10 @@
         alias -g _vim="| eval ${EDITOR_TAB}"
         alias -g _copy='| pbcopy'
 
+        # last downloaded file
+        alias -g _ldf='~"downloads/$(ls -1t ~downloads/ | head -n1)"'
+        alias -g _lss='~"pictures/Screenshots/$(ls -1t ~pictures/Screenshots/ | head -n1)"'
+
         # alias -g õrg='~org'
     # }
 
@@ -606,6 +610,7 @@
     # }
 
     # tools {
+        alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu'
         alias p='pbpaste'
         alias c='pbcopy'
         alias ag='ag --path-to-agignore ~/.agignore'
@@ -620,6 +625,7 @@
         # alias emacs='open -a Emacs.app'
         alias cemacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs -nw'
         alias bpython='$WORKON_HOME/python3.4.1/bin/bpython'
+        alias redis='$HOME/Utils/redis-4.0.2/src/redis-server'
 
         # vim {
             alias cvim='/usr/local/bin/vim'
@@ -704,6 +710,20 @@
 
 # functions {{{
             # tools {
+            print_python_kws () {
+                python -c "import keyword
+for kw in keyword.kwlist:
+    print(kw)"
+            }
+            # >--< <- rm from clipboard entry
+            # >>> import hashlib
+            rm_prefix () {
+                pbpaste|cut -c 4-|pbcopy
+            }
+            # reverse line order of file
+            tac () {
+                sed '1!G;h;$!d' $1
+            }
             mk_zip_bomb () {
                 dd if=/dev/zero bs=1M count=10240 | gzip > 10G.gzip
             }
@@ -731,6 +751,11 @@
         }
     # }
     # echo {
+        # get the last file of the given directory
+        echo_lf () {
+            echo "$1/$(ls -1t $1/ | head -n1)"
+
+        }
         echo_timestamp () {
             echo $(date +%Y-%m-%d-%H-%M-%S)
         }
