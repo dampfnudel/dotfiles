@@ -255,97 +255,114 @@ the tangled file is compiled."
 
 ** theme
 
-    #+BEGIN_SRC emacs-lisp
-    ;; theme
-    ;; trust theme
-    (setq custom-safe-themes t)
-    (load-theme 'labburn)
-    ;; (load-theme 'spacemacs-dark)
-    ;; (load-theme 'spacemacs-light)
-    ;; (load-theme 'rebecca)
-    ;; (load-theme 'reykjavik)
-    ;; (load-theme 'darcula)
-    ;; (load-theme 'monokai)
-    ;; (load-theme 'sanityinc-tomorrow-blue)
-    ;; (load-theme 'darktooth)
-    ;; (load-theme 'challenger-deep)
-    ;; (load-theme 'avk-darkblue-yellow)
-    ;; set font
-    (set-frame-font "Envy Code R 16")
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+;; TODO
+;; theme
+;; trust theme
+(setq custom-safe-themes t)
+;; (load-theme 'labburn)
+;; (load-theme 'material-light)
+;; (load-theme 'spacemacs-dark)
+;; (load-theme 'spacemacs-light)
+;; (load-theme 'rebecca)
+;; (load-theme 'reykjavik)
+;; (load-theme 'darcula)
+;; (load-theme 'monokai)
+;; (load-theme 'sanityinc-tomorrow-blue)
+;; (load-theme 'darktooth)
+(load-theme 'challenger-deep)
+;; (load-theme 'avk-darkblue-yellow)
+;; set font
+(set-frame-font "Envy Code R 16")
+#+END_SRC
 
 ** symlinks
 
-    #+BEGIN_SRC emacs-lisp
-    ;; follow symbolic links
-    ;; (setq vc-follow-symlinks t)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+;; follow symbolic links
+;; (setq vc-follow-symlinks t)
+#+END_SRC
 
 ** cursor
 
-    #+BEGIN_SRC emacs-lisp
-    ;; disable blinking cursor
-    (blink-cursor-mode 0)
-    ;; disable audio bell
-    (setq ring-bell-function 'ignore)
-    ;; remember cursor position
-    (if (version< emacs-version "25.0")
-        (progn
-            (require 'saveplace)
-      (setq-default save-place t))
-      (setq save-place-file (concat user-emacs-directory "persistence/places"))
-      (save-place-mode 1))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+;; disable blinking cursor
+(blink-cursor-mode 0)
+;; disable audio bell
+(setq ring-bell-function 'ignore)
+;; remember cursor position
+(if (version< emacs-version "25.0")
+    (progn
+        (require 'saveplace)
+  (setq-default save-place t))
+  (setq save-place-file (concat user-emacs-directory "persistence/places"))
+  (save-place-mode 1))
+#+END_SRC
 
 ** gpg encryption
 
 #+BEGIN_SRC elisp
-   (custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
+(custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
 #+END_SRC
 
 ** UI                                                               :manual:
 
-    #+BEGIN_SRC emacs-lisp
-    ;; disable welcome window
-    (setq ns-pop-up-frames nil)
+#+BEGIN_SRC emacs-lisp
+;; disable welcome window
+(setq ns-pop-up-frames nil)
 
-    ;; disable tool-bar
-    (tool-bar-mode -1)
+;; disable tool-bar
+(tool-bar-mode -1)
 
-    ;; show line numbers
-    (global-linum-mode t)
+;; slows down emacs
+;; show line numbers
+(global-linum-mode -1)
+(line-number-mode -1)
 
-    ;; y & n instead of yes & no
-    (fset 'yes-or-no-p 'y-or-n-p)
+;; ;;
+y & n instead of yes & no
+(fset 'yes-or-no-p 'y-or-n-p)
 
-    ;; 80-column-ruler
-    (add-to-list 'load-path (expand-file-name
-        (concat user-emacs-directory "other-srcs/Fill-Column-Indicator")))
-    (setq fci-rule-column 81)
-    (require 'fill-column-indicator)
+;; 80-column-ruler
+(add-to-list 'load-path (expand-file-name
+    (concat user-emacs-directory "other-srcs/Fill-Column-Indicator")))
+(setq fci-rule-column 81)
+(require 'fill-column-indicator)
 
-    ;; TODO define list of used programming languages (prog-mode doesn't work with js)
-    (add-hook 'python-mode-hook 'turn-on-fci-mode)
-    (add-hook 'js-mode-hook 'turn-on-fci-mode)
+(setq-default fill-column 80)
+(setq-default auto-fill-function 'do-auto-fill)
 
-    ;; highlight current line
-    (global-hl-line-mode)
+;; TODO define list of used programming languages (prog-mode doesn't work with js)
+(add-hook 'python-mode-hook 'turn-on-fci-mode)
+(add-hook 'js-mode-hook 'turn-on-fci-mode)
 
-    ;; wrap long lines
-    (global-visual-line-mode)
-    ;(set-default 'truncate-lines t)
+;; highlight current line
+(global-hl-line-mode)
+;; disable hl-line-mode slows down emacs in certain modes
+;; M-x cutomize-themes
+(add-hook 'special-mode-hook (lambda () (hl-line-mode -1)))
+;; M-x package-list-packages
+(add-hook 'package-menu-mode-hook (lambda () (hl-line-mode -1)))
+;; magit
+(add-hook 'magit-mode-hook (lambda () (global-hl-line-mode -1)))
 
-    ;; start fullscreen
-    ;(toggle-frame-maximized)
-    (add-to-list 'default-frame-alist '(fullscreen . maximized))
-    #+END_SRC
+
+;; wrap long lines
+(global-visual-line-mode)
+;(set-default 'truncate-lines t)
+
+;; start fullscreen
+;(toggle-frame-maximized)
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+#+END_SRC
 
 *** modeline
 
-    #+BEGIN_SRC emacs-lisp
-    ;; display column number
-    (setq column-number-mode t)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+;; slows down emacs
+;; display column number
+;; (setq column-number-mode t)
+#+END_SRC
 
 *** frames
 
@@ -364,69 +381,69 @@ no forced new line
 
 ** whitespace
 
-    #+BEGIN_SRC emacs-lisp
-    ;; show trailing whitespace
-    (setq-default show-trailing-whitespace t)
+#+BEGIN_SRC emacs-lisp
+;; show trailing whitespace
+(setq-default show-trailing-whitespace t)
 
-    ;;; use 4 spaces instead of tabs
-    (setq-default indent-tabs-mode nil)
-    (setq-default tab-width 4)
+;; use 4 spaces instead of tabs
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
 
-   ;; (setq indent-line-function 'insert-tab)
-    #+END_SRC
+;; (setq indent-line-function 'insert-tab)
+#+END_SRC
 
 ** encoding
 
-    #+BEGIN_SRC emacs-lisp
-    (set-language-environment "UTF-8")
-    (prefer-coding-system 'utf-8)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+(set-language-environment "UTF-8")
+(prefer-coding-system 'utf-8)
+#+END_SRC
 
 ** paranthesis
 
-    #+BEGIN_SRC emacs-lisp
-    (show-paren-mode 1)
-    (require 'paren)
-    (set-face-background 'show-paren-match (face-background 'default))
-    (set-face-foreground 'show-paren-match "#FF0097")
-    (set-face-attribute 'show-paren-match nil :weight 'extra-bold)
-    (electric-pair-mode)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+(show-paren-mode 1)
+(require 'paren)
+(set-face-background 'show-paren-match (face-background 'default))
+(set-face-foreground 'show-paren-match "#FF0097")
+(set-face-attribute 'show-paren-match nil :weight 'extra-bold)
+(electric-pair-mode)
+#+END_SRC
 
 ** temporary files
 
-    #+BEGIN_SRC emacs-lisp
-      ;; paths
-      ;disable backup
-      (setq backup-inhibited t)
-      ;disable auto save
-      (setq make-backup-files nil) ; stop creating backup~ files
-      (setq auto-save-default nil) ; stop creating #autosave# files
+#+BEGIN_SRC emacs-lisp
+;; paths
+;disable backup
+(setq backup-inhibited t)
+;disable auto save
+(setq make-backup-files nil) ; stop creating backup~ files
+(setq auto-save-default nil) ; stop creating #autosave# files
 
-      ;; (setq auto-save-file-name-transforms
-      ;;           `((".*" ,(concat user-emacs-directory "tmp/auto-save/") t)))
-      ;; (setq backup-directory-alist
-      ;;       `(("." . ,(expand-file-name
-      ;;                  (concat user-emacs-directory "tmp/backup/")))))
-      ;; ;; backup method
-      ;; (setq backup-by-copying t)
-      ;; ;; backup frequency
-      ;; (setq delete-old-versions t
-      ;;   kept-new-versions 6
-      ;;   kept-old-versions 2
-      ;;   version-control t)
+;; (setq auto-save-file-name-transforms
+;;           `((".*" ,(concat user-emacs-directory "tmp/auto-save/") t)))
+;; (setq backup-directory-alist
+;;       `(("." . ,(expand-file-name
+;;                  (concat user-emacs-directory "tmp/backup/")))))
+;; ;; backup method
+;; (setq backup-by-copying t)
+;; ;; backup frequency
+;; (setq delete-old-versions t
+;;   kept-new-versions 6
+;;   kept-old-versions 2
+;;   version-control t)
 
-      ;; ;;TOTRY
-      ;; ;;(setq savehist-file "~/.emacs.d/savehist")
-      ;;(savehist-mode 1)
-      ;;(setq history-length t)
-      ;;(setq history-delete-duplicates t)
-      ;;(setq savehist-save-minibuffer-history 1)
-      ;;(setq savehist-additional-variables
-      ;;'(kill-ring
-      ;;    search-ring
-      ;;    regexp-search-ring))
-    #+END_SRC
+;; ;;TOTRY
+;; ;;(setq savehist-file "~/.emacs.d/savehist")
+;;(savehist-mode 1)
+;;(setq history-length t)
+;;(setq history-delete-duplicates t)
+;;(setq savehist-save-minibuffer-history 1)
+;;(setq savehist-additional-variables
+;;'(kill-ring
+;;    search-ring
+;;    regexp-search-ring))
+#+END_SRC
 
 ** file modes
 
@@ -495,16 +512,18 @@ and copy it over the desired file.
 (setq org-log-done t)
 ;; setup priorities from A-Z
 (setq org-highest-priority ?A)
-(setq org-lowest-priority ?Z)
+(setq org-lowest-priority ?G)
 (setq org-default-priority ?A)
 ;; define states
 (setq org-todo-keywords
-       '((sequence "TODO" "NEXT" "BLOCKED" "|" "DONE")))
+       '((sequence "TODO" "NEXT" "BLOCKED" "|" "DONE" "FAILED")))
 ;; concat agenda from this files
-(setq org-agenda-files (append '("~/.notes.org" "~/Documents/org/plan/agenda.org") (file-expand-wildcards "~/Documents/org/cal/*\.org")))
+(setq org-agenda-files (append '("~/Documents/org/agenda.gpg" "~/Documents/org/wiederkehrende-tasks.org")))
+;; (setq org-agenda-files (append '("~/Documents/org/agenda.gpg" "~/Documents/org/wiederkehrende-tasks.org") (file-expand-wildcards "~/Documents/org/cal/*\.org")))
 
 ;; indentation options
 (setq org-startup-folded "showeverything")
+
 ;; In this minor mode, all lines are prefixed for display with the necessary amount of space.
 ;; All headline stars but the last one are made invisible
 (add-hook 'org-mode-hook
@@ -533,6 +552,16 @@ and copy it over the desired file.
 (setq org-capture-templates
 '(("t" "Todo" entry (file "~/Documents/org/backlog.org")
         "* TODO %?")))
+
+;; Set to the location of your Org files on your local system
+(setq org-directory "~/Documents/org")
+;; concat mobile files from this files
+(setq org-mobile-files '("mobile-notes.org" "listen/restaurants.org"))
+
+;; Set to the name of the file where new notes will be stored
+(setq org-mobile-inbox-for-pull "~/Documents/org/mobile-captured.org")
+;; Set to <your Dropbox root directory>/MobileOrg.
+(setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
 #+END_SRC
 
 ** python
@@ -760,8 +789,7 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
 
 (defun my-web-mode-hook ()
   "Hooks for Web mode."
-  (setq web-mode-markup-indent-offset 2)
-)
+  (setq web-mode-markup-indent-offset 2))
 (add-hook 'web-mode-hook  'my-web-mode-hook)
 #+END_SRC
 
@@ -783,12 +811,12 @@ expected at [[~/.emacs.d/other-srcs/nyan-mode][nyan-mode]]
 
 decide
 
- #+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle no
 (setq powerline-arrow-shape 'curve)
 (setq powerline-default-separator-dir '(right . left))
 (setq sml/theme 'powerline)
 (sml/setup)
- #+END_SRC
+#+END_SRC
 
 ** spaceline
 
@@ -896,11 +924,11 @@ fancy eshell prompt with different colors, time, pwd, version control info and h
 ** company-emoji
 
 #+BEGIN_SRC emacs-lisp
- ; (add-to-list 'load-path (expand-file-name
- ;     (concat user-emacs-directory "other-srcs/company-emoji")))
- ; (require 'company-emoji)
+; (add-to-list 'load-path (expand-file-name
+;     (concat user-emacs-directory "other-srcs/company-emoji")))
+; (require 'company-emoji)
 
- ; (add-to-list 'company-backends 'company-emoji)
+; (add-to-list 'company-backends 'company-emoji)
 
 ;; macOS font
 (set-fontset-font
@@ -1006,36 +1034,36 @@ lazy require packages
 
 ** yank line without newline
 #+BEGIN_SRC elisp
-    (defun copy-line ()
-        (interactive)
-            (save-excursion
-              (back-to-indentation)
-              (kill-ring-save
-               (point)
-               (line-end-position)))
-               (message "1 line copied"))
+(defun copy-line ()
+    (interactive)
+        (save-excursion
+          (back-to-indentation)
+          (kill-ring-save
+           (point)
+           (line-end-position)))
+           (message "1 line copied"))
 #+END_SRC
 
 ** daily journal
-#+begin_src elisp
-    (defun daily ()
-        "setup journal windows and buffers"
-        (interactive)
-        (delete-other-windows)
-        (find-file "~/Documents/org/journal.org")
-        (split-window-right)
-        (evil-window-right 1)
-        (find-file "~/Documents/org/agenda.org")
-        (evil-window-left 1)
-        (evil-goto-first-line)
-        (evil-open-above 0)
-        (evil-open-above 0)
-        (insert "day")
-        (yas-expand))
-#+end_src
+#+BEGIN_SRC elisp
+(defun daily ()
+    "setup journal windows and buffers"
+    (interactive)
+    (delete-other-windows)
+    (find-file "~/Documents/org/journal.org")
+    (split-window-right)
+    (evil-window-right 1)
+    (find-file "~/Documents/org/agenda.org")
+    (evil-window-left 1)
+    (evil-goto-first-line)
+    (evil-open-above 0)
+    (evil-open-above 0)
+    (insert "day")
+    (yas-expand))
+#+END_SRC
 
 ** toggle word case
-#+begin_src elisp
+#+BEGIN_SRC elisp
 (defun toggle-word-case ()
   "Toggle the letter case of current word or text selection.
 Always cycle in this order: Init Caps, ALL CAPS, all lower.
@@ -1066,7 +1094,7 @@ Version 2016-01-08"
      ((equal 2 (get this-command 'state))
       (downcase-region -p1 -p2)
       (put this-command 'state 0)))))
-#+end_src
+#+END_SRC
 
 ** recreate scratch buffer
 #+BEGIN_SRC emacs-lisp
@@ -1132,171 +1160,170 @@ prevent losing the selection after a shift operation by re-selecting
 * keybindings keymappings
 
 #+BEGIN_SRC emacs-lisp
-  ;; minor mode for keybindings
-  (
-   defvar my-keys-minor-mode-map
-    (let ((map (make-sparse-keymap)))
-      (define-key map (kbd "M-t") 'toggle-word-case)
-      (define-key map (kbd "M-+") 'text-scale-adjust)
-      (define-key map (kbd "M--") 'text-scale-adjust)
-      (define-key map (kbd "M-0") 'text-scale-adjust)
-      (define-key map (kbd "M-e") 'move-end-of-line)
-      (define-key map (kbd "M-b") 'move-beginning-of-line)
-      ;; macOS
-      (define-key map (kbd "M-q") 'save-buffers-kill-terminal)        ; quit
-      (define-key map (kbd "M-w") 'kill-buffer)                       ; close
-      (define-key map (kbd "M-c") 'kill-ring-save)                    ; copy
-      (define-key map (kbd "M-v") 'yank)                              ; paste
-      (define-key map (kbd "M-s") 'save-buffer)                       ; save
-      (define-key map (kbd "M-a") 'mark-whole-buffer)                 ; select all
-      (define-key map (kbd "M-x") 'helm-M-x)
-      (define-key map (kbd "\C-cl") 'org-store-link)
-      (define-key map (kbd "\C-ca") 'org-agenda)
-      (define-key map (kbd "C-+") 'er/expand-region)
-      ;; TOOD Backspace?
-      (define-key map (kbd "DEL") 'backward-delete-char)
-      (define-key map (kbd "C--") 'evilnc-comment-or-uncomment-lines)
+;; minor mode for keybindings
+(defvar my-keys-minor-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "M-t") 'toggle-word-case)
+    (define-key map (kbd "M-+") 'text-scale-adjust)
+    (define-key map (kbd "M--") 'text-scale-adjust)
+    (define-key map (kbd "M-0") 'text-scale-adjust)
+    (define-key map (kbd "M-e") 'move-end-of-line)
+    (define-key map (kbd "M-b") 'move-beginning-of-line)
+    ;; macOS
+    (define-key map (kbd "M-q") 'save-buffers-kill-terminal)        ; quit
+    (define-key map (kbd "M-w") 'kill-buffer)                       ; close
+    (define-key map (kbd "M-c") 'kill-ring-save)                    ; copy
+    (define-key map (kbd "M-v") 'yank)                              ; paste
+    (define-key map (kbd "M-s") 'save-buffer)                       ; save
+    (define-key map (kbd "M-a") 'mark-whole-buffer)                 ; select all
+    (define-key map (kbd "M-x") 'helm-M-x)
+    (define-key map (kbd "\C-cl") 'org-store-link)
+    (define-key map (kbd "\C-ca") 'org-agenda)
+    (define-key map (kbd "C-+") 'er/expand-region)
+    ;; TOOD Backspace?
+    (define-key map (kbd "DEL") 'backward-delete-char)
+    (define-key map (kbd "C--") 'evilnc-comment-or-uncomment-lines)
 
-      ;; evil keymappings
-      ;; normal state
-      ;; (define-key evil-normal-state-map (kbd "C-h") 'delete-forward-char)
-      (define-key evil-normal-state-map (kbd "C-d") 'delete-backward-char)
-      (define-key evil-normal-state-map (kbd "M-o") 'helm-find-files)
-      (define-key evil-normal-state-map (kbd "M-b") 'helm-buffers-list)
-      (define-key evil-normal-state-map (kbd "+") 'er/expand-region)
-      (define-key evil-normal-state-map (kbd "f") 'ace-jump-mode)
-      (define-key evil-normal-state-map (kbd "B") 'evil-first-non-blank)
-      (define-key evil-normal-state-map (kbd "E") 'evil-end-of-line)
-      (define-key evil-normal-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
-      ;; (define-key evil-normal-state-map (kbd "ä") 'delete-other-windows)
-      ;; (define-key evil-normal-state-map (kbd "Ä") 'evil-search-highlight-persist-remove-all)
-      (define-key evil-normal-state-map (kbd "ö") 'avy-goto-line)
-      (define-key evil-normal-state-map (kbd "Ö") 'avy-goto-char)
-      (define-key evil-normal-state-map (kbd "f") 'avy-goto-char-timer)
-      (define-key evil-normal-state-map (kbd "F") 'avy-goto-char-in-line)
-      (define-key evil-normal-state-map (kbd "C-j") 'scroll-up-command)
-      (define-key evil-normal-state-map (kbd "C-k") 'scroll-down-command)
-      (define-key evil-normal-state-map (kbd "~") 'toggle-word-case)
-      (define-key evil-normal-state-map (kbd "º") 'evil-forward-paragraph)      ;; <alt-j>
-      (define-key evil-normal-state-map (kbd "∆") 'evil-backward-paragraph)     ;; <alt-k>
-      (define-key evil-normal-state-map (kbd "U") 'delete-backward-char)
-      (define-key evil-normal-state-map (kbd "u") 'undo-tree-undo)
-      (define-key evil-normal-state-map (kbd "Y") 'copy-line)
+    ;; evil keymappings
+    ;; normal state
+    ;; (define-key evil-normal-state-map (kbd "C-h") 'delete-forward-char)
+    (define-key evil-normal-state-map (kbd "C-d") 'delete-backward-char)
+    (define-key evil-normal-state-map (kbd "M-o") 'helm-find-files)
+    (define-key evil-normal-state-map (kbd "M-b") 'helm-buffers-list)
+    (define-key evil-normal-state-map (kbd "+") 'er/expand-region)
+    (define-key evil-normal-state-map (kbd "f") 'ace-jump-mode)
+    (define-key evil-normal-state-map (kbd "B") 'evil-first-non-blank)
+    (define-key evil-normal-state-map (kbd "E") 'evil-end-of-line)
+    (define-key evil-normal-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
+    ;; (define-key evil-normal-state-map (kbd "ä") 'delete-other-windows)
+    ;; (define-key evil-normal-state-map (kbd "Ä") 'evil-search-highlight-persist-remove-all)
+    (define-key evil-normal-state-map (kbd "ö") 'avy-goto-line)
+    (define-key evil-normal-state-map (kbd "Ö") 'avy-goto-char)
+    (define-key evil-normal-state-map (kbd "f") 'avy-goto-char-timer)
+    (define-key evil-normal-state-map (kbd "F") 'avy-goto-char-in-line)
+    (define-key evil-normal-state-map (kbd "C-j") 'scroll-up-command)
+    (define-key evil-normal-state-map (kbd "C-k") 'scroll-down-command)
+    (define-key evil-normal-state-map (kbd "~") 'toggle-word-case)
+    (define-key evil-normal-state-map (kbd "º") 'evil-forward-paragraph)      ;; <alt-j>
+    (define-key evil-normal-state-map (kbd "∆") 'evil-backward-paragraph)     ;; <alt-k>
+    (define-key evil-normal-state-map (kbd "U") 'delete-backward-char)
+    (define-key evil-normal-state-map (kbd "u") 'undo-tree-undo)
+    (define-key evil-normal-state-map (kbd "Y") 'copy-line)
 
-      ;; visual line
-      (define-key evil-visual-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
-      ; Overload shifts so that they don't lose the selection
-      (define-key evil-visual-state-map (kbd ">") 'evil-shift-right-visual)
-      (define-key evil-visual-state-map (kbd "<") 'evil-shift-left-visual)
-      (define-key evil-visual-state-map [tab] 'evil-shift-right-visual)
-      (define-key evil-visual-state-map [S-tab] 'evil-shift-left-visual)
-      (define-key evil-visual-state-map (kbd "B") 'evil-first-non-blank)
-      (define-key evil-visual-state-map (kbd "E") 'evil-end-of-line)
+    ;; visual line
+    (define-key evil-visual-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
+    ; Overload shifts so that they don't lose the selection
+    (define-key evil-visual-state-map (kbd ">") 'evil-shift-right-visual)
+    (define-key evil-visual-state-map (kbd "<") 'evil-shift-left-visual)
+    (define-key evil-visual-state-map [tab] 'evil-shift-right-visual)
+    (define-key evil-visual-state-map [S-tab] 'evil-shift-left-visual)
+    (define-key evil-visual-state-map (kbd "B") 'evil-first-non-blank)
+    (define-key evil-visual-state-map (kbd "E") 'evil-end-of-line)
 
-      ;; evil-leader mappings
-      (evil-leader/set-key
-      "/" 'evil-command-window-search-forward
-      "|" 'split-window-right
-      "-" 'split-window-below
-      "k" 'evil-window-up
-      "j" 'evil-window-down
-      "h" 'evil-window-left
-      "l" 'evil-window-right
-      "x" 'delete-other-windows    ; duplicated
-      "y" 'helm-yas-complete
-      "f" 'helm-for-files
-      "a" 'helm-ag-project-root
-      "O" 'helm-find-files
-      "oh" 'helm-org-in-buffer-headings
-      "oa" 'helm-org-agenda-files-headings
-      "oc" 'org-capture
-      "or" 'org-reset-checkbox-state-subtree
-      "oe" 'org-export-dispatch
-      "ota" 'org-time-stamp
-      "oti" 'org-time-stamp-inactive
-      "odc" 'org-table-blank-field
-      "SPC" 'helm-buffers-list
-      "bb" 'bookmark-set
-      "bp" 'projectile-add-known-project
-      "gn" 'git-gutter:next-hunk
-      "gp" 'git-gutter:previous-hunk
-      "gs" 'helm-google-suggest
-      "v" 'visual-line-mode
-      "TAB" 'mode-line-other-buffer               ; previous buffer (like 'helm-buffer-list "RET")
-      "D" 'dumb-jump-go
-      "d" 'anaconda-mode-show-doc
-      "*" 'helm-swoop
-      "ö" 'evil-search-highlight-persist-remove-all        ; duplicated
-      "p" 'helm-projectile
-      "P" 'helm-projectile-find-file-in-known-projects
-      "sp" 'projectile-switch-project
-      ;; TOTEST
-      "A" 'helm-projectile-ag
-      "m" 'magit-status
-      "nn" 'find-file
-      "ns" 'create-scratch-buffer
-      "ss" 'wg-save-session
-      "so" 'wg-open-session
-      "sc" 'wg-save-session-as
-      "S" 'src-init
-      "r" 'revert-buffer
-      "C" 'shell-command
-      "ci" 'org-clock-in
-      "co" 'org-clock-out
-      "cl" 'org-clock-in-last
-      "cs" 'org-clock-select-task
-      "i" 'python-shell
-      "Hh" 'helm-howdoi
-      "Hi" 'howdoi-query-insert-code-snippet-at-point
-      "tl" 'helm-semantic-or-imenu
-      "tt" 'google-translate-at-point
-      "tq" 'google-translate-query-translate
-      ;; "t" (lambda () (interactive) (evil-ex "%s /foo/bar/g"))
-      "w/" 'find-file-other-window)
+    ;; evil-leader mappings
+    (evil-leader/set-key
+    "/" 'evil-command-window-search-forward
+    "|" 'split-window-right
+    "-" 'split-window-below
+    "k" 'evil-window-up
+    "j" 'evil-window-down
+    "h" 'evil-window-left
+    "l" 'evil-window-right
+    "x" 'delete-other-windows    ; duplicated
+    "y" 'helm-yas-complete
+    "f" 'helm-for-files
+    "a" 'helm-ag-project-root
+    "O" 'helm-find-files
+    "oh" 'helm-org-in-buffer-headings
+    "oa" 'helm-org-agenda-files-headings
+    "oc" 'org-capture
+    "or" 'org-reset-checkbox-state-subtree
+    "oe" 'org-export-dispatch
+    "ota" 'org-time-stamp
+    "oti" 'org-time-stamp-inactive
+    "odc" 'org-table-blank-field
+    "SPC" 'helm-buffers-list
+    "bb" 'bookmark-set
+    "bp" 'projectile-add-known-project
+    "gn" 'git-gutter:next-hunk
+    "gp" 'git-gutter:previous-hunk
+    "gs" 'helm-google-suggest
+    "v" 'visual-line-mode
+    "TAB" 'mode-line-other-buffer               ; previous buffer (like 'helm-buffer-list "RET")
+    "D" 'dumb-jump-go
+    "d" 'anaconda-mode-show-doc
+    "*" 'helm-swoop
+    "ö" 'evil-search-highlight-persist-remove-all        ; duplicated
+    "p" 'helm-projectile
+    "P" 'helm-projectile-find-file-in-known-projects
+    "sp" 'projectile-switch-project
+    ;; TOTEST
+    "A" 'helm-projectile-ag
+    "m" 'magit-status
+    "nn" 'find-file
+    "ns" 'create-scratch-buffer
+    "ss" 'wg-save-session
+    "so" 'wg-open-session
+    "sc" 'wg-save-session-as
+    "S" 'src-init
+    "r" 'revert-buffer
+    "C" 'shell-command
+    "ci" 'org-clock-in
+    "co" 'org-clock-out
+    "cl" 'org-clock-in-last
+    "cs" 'org-clock-select-task
+    "i" 'python-shell
+    "Hh" 'helm-howdoi
+    "Hi" 'howdoi-query-insert-code-snippet-at-point
+    "tl" 'helm-semantic-or-imenu
+    "tt" 'google-translate-at-point
+    "tq" 'google-translate-query-translate
+    ;; "t" (lambda () (interactive) (evil-ex "%s /foo/bar/g"))
+    "w/" 'find-file-other-window)
 
-      ;; macOS
-      ;; map command key to meta
-      (if (boundp 'ns-command-modifier)
-          (setq ns-command-modifier 'meta))
-      (if (boundp 'ns-option-modifier)
-          (setq ns-option-modifier nil))
+    ;; macOS
+    ;; map command key to meta
+    (if (boundp 'ns-command-modifier)
+        (setq ns-command-modifier 'meta))
+    (if (boundp 'ns-option-modifier)
+        (setq ns-option-modifier nil))
 
-      ;; make use of <Meta-Up> <Meta-Down>
-      ;; TODO double mapped
-      (define-key input-decode-map "\e\eOA" [(meta up)])
-      (define-key input-decode-map "\e\eOB" [(meta down)])
-      (global-set-key [(meta up)] 'scroll-down-command)
-      (global-set-key [(meta down)] 'scroll-up-command)
+    ;; make use of <Meta-Up> <Meta-Down>
+    ;; TODO double mapped
+    (define-key input-decode-map "\e\eOA" [(meta up)])
+    (define-key input-decode-map "\e\eOB" [(meta down)])
+    (global-set-key [(meta up)] 'scroll-down-command)
+    (global-set-key [(meta down)] 'scroll-up-command)
 
-      map)
-    "my-keys-minor-mode keymap.")
+    map)
+  "my-keys-minor-mode keymap.")
 
-  (define-minor-mode my-keys-minor-mode
-    "A minor mode so that my key settings override annoying major modes."
-    :init-value t
-    :lighter " my-keys")
+(define-minor-mode my-keys-minor-mode
+  "A minor mode so that my key settings override annoying major modes."
+  :init-value t
+  :lighter " my-keys")
 
-  (my-keys-minor-mode 1)
+(my-keys-minor-mode 1)
 
 
-  ;; (template insertion
-  ;; TODO use yasnippet
-  (defun insert-org-checkbox ()
-    (interactive)
-    (insert "- [ ] "))
-  (global-set-key (kbd "M--") 'insert-checkbox)
+;; (template insertion
+;; TODO use yasnippet
+(defun insert-org-checkbox ()
+  (interactive)
+  (insert "- [ ] "))
+(global-set-key (kbd "M--") 'insert-checkbox)
 
-  (defun insert-org-minimal-theme ()
-    (interactive)
-      (insert "#+SETUPFILE: ~/Settings/dotfiles/org-minimal-theme.setup"))
+(defun insert-org-minimal-theme ()
+  (interactive)
+    (insert "#+SETUPFILE: ~/Settings/dotfiles/org-minimal-theme.setup"))
 
-  (defun insert-org-title ()
-    (interactive)
-    (insert "#+TITLE: "))
+(defun insert-org-title ()
+  (interactive)
+  (insert "#+TITLE: "))
 
-  (defun insert-src ()
-    (interactive)
-    (insert "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC"))
+(defun insert-src ()
+  (interactive)
+  (insert "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC"))
 #+END_SRC
 
 * Meta
@@ -1333,14 +1360,14 @@ http://emacs-fu.blogspot.de/2008/12/highlighting-todo-fixme-and-friends.html
 **** startify
 **** big file handling
 **** named regexes
-  "t" (lambda () (interactive) (evil-ex "%s /foo/bar/g"))
-  as helm list
+"t" (lambda () (interactive) (evil-ex "%s /foo/bar/g"))
+as helm list
 ***** store commands
 I generally like writing custom commands, here's the one for your first replacement:
 
 (defun replace-plus-minus ()
-  (interactive)
-  (replace-string "±" "\\pm" nil (point-min) (point-max)))
+(interactive)
+(replace-string "±" "\\pm" nil (point-min) (point-max)))
 But, you can also use keyboard macros. Check out the wiki and docs.
 
 Basically, you'd do:

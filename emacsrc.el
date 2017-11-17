@@ -214,10 +214,12 @@ the tangled file is compiled."
 (add-to-list 'load-path (expand-file-name
     (concat user-emacs-directory "other-srcs/lisp")))
 
+;; TODO
 ;; theme
 ;; trust theme
 (setq custom-safe-themes t)
-(load-theme 'labburn)
+;; (load-theme 'labburn)
+;; (load-theme 'material-light)
 ;; (load-theme 'spacemacs-dark)
 ;; (load-theme 'spacemacs-light)
 ;; (load-theme 'rebecca)
@@ -226,7 +228,7 @@ the tangled file is compiled."
 ;; (load-theme 'monokai)
 ;; (load-theme 'sanityinc-tomorrow-blue)
 ;; (load-theme 'darktooth)
-;; (load-theme 'challenger-deep)
+(load-theme 'challenger-deep)
 ;; (load-theme 'avk-darkblue-yellow)
 ;; set font
 (set-frame-font "Envy Code R 16")
@@ -252,10 +254,13 @@ the tangled file is compiled."
 ;; disable tool-bar
 (tool-bar-mode -1)
 
+;; slows down emacs
 ;; show line numbers
-(global-linum-mode t)
+(global-linum-mode -1)
+(line-number-mode -1)
 
-;; y & n instead of yes & no
+;; ;;
+y & n instead of yes & no
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;; 80-column-ruler
@@ -264,12 +269,23 @@ the tangled file is compiled."
 (setq fci-rule-column 81)
 (require 'fill-column-indicator)
 
+(setq-default fill-column 80)
+(setq-default auto-fill-function 'do-auto-fill)
+
 ;; TODO define list of used programming languages (prog-mode doesn't work with js)
 (add-hook 'python-mode-hook 'turn-on-fci-mode)
 (add-hook 'js-mode-hook 'turn-on-fci-mode)
 
 ;; highlight current line
 (global-hl-line-mode)
+;; disable hl-line-mode slows down emacs in certain modes
+;; M-x cutomize-themes
+(add-hook 'special-mode-hook (lambda () (hl-line-mode -1)))
+;; M-x package-list-packages
+(add-hook 'package-menu-mode-hook (lambda () (hl-line-mode -1)))
+;; magit
+(add-hook 'magit-mode-hook (lambda () (global-hl-line-mode -1)))
+
 
 ;; wrap long lines
 (global-visual-line-mode)
@@ -279,8 +295,9 @@ the tangled file is compiled."
 ;(toggle-frame-maximized)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
+;; slows down emacs
 ;; display column number
-(setq column-number-mode t)
+;; (setq column-number-mode t)
 
 ;; switch frames with <Shift-Left/Right/Up/Down>
 (windmove-default-keybindings)
@@ -288,11 +305,11 @@ the tangled file is compiled."
 (setq-default indent-tabs-mode nil)
 
 ;; show trailing whitespace
- (setq-default show-trailing-whitespace t)
+(setq-default show-trailing-whitespace t)
 
- ;;; use 4 spaces instead of tabs
- (setq-default indent-tabs-mode nil)
- (setq-default tab-width 4)
+;; use 4 spaces instead of tabs
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
 
 ;; (setq indent-line-function 'insert-tab)
 
@@ -373,16 +390,18 @@ the tangled file is compiled."
 (setq org-log-done t)
 ;; setup priorities from A-Z
 (setq org-highest-priority ?A)
-(setq org-lowest-priority ?Z)
+(setq org-lowest-priority ?G)
 (setq org-default-priority ?A)
 ;; define states
 (setq org-todo-keywords
-       '((sequence "TODO" "NEXT" "BLOCKED" "|" "DONE")))
+       '((sequence "TODO" "NEXT" "BLOCKED" "|" "DONE" "FAILED")))
 ;; concat agenda from this files
-(setq org-agenda-files (append '("~/.notes.org" "~/Documents/org/plan/agenda.org") (file-expand-wildcards "~/Documents/org/cal/*\.org")))
+(setq org-agenda-files (append '("~/Documents/org/agenda.gpg" "~/Documents/org/wiederkehrende-tasks.org")))
+;; (setq org-agenda-files (append '("~/Documents/org/agenda.gpg" "~/Documents/org/wiederkehrende-tasks.org") (file-expand-wildcards "~/Documents/org/cal/*\.org")))
 
 ;; indentation options
 (setq org-startup-folded "showeverything")
+
 ;; In this minor mode, all lines are prefixed for display with the necessary amount of space.
 ;; All headline stars but the last one are made invisible
 (add-hook 'org-mode-hook
@@ -411,6 +430,16 @@ the tangled file is compiled."
 (setq org-capture-templates
 '(("t" "Todo" entry (file "~/Documents/org/backlog.org")
         "* TODO %?")))
+
+;; Set to the location of your Org files on your local system
+(setq org-directory "~/Documents/org")
+;; concat mobile files from this files
+(setq org-mobile-files '("mobile-notes.org" "listen/restaurants.org"))
+
+;; Set to the name of the file where new notes will be stored
+(setq org-mobile-inbox-for-pull "~/Documents/org/mobile-captured.org")
+;; Set to <your Dropbox root directory>/MobileOrg.
+(setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
 
 ;(setq python-shell-interpreter "ipython"
 ;      python-shell-interpreter-args "--simple-prompt --pprint")
@@ -565,8 +594,7 @@ the tangled file is compiled."
 
 (defun my-web-mode-hook ()
   "Hooks for Web mode."
-  (setq web-mode-markup-indent-offset 2)
-)
+  (setq web-mode-markup-indent-offset 2))
 (add-hook 'web-mode-hook  'my-web-mode-hook)
 
 (require 'evil-surround)
@@ -646,10 +674,10 @@ the tangled file is compiled."
 (setq eshell-highlight-prompt nil)
 
 ; (add-to-list 'load-path (expand-file-name
- ;     (concat user-emacs-directory "other-srcs/company-emoji")))
- ; (require 'company-emoji)
+;     (concat user-emacs-directory "other-srcs/company-emoji")))
+; (require 'company-emoji)
 
- ; (add-to-list 'company-backends 'company-emoji)
+; (add-to-list 'company-backends 'company-emoji)
 
 ;; macOS font
 (set-fontset-font
@@ -739,8 +767,7 @@ the tangled file is compiled."
 
 
 ;; minor mode for keybindings
-(
- defvar my-keys-minor-mode-map
+(defvar my-keys-minor-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "M-t") 'toggle-word-case)
     (define-key map (kbd "M-+") 'text-scale-adjust)
