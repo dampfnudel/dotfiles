@@ -710,6 +710,10 @@
 
 # functions {{{
             # tools {
+            print_shrug () {
+                echo "¯\_(ツ)_/¯"
+            }
+            
             print_python_kws () {
                 python -c "import keyword
 for kw in keyword.kwlist:
