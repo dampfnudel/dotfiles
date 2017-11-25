@@ -1191,6 +1191,16 @@ FZF-EOF"
                 (org-babel-tangle))"
         }
 
+        old () {
+            rm ~/.zshrc
+            ln -s ~dotfiles/zshrc.zsh ~/.zshrc
+        }
+
+        new () {
+            rm ~/.zshrc
+            ln -s ~dotfiles/zsh.zsh ~/.zshrc
+        }
+
     # }
 
     # vim {
