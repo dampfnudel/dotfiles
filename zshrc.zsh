@@ -710,10 +710,12 @@
 
 # functions {{{
             # tools {
+            clipboard_plain_text () {
+                pbpaste | textutil -convert txt -stdin -stdout -encoding 30 | pbcopy
+            }
             print_shrug () {
                 echo "¯\_(ツ)_/¯"
             }
-            
             print_python_kws () {
                 python -c "import keyword
 for kw in keyword.kwlist:
@@ -721,7 +723,7 @@ for kw in keyword.kwlist:
             }
             # >--< <- rm from clipboard entry
             # >>> import hashlib
-            rm_prefix () {
+            rm_prefix (){
                 pbpaste|cut -c 4-|pbcopy
             }
             # reverse line order of file
@@ -755,10 +757,13 @@ for kw in keyword.kwlist:
         }
     # }
     # echo {
+        # 
+        echo_external_ip () {
+            curl ipecho.net/plain
+        }
         # get the last file of the given directory
         echo_lf () {
             echo "$1/$(ls -1t $1/ | head -n1)"
-
         }
         echo_timestamp () {
             echo $(date +%Y-%m-%d-%H-%M-%S)
@@ -1177,6 +1182,15 @@ FZF-EOF"
             done
         }
         alias e='emacs'
+
+        tangle () {
+            FILE=$(realpath $1)
+            open -a /usr/local/Cellar/emacs/25.2/Emacs.app --args --eval "(progn
+                (require 'org)
+                (find-file (expand-file-name \"$FILE\"))
+                (org-babel-tangle))"
+        }
+
     # }
 
     # vim {
