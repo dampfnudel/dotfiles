@@ -53,27 +53,80 @@ setopt correct
 setopt HIST_IGNORE_SPACE
 #+END_SRC
 
+** Hashes
+#+BEGIN_SRC shell
+export HOME=/Users/mbayer
+# projects
+hash -d ai=$HOME/Workspace/ai
+hash -d amber=$HOME/Workspace/amber
+hash -d bay=$HOME/Workspace/bay
+hash -d gists=$HOME/Workspace/gists
+hash -d hackedHN=$HOME/Workspace/hackedHN
+hash -d impure=$HOME/Workspace/impure
+# system
+hash -d bin=$HOME/bin
+hash -d desktop=$HOME/Desktop
+hash -d dev=$HOME/Workspace
+hash -d documents=$HOME/Documents
+hash -d dotfiles=$HOME/Settings/dotfiles
+hash -d downloads=$HOME/Downloads
+hash -d dropbox=$HOME/Dropbox
+hash -d emacs.d=$HOME/.emacs.d
+hash -d library=$HOME/Library
+hash -d music=$HOME/Music
+hash -d oh-my-zsh=$HOME/.oh-my-zsh
+hash -d org=$HOME/Documents/org
+hash -d pictures=$HOME/Pictures
+hash -d regiobot=$HOME/Workspace/project-inquant/gitlab
+hash -d rezepte=$HOME/Documents/org/rezepte
+hash -d scripts=$HOME/Workspace/scripts
+hash -d settings=$HOME/Settings
+hash -d tmp=$HOME/tmp
+hash -d trash=$HOME/.Trash
+hash -d utils=$HOME/utils
+hash -d videos=$HOME/Movies
+# mounts
+hash -d i32=/Volumes/INGOT32
+hash -d i64=/Volumes/INGOT64
+hash -d sd2=/Volumes/sd2
+hash -d sd=/Volumes/sd
+hash -d v=/Volumes
+# mobile
+hash -d mobile_audiobooks=root@192.168.178.41:/storage/extSdCard/Audiobooks
+hash -d mobile_images=root@192.168.178.41:/storage/extSdCard/DCIM
+hash -d mobile_org=root@192.168.178.41:/storage/sdcard0/org_m
+hash -d mobile_sd=root@192.168.178.41:/storage/extSDCard
+hash -d mobile_storage=root@192.168.178.41:/storage/sdcard0
+# files
+hash -d emacsrc=$HOME/Settings/dotfiles/emacsrc.org
+hash -d vimrc=$HOME/Settings/dotfiles/vimrc.vim
+hash -d zsh_history=$HOME/.zsh_history
+hash -d zshrc=$HOME/Settings/dotfiles/zshrc.zsh
+#+END_SRC
+
 ** ZSH Parameters
 #+BEGIN_SRC shell
 # PATH
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/bin:$PATH"
-export HOME=/Users/mbayer
+export BIN=/usr/local/bin
 export LANG=de_DE.UTF-8
 export LC_ALL=de_DE.UTF-8
 
 # TODO Editor
 if [[ -n $SSH_CONNECTION ]]; then
-    export EDITOR='/usr/local/bin/vim'
+    export EDITOR="$BIN/vim"
 else
-    export EDITOR='open -a /usr/local/Cellar/emacs/25.2/Emacs.app'
+    export EDITOR="$HOME/Workspace/scripts/start_emacs.sh"
+    # TODO rm obsolete
     export EDITOR_TAB=${EDITOR}
-    export VIM_EDITOR='/usr/local/Cellar/macvim/8.0-110/bin/mvim'
-    export VIM_EDITOR_TAB=${VIM_EDITOR}' --remote-tab-silent'
+    export VIM_EDITOR="$BIN/mvim"
+    export VIM_EDITOR_TAB="${VIM_EDITOR} --remote-tab-silent"
 fi
 #+END_SRC
 
 ** Python Parameters
 #+BEGIN_SRC shell
+# project amber
 export DJANGO_SETTINGS_MODULE=amber.settings
 #+END_SRC
 
@@ -86,8 +139,6 @@ export DYLD_LIBRARY_PATH="$MAGICK_HOME/lib/"
 #+END_SRC
 
 ** Python
-
-** Hashes
 
 * Aliases
 
@@ -299,66 +350,6 @@ export DYLD_LIBRARY_PATH="$MAGICK_HOME/lib/"
     # export DOCKER_TLS_VERIFY=1
 # }}}
 
-# hashes / named directories {{{
-    hash -d mobile_storage=root@192.168.178.41:/storage/sdcard0
-    hash -d mobile_sd=root@192.168.178.41:/storage/extSDCard
-    hash -d mobile_org=root@192.168.178.41:/storage/sdcard0/org_m
-    hash -d mobile_images=root@192.168.178.41:/storage/extSdCard/DCIM
-    hash -d mobile_audiobooks=root@192.168.178.41:/storage/extSdCard/Audiobooks
-    hash -d tmp=$HOME/tmp
-    hash -d ai=$HOME/Workspace/ai
-    hash -d ast=$HOME/Workspace/fba/ast
-    hash -d bay=$HOME/Workspace/bay
-    hash -d bin=$HOME/bin
-    hash -d utils=$HOME/utils
-    hash -d colors=$HOME/Settings/colors
-    hash -d custom=$HOME/.oh-my-zsh/custom
-    hash -d desktop=$HOME/Desktop
-    hash -d dev=$HOME/Workspace
-    hash -d documents=$HOME/Documents
-    hash -d dotfiles=$HOME/Settings/dotfiles
-    hash -d downloads=$HOME/Downloads
-    hash -d dropbox=$HOME/Dropbox
-    hash -d firma=$HOME/Documents/firma
-    hash -d fzf_marks=$HOME/Workspace/fzf_marks
-    hash -d gists=$HOME/Workspace/gists
-    hash -d hackedHN=$HOME/Workspace/hackedHN
-    hash -d i32=/Volumes/INGOT32
-    hash -d i64=/Volumes/INGOT64
-    hash -d impure=$HOME/Workspace/impure
-    hash -d jason=$HOME/Workspace/moment/jason
-    hash -d library=$HOME/Library
-    hash -d moment=$HOME/Workspace/moment
-    hash -d music=$HOME/Music
-    hash -d oh-my-zsh=$HOME/.oh-my-zsh
-    hash -d org=$HOME/Documents/org
-    hash -d pictures=$HOME/Pictures
-    hash -d plan=$HOME/Documents/org/plan
-    hash -d regiobot=$HOME/Workspace/project-inquant/gitlab
-    hash -d rezepte=$HOME/Documents/org/rezepte
-    hash -d scripts=$HOME/Workspace/scripts
-    hash -d sd=/Volumes/sd
-    hash -d sd2=/Volumes/sd2
-    hash -d settings=$HOME/Settings
-    hash -d termxplorer=$HOME/Workspace/termxplorer
-    hash -d test=$HOME/Workspace/test_repo
-    hash -d til=$HOME/Workspace/til
-    hash -d trash=$HOME/.Trash
-    hash -d tx=$HOME/Workspace/termxplorer/docker
-    hash -d v=/Volumes
-    hash -d videos=$HOME/Movies
-    hash -d wil=$HOME/Workspace/wil
-    hash -d emacs.d=$HOME/.emacs.d
-    hash -d snippets=$HOME/.emacs.d/snippets
-    hash -d amazin=$HOME/Workspace/fba/amazin
-    hash -d amber=$HOME/Workspace/amber
-
-    # files
-    hash -d emacsrc=$HOME/Settings/dotfiles/emacsrc.org
-    hash -d vimrc=$HOME/Settings/dotfiles/vimrc.vim
-    hash -d zsh_history=$HOME/.zsh_history
-    hash -d zshrc=$HOME/Settings/dotfiles/zshrc.zsh
-# }}}
 
 # keybindings / keymappings {{{
     # vi mode
