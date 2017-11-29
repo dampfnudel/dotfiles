@@ -1,3 +1,13 @@
+(defun tangle-init-zsh ()
+"If the current buffer is 'zsh.org' the code-blocks are tangled"
+(when (equal (buffer-file-name)
+    (expand-file-name "~/Settings/dotfiles/zsh.org"))
+    ;; avoid running hooks when tangling.
+    (let ((prog-mode-hook nil))
+    (org-babel-tangle))))
+
+(add-hook 'after-save-hook 'tangle-init-zsh)
+
 (custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
 
 (defun kill-ring-save-until (x)
@@ -199,7 +209,7 @@ Version 2016-01-08"
                         (when (memq window-system '(mac ns))
                             (package-install 'exec-path-from-shell))))))
 
-(defun tangle-init ()
+(defun tangle-init-emacs ()
 "If the current buffer is 'emacsrc.org' the code-blocks are tangled, and
 the tangled file is compiled."
 (when (equal (buffer-file-name)
@@ -209,7 +219,7 @@ the tangled file is compiled."
     (org-babel-tangle)
     (byte-compile-file (expand-file-name "~/Settings/dotfiles/emacsrc.el")))))
 
-(add-hook 'after-save-hook 'tangle-init)
+(add-hook 'after-save-hook 'tangle-init-emacs)
 
 (add-to-list 'load-path (expand-file-name
     (concat user-emacs-directory "other-srcs/lisp")))
@@ -285,6 +295,14 @@ y & n instead of yes & no
 (add-hook 'package-menu-mode-hook (lambda () (hl-line-mode -1)))
 ;; magit
 (add-hook 'magit-mode-hook (lambda () (global-hl-line-mode -1)))
+; https://stackoverflow.com/questions/6837511/automatically-disable-a-global-minor-mode-for-a-specific-major-mode
+;(define-global-minor-mode my-global-centered-cursor-mode global-undo-tree-mode
+;  (lambda ()
+;    (when (not (memq major-mode
+;                     (list 'fireplace-mode)))
+;      (global-undo-tree-mode))))
+;
+;(my-global-centered-cursor-mode 1)
 
 
 ;; wrap long lines
