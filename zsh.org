@@ -62,7 +62,7 @@ http://zsh.sourceforge.net/Doc/Release/Options.html
 unsetopt option == setopt no_option
 #+BEGIN_SRC shell
 # allow to change to a directory by entering it as a command
-setopt auto_cd 
+setopt auto_cd
 # prevent > redirection from truncating the given file if it already exists
 setopt no_clobber
 # recognize comments
@@ -259,6 +259,47 @@ zstyle ':completion:*:rm:*' ignore-line yes
 
 ** Python
 
+      path=(
+          $path
+          /usr/bin/python
+          /usr/local/bin/python3
+      )
+
+      # virtualenv {
+          export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
+          export PROJECT_HOME=$HOME/Workspace
+          export WORKON_HOME=$HOME/Workspace/Envs
+          export VIRTUALENV_ROOT=$WORKON_HOME
+          export DEFAULT_PYTHON_INTERPRETER=$WORKON_HOME/python3.4.1/bin/python
+          source /usr/local/bin/virtualenvwrapper.sh
+
+          # fix the new tab = virtual_env dir bug
+          if [[ "$PWD" == "$HOME/Workspace/Envs" ]]; then
+              cd - > /dev/null
+          fi
+
+*** virtualenvwrapper                                              :plugin:
+https://virtualenvwrapper.readthedocs.io/en/latest/
+#+BEGIN_SRC shell
+export WORKON_HOME=~dev/Envs
+export PROJECT_HOME=~dev
+source "$BIN/virtualenvwrapper.sh"
+#+END_SRC
+
+*** virtualenv                                                     :plugin:
+https://virtualenv.pypa.io/en/latest/
+#+BEGIN_SRC shell
+# set default virtual_env
+export VIRTUALENV_DEFAULT_PATH="$WORKON_HOME/python3.4.1/bin/activate"
+# load it
+if [[ $(basename "$VIRTUAL_ENV") == "" ]]
+then
+    if [[ -f "$VIRTUALENV_DEFAULT_PATH" ]]; then
+        source "$VIRTUALENV_DEFAULT_PATH"
+    fi
+fi
+#+END_SRC
+
 * Aliases
 :PROPERTIES:
 :CUSTOM_ID: aliases
@@ -327,6 +368,32 @@ bindkey . rationalise-dot
 :PROPERTIES:
 :CUSTOM_ID: plugins
 :END:
+** fzf
+https://github.com/junegunn/fzf
+https://github.com/junegunn/fzf/wiki
+
+# TODO complete
+| shortcut      | action            |
+|---------------+-------------------|
+| CTRL-G CTRL-F | git files         |
+| CTRL-G CTRL-B | git branches      |
+| CTRL-G CTRL-T | git tags          |
+| CTRL-G CTRL-R | git remotes       |
+| CTRL-G CTRL-H | git commit hashes |
+
+#+BEGIN_SRC shell
+## source completions and bindings
+source ~dotfiles/zsh/plugins/fzf/completion.zsh
+# https://junegunn.kr/2016/07/fzf-git/
+source ~dotfiles/zsh/plugins/fzf/git-completion.zsh
+source ~dotfiles/zsh/plugins/fzf/key-bindings.zsh
+
+export FZF_DEFAULT_COMMAND='
+    (git ls-files $(git rev-parse --show-toplevel) ||
+        /usr/bin/find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
+        sed s/^..//) 2> /dev/null'
+
+#+END_SRC
 
 * Original zshrc
 :PROPERTIES:
@@ -345,32 +412,12 @@ bindkey . rationalise-dot
       # completion {
           # enable vcs_info used by the prompt
           autoload -U compinit && compinit
-          autoload -Uz vcs_info
-          zstyle ':vcs_info:*' enable git svn
-          precmd () { vcs_info ; }
     
           zstyle ':completion:*' completer _expand _complete
-    
-
-          zstyle ':completion:*' users resolve
-          # use dircolours in completion listings
-          zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-          # Enable menu completion
-          zstyle ':completion*:default' menu 'select=1'
     
           # allow approximate matching
           zstyle ':completion:*' completer _complete _match _approximate
           zstyle ':completion:*:match:*' original only
-          zstyle ':completion:*:approximate:*' max-errors 1 numeric
-          zstyle ':completion:*' auto-description 'Specify: %d'
-          zstyle ':completion:*' format 'Completing %d'
-          zstyle ':completion:*' verbose true
-          zstyle ':completion:*:functions' ignored-patterns '_*'
-          zstyle ':completion:*:*:(^rm):*:*files' ignored-patterns \
-          '*?.(o|c~|zwc)' '*?~'
-    
-          zstyle ':completion:*:vim:*' ignored-patterns '*.(o|a|so|aux|dvi|log|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pdf|ps|pyc)'
-    
           # init completion
           autoload -U compinit && compinit
       # #}
@@ -455,55 +502,13 @@ bindkey . rationalise-dot
           source ~/.oh-my-zsh/custom/plugins/fzf/completion.zsh
 
                   # ag -g "" --path-to-agignore ~/.agignore'
-          export FZF_DEFAULT_COMMAND='
-              (git ls-files $(git rev-parse --show-toplevel) ||
-                  /usr/bin/find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
-                  sed s/^..//) 2> /dev/null'
-
-          # Feed the output of ag into fzf
-          alias fzf_ag='ag -g "" | fzf'
-
-          # To apply the command to CTRL-T as well
-          export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-
-          # fzf bms {
-              alias fm='. fm'
-              FZF_MARKS_DIRMARKS=~/.fzf_dirmarks
-              FZF_MARKS_FILEMARKS=~/.fzf_filemarks
-              FZF_MARKS_TEXT_ACTION=${EDITOR_TAB}
-              FZF_MARKS_FILE_ACTION='open'
-              FZF_MARKS_DIR_ACTION='cd'
+# Feed the output of ag into fzf
+alias fzf_ag='ag -g "" | fzf'
           # }
       # }
   # }}}
 
   # python {{{
-      path=(
-          $path
-          /usr/bin/python
-          /usr/local/bin/python3
-      )
-
-      # virtualenv {
-          export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
-          export PROJECT_HOME=$HOME/Workspace
-          export WORKON_HOME=$HOME/Workspace/Envs
-          export VIRTUALENV_ROOT=$WORKON_HOME
-          export DEFAULT_PYTHON_INTERPRETER=$WORKON_HOME/python3.4.1/bin/python
-          source /usr/local/bin/virtualenvwrapper.sh
-
-          # fix the new tab = virtual_env dir bug
-          if [[ "$PWD" == "$HOME/Workspace/Envs" ]]; then
-              cd - > /dev/null
-          fi
-          # set default virtual_env
-          if [[ $(basename "$VIRTUAL_ENV") == "" ]]
-          then
-              local virtualenv_default_path="$HOME/Workspace/Envs/python3.4.1/bin/activate"
-              if [[ -f "$virtualenv_default_path" ]]; then
-                  source "$virtualenv_default_path"
-              fi
-          fi
       # }
   # }}}
 

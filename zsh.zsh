@@ -16,12 +16,46 @@ new () {
     ln -s ~dotfiles/zsh.zsh ~/.zshrc
 }
 
-# Try to correct the spelling of all arguments in a line.
-unsetopt correct_all
-# Try to correct the spelling of commands.
+# allow to change to a directory by entering it as a command
+setopt auto_cd
+# prevent > redirection from truncating the given file if it already exists
+setopt no_clobber
+# recognize comments
+setopt interactivecomments
+
+## correction
+# automatically correct the spelling of each word on the command line
+setopt correct_all
+# try to correct the spelling of commands.
 setopt correct
-# Remove command lines from the history list when the first character on the line is a space
-setopt HIST_IGNORE_SPACE
+
+## history
+# zsh sessions will append their history list to the history file, rather than replace it. Thus, multiple parallel zsh sessions will all have the new entries from their history lists added to the history file
+setopt append_history
+# works like APPEND_HISTORY except that new history lines are added to the $HISTFILE incrementally (as soon as they are entered), rather than waiting until the shell exits
+setopt inc_append_history
+# save each command’s beginning timestamp (in seconds since the epoch) and the duration (in seconds) to the history file
+setopt extended_history
+# the oldest history event that has a duplicate will be lost before losing a unique event from the list
+setopt hist_expire_dups_first
+# ignore duplication command history list
+setopt hist_ignore_dups
+# remove command lines from the history list when the first character on the line is a space
+setopt hist_ignore_space
+# whenever the user enters a line with history expansion, don’t execute the line directly; instead, perform history expansion and reload the line into the editing buffer.
+setopt hist_verify
+# use the same history file for all sessions
+setopt share_history
+
+## completion
+# do not autoselect the first completion entry
+unsetopt menu_complete
+# show completion menu on successive tab press
+setopt auto_menu
+# if unset, the cursor is set to the end of the word if completion is started. Otherwise it stays there and completion is done from both ends.
+setopt complete_in_word
+# if a completion is performed with the cursor within a word, and a full completion is inserted, the cursor is moved to the end of the word. That is, the cursor is moved to the end of the word if either a single match is inserted or menu completion is performed.
+setopt always_to_end
 
 export HOME=/Users/mbayer
 # projects
@@ -71,27 +105,138 @@ hash -d vimrc=$HOME/Settings/dotfiles/vimrc.vim
 hash -d zsh_history=$HOME/.zsh_history
 hash -d zshrc=$HOME/Settings/dotfiles/zshrc.zsh
 
-# PATH
+# $PATH
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/bin:$PATH"
+
+# paths
+# TODO hash?
 export BIN=/usr/local/bin
+export DOTFILES="$HOME/Settings/dotfiles"
+
+# language
 export LANG=de_DE.UTF-8
 export LC_ALL=de_DE.UTF-8
 
-# TODO Editor
+# history
+# TODO rm 2
+export HISTFILE="$HOME/.zsh_history2"
+export HISTSIZE=1200000
+export SAVEHIST=1000000
+
+# $EDITOR
 if [[ -n $SSH_CONNECTION ]]; then
     export EDITOR="$BIN/vim"
 else
-    export EDITOR="$HOME/Workspace/scripts/start_emacs.sh"
+    export EDITOR=~bin"/emacs"
     # TODO rm obsolete
     export EDITOR_TAB=${EDITOR}
     export VIM_EDITOR="$BIN/mvim"
+    # TODO function || alias
     export VIM_EDITOR_TAB="${VIM_EDITOR} --remote-tab-silent"
 fi
+
+# $LS_COLORS
+# TODO 
+eval $(gdircolors -b "$DOTFILES/monobay.256dark")
 
 # project amber
 export DJANGO_SETTINGS_MODULE=amber.settings
 
-# imagemagick
-export MAGICK_HOME="$HOME/bin/ImageMagick-7.0.3"
-export PATH="$MAGICK_HOME/bin:$PATH"
-export DYLD_LIBRARY_PATH="$MAGICK_HOME/lib/"
+
+
+# initialize the completion system
+autoload -U compinit && compinit
+# enable menu widget
+# zstyle ':completion*:default' menu 'select=1'
+zstyle ':completion:*' menu select
+# use dircolors in completion listings
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+# color options red, descriptions green
+zstyle ':completion:*:options' list-colors '=(#b)*(-- *)=31=32'
+zstyle ':completion:*:common-commands' list-colors '=(#b)*(-- *)=31=32'
+# print the completion type
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*' format 'Completing %B%d%b'
+# TODO style
+zstyle ':completion:*:descriptions' format "$fg[yellow]%B--- %d%b"
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format "$fg[red]No matches for:$reset_color %d"
+zstyle ':completion:*:corrections' format '%B%d (errors: %e)%b'
+# group different completion types
+zstyle ':completion:*' group-name ''
+# error can be a transposed character, a missing character or an additional character
+# to have a better heuristic, by allowing one error per 6 character typed
+zstyle ':completion:*:approximate:*' max-errors 'reply=( $(( ($#PREFIX+$#SUFFIX)/6 )) numeric )'
+# case insensitive matching
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+# caching
+zstyle ':completion:*' use-cache on
+# TODO required?
+zstyle ':completion:*' cache-path "$HOME/.zsh/cache" 
+# ignore completion functions for commands you don’t have:
+zstyle ':completion:*:functions' ignored-patterns '_*'
+# don't complete uninteresting users
+zstyle ':completion:*:*:*:users' ignored-patterns \
+    adm amanda apache at avahi avahi-autoipd beaglidx bin cacti canna \
+    clamav daemon dbus distcache dnsmasq dovecot fax ftp games gdm \
+    gkrellmd gopher hacluster haldaemon halt hsqldb ident junkbust kdm \
+    ldap lp mail mailman mailnull man messagebus  mldonkey mysql nagios \
+    named netdump news nfsnobody nobody nscd ntp nut nx obsrun openvpn \
+    operator pcap polkitd postfix postgres privoxy pulse pvm quagga radvd \
+    rpc rpcuser rpm rtkit scard shutdown squid sshd statd svn sync tftp \
+    usbmux uucp vcsa wwwrun xfs '_*'
+# don't complete uninteresting files
+zstyle ':completion:*:emacs:*' ignored-patterns '*.(o|a|so|aux|dvi|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pdf|ps|pyc)'
+# avoid getting offered the same filename with rm
+zstyle ':completion:*:rm:*' ignore-line yes
+
+export WORKON_HOME=~dev/Envs
+export PROJECT_HOME=~dev
+source "$BIN/virtualenvwrapper.sh"
+
+# set default virtual_env
+export VIRTUALENV_DEFAULT_PATH="$WORKON_HOME/python3.4.1/bin/activate"
+# load it
+if [[ $(basename "$VIRTUAL_ENV") == "" ]]
+then
+    if [[ -f "$VIRTUALENV_DEFAULT_PATH" ]]; then
+        source "$VIRTUALENV_DEFAULT_PATH"
+    fi
+fi
+
+# filter columns
+alias -g _awk1="|awk '{print \$1}'"
+alias -g _awk2="|awk '{print \$2}'"
+alias -g _awk3="|awk '{print \$3}'"
+alias -g _awk4="|awk '{print \$4}'"
+alias -g _awk5="|awk '{print \$5}'"
+alias -g _awk6="|awk '{print \$6}'"
+# count lines
+alias -g _cl='| wc -l'
+# archives in pwd
+alias -g _acd='./(*.bz2|*.gz|*.tgz|*.zip|*.z)'
+
+# TODO
+# open org-mode files in emacs
+alias -s org=emacs
+
+rationalise-dot() {
+  if [[ $LBUFFER = *.. ]]; then
+    LBUFFER+=/..
+  else
+    LBUFFER+=.
+  fi
+}
+zle -N rationalise-dot
+bindkey . rationalise-dot
+
+## source completions and bindings
+source ~dotfiles/zsh/plugins/fzf/completion.zsh
+# https://junegunn.kr/2016/07/fzf-git/
+source ~dotfiles/zsh/plugins/fzf/git-completion.zsh
+source ~dotfiles/zsh/plugins/fzf/key-bindings.zsh
+
+export FZF_DEFAULT_COMMAND='
+    (git ls-files $(git rev-parse --show-toplevel) ||
+        /usr/bin/find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
+        sed s/^..//) 2> /dev/null'
