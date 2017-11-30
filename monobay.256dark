@@ -82,12 +82,12 @@ TERM xterm-termite
 
 ## Special files
 
-NORMAL 00;38;5;244 # no color code at all
-#FILE 00 # regular file: use no color at all
+NORMAL 00
 RESET 0 # reset to "normal" color
+FILE 00 # regular file: use no color at all
 DIR 00;38;5;81 # directory 01;34
 LINK 01;38;5;37 # symbolic link. (If you set this to 'target' instead of a
- # numerical value, the color is as for the file pointed to.)
+# numerical value, the color is as for the file pointed to.)
 MULTIHARDLINK 00 # regular file with more than one link
 FIFO 48;5;230;38;5;148;01 # pipe
 SOCK 48;5;230;38;5;148;01 # socket
@@ -103,6 +103,8 @@ OTHER_WRITABLE 48;5;235;38;5;33 # dir that is other-writable (o+w) and not stick
 STICKY 48;5;33;38;5;230 # dir with the sticky bit set (+t) and not other-writable
 # This is for files with execute permission:
 EXEC 01;38;5;196
+
+
 
 ## Archives or compressed (violet + bold for compression)
 .tar    00;38;5;141
@@ -142,6 +144,7 @@ EXEC 01;38;5;196
 .jpg    00;38;5;148
 .JPG    00;38;5;148 #stupid but needed
 .jpeg   00;38;5;148
+.JPEG   00;38;5;148
 .gif    00;38;5;148
 .bmp    00;38;5;148
 .pbm    00;38;5;148
@@ -224,6 +227,7 @@ EXEC 01;38;5;196
 
 # "unimportant" files as backups (base01)
 .bak        00;38;5;240
+.bu         00;38;5;240
 .aux        00;38;5;240
 .lof        00;38;5;240
 .lol        00;38;5;240
