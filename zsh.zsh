@@ -135,6 +135,9 @@ else
     export VIM_EDITOR_TAB="${VIM_EDITOR} --remote-tab-silent"
 fi
 
+# A list of non-alphanumeric characters considered part of a word by the line editor.
+export WORDCHARS='*?_-.[]~=/&;!#$%^(){}<>/'
+
 # $LS_COLORS
 # TODO 
 eval $(gdircolors -b "$DOTFILES/monobay.256dark")
@@ -207,6 +210,10 @@ fi
 # ripgrep as find
 # TODO define in var
 alias fd="rg --files --no-ignore --hidden --follow -g '!{.git,node_modules}/*'"
+# create parent directories on demand
+alias mkdir="mkdir -pv"
+# disk usage statistics default
+alias du="du -ach | sort"
 
 # filter columns
 alias -g _awk1="|awk '{print \$1}'"
@@ -215,8 +222,10 @@ alias -g _awk3="|awk '{print \$3}'"
 alias -g _awk4="|awk '{print \$4}'"
 alias -g _awk5="|awk '{print \$5}'"
 alias -g _awk6="|awk '{print \$6}'"
+# filter with fzf
+alias -g _f="|fzf"
 # count lines
-alias -g _cl='| wc -l'
+alias -g _cl='|wc -l'
 # archives in pwd
 alias -g _acd='./(*.bz2|*.gz|*.tgz|*.zip|*.z)'
 
@@ -224,40 +233,154 @@ alias -g _acd='./(*.bz2|*.gz|*.tgz|*.zip|*.z)'
 # open org-mode files in emacs
 alias -s org=emacs
 
-function human_time () {
+# Custom fuzzy completion for "doge" command
+#   e.g. doge **<TAB>
+_fzf_complete_doge() {
+  _fzf_complete "--multi --reverse" "$@" < <(
+    echo very
+    echo wow
+    echo such
+    echo doge
+  )
+}
+
+function bip() {
+    # Install (one or multiple) selected application(s)
+    # using "brew search" as source input
+    # mnemonic [B]rew [I]nstall [P]lugin
+    local inst=$(brew search | fzf -m)
+
+    if [[ $inst ]]; then
+      for prog in $(echo $inst);
+      do; brew install $prog; done;
+    fi
+}
+
+function bup() {
+    # Update (one or multiple) selected application(s)
+    # mnemonic [B]rew [U]pdate [P]lugin
+    local upd=$(brew leaves | fzf -m)
+
+    if [[ $upd ]]; then
+      for prog in $(echo $upd);
+      do; brew upgrade $prog; done;
+    fi
+}
+function bcp() {
+    # Delete (one or multiple) selected application(s)
+    # mnemonic [B]rew [C]lean [P]lugin (e.g. uninstall)
+    local uninst=$(brew leaves | fzf -m)
+
+    if [[ $uninst ]]; then
+    for prog in $(echo $uninst);
+    do; brew uninstall $prog; done;
+    fi
+    }
+
+function chrome_history () {
+    # browse chrome history
+    local cols sep entry
+    cols=$(( COLUMNS / 3 ))
+    sep='{{::}}'
+
+    # Copy History DB to circumvent the lock
+    # - See http://stackoverflow.com/questions/8936878 for the file path
+    cp -f ~/Library/Application\ Support/Google/Chrome/Default/History /tmp/h
+
+    entry=$(sqlite3 -separator $sep /tmp/h \
+        "select substr(title, 1, $cols), url
+        from urls order by last_visit_time desc" |
+    awk -F $sep '{printf "%-'$cols's  \x1b[36m%s\n", $1, $2}' |
+    fzf --ansi --multi | sed 's#.*\(https*://\)#\1#')
+    echo "$entry"
+    open "$entry"
+}
+
+function fdr() {
+    # fdr - cd to selected parent directory
+    local declare dirs=()
+    get_parent_dirs() {
+      if [[ -d "${1}" ]]; then dirs+=("$1"); else return; fi
+      if [[ "${1}" == '/' ]]; then
+        for _dir in "${dirs[@]}"; do echo $_dir; done
+      else
+        get_parent_dirs $(dirname "$1")
+      fi
+    }
+    local DIR=$(get_parent_dirs $(realpath "${1:-$PWD}") | fzf-tmux --tac)
+    cd "$DIR"
+}
+
+function human_time_cat () {
     # print unix timestamps in human readable form
     if [ $# -eq 0 ]; then echo "Argument required"; return 1; fi
     perl -lne 'm#: (\d+):\d+;(.+)# && printf "%s :: %s\n",scalar localtime $1,$2' $1
 }
 
-rationalise-dot() {
-  if [[ $LBUFFER = *.. ]]; then
-    LBUFFER+=/..
-  else
-    LBUFFER+=.
-  fi
+function latest_in () {
+    # select file in a given directory (sorted by dates)
+    if [ $# -eq 0 ]; then echo "Argument required"; return 1; fi
+    ls -1t "$1" | fzf
+}
+
+bindkey '^N' accept-and-hold                        # ctrl n .................... multiselect in menu complete
+bindkey '^[^[[D' backward-word                      # alt <arrow-left>............move a word backward
+bindkey '^[^[[C' forward-word                       # alt <arrow-right>...........move a word forward
+bindkey '^[^H' backward-kill-word                   # cmd <del>...................delete the word left of the cursor
+bindkey '^A' beginning-of-line                      # cmd <arrow-left>............move to the beginning of the line
+bindkey '^E' end-of-line                            # cmd <arrow-right>...........move to the end of the line
+bindkey '^[^[[B' kill-whole-line                    # cmd <arrow-down>............delete the whole line
+bindkey '^X' delete-char                            # ctrl x......................delete the char under the cursor
+bindkey '^W' delete-word                            # ctrl w......................delete the word under the cursor
+bindkey -s '^[^[[A' 'cd ..\n'                       # alt <arrow-up>..............cd ..
+bindkey -s '^L' 'ls -laH\n'                         # ctr l.......................ls -laH
+bindkey '^[[A' history-beginning-search-backward    # <arrow-up>..................history substring search backward
+bindkey '^[[B' history-beginning-search-forward     # <arrow-down>................history substring search forward
+# fixes outputting tildes on <del>
+bindkey '^[[3~' delete-char
+bindkey '^[3;5~' delete-char
+
+function rationalise-dot() {
+    # expands .... to ../../..
+    if [[ $LBUFFER = *.. ]]; then
+        LBUFFER+=/..
+    else
+        LBUFFER+=.
+    fi
 }
 zle -N rationalise-dot
 bindkey . rationalise-dot
+
+function backward-delete-path-part () {
+    # backward delete until /
+    # TODO document
+    # local WORDCHARS="${WORDCHARS:s#/#}"
+    local WORDCHARS="${WORDCHARS//\/}"
+    zle backward-delete-word
+}
+zle -N backward-delete-path-part
+bindkey '^W' backward-delete-path-part
 
 ## source completions and bindings
 source ~dotfiles/zsh/plugins/fzf/completion.zsh
 # https://junegunn.kr/2016/07/fzf-git/
 source ~dotfiles/zsh/plugins/fzf/git-completion.zsh
 source ~dotfiles/zsh/plugins/fzf/key-bindings.zsh
+# TODO steal, fullscreen
+source ~dotfiles/zsh/plugins/forgit/forgit.plugin.zsh
 
 ## default commands
 export FZF_DEFAULT_COMMAND="
     (git ls-tree -r --name-only HEAD \$(git rev-parse --show-toplevel) ||
     rg --files --no-ignore --hidden --follow -g '!{.git,node_modules}/*') 2> /dev/null"
 
-# TODO better preview (sh, el)
-export FZF_DEFAULT_OPTS="--multi --cycle --border --margin 1% --prompt 'ϟ '
-    --select-1 --exit-0
+# TODO preview with someting fast, fallback to pygmentize
+export FZF_DEFAULT_OPTS="--multi --cycle --select-1 --exit-0
+    --border --margin 1% --prompt 'ϟ ' --no-height --no-reverse
+    --color fg:-1,bg:-1,hl:230,fg+:3,bg+:233,hl+:229
+    --color info:150,prompt:110,spinner:150,pointer:167,marker:174
     --header='Anchored-match (^music, .mp3\$) | Exact-Match (’quoted) | Negation (!fire) | OR operator (^core go\$ | rb\$ | py\$)'
-    --preview '[[ -d {} ]] && tree {} ||
-               [[ \$(file --mime {}) =~ binary ]] &&
-                 echo {} is a binary file && ls -lah {} ||
+    --preview '[[ -d {} ]] && tree -C {} | head -200 ||
                  (highlight -O ansi -l {} ||
                   ls -lah {} &&
                   pygmentize {} ||
@@ -269,3 +392,5 @@ export FZF_DEFAULT_OPTS="--multi --cycle --border --margin 1% --prompt 'ϟ '
 
 # to apply the command to CTRL-T as well (CTRL-F in my case)
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+# TODO get cp working
+# export FZF_CTRL_T_OPTS="--bind 'ctrl-x:execute(echo {}|awk '{print \$2}'|pbcopy)+accept'"
