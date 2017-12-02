@@ -214,6 +214,8 @@ alias fd="rg --files --no-ignore --hidden --follow -g '!{.git,node_modules}/*'"
 alias mkdir="mkdir -pv"
 # disk usage statistics default
 alias du="du -ach | sort"
+# continue the download in case of problems
+alias wget="wget -c"
 
 # filter columns
 alias -g _awk1="|awk '{print \$1}'"
@@ -323,22 +325,115 @@ function latest_in () {
     ls -1t "$1" | fzf
 }
 
-bindkey '^N' accept-and-hold                        # ctrl n .................... multiselect in menu complete
+# Make sure that the terminal is in application mode when zle is active, since
+# only then values from $terminfo are valid
+if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
+    function zle-line-init() {
+        echoti smkx
+    }
+    function zle-line-finish() {
+        echoti rmkx
+    }
+    zle -N zle-line-init
+    zle -N zle-line-finish
+fi
+
+## movement http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Movement
 bindkey '^[^[[D' backward-word                      # alt <arrow-left>............move a word backward
 bindkey '^[^[[C' forward-word                       # alt <arrow-right>...........move a word forward
-bindkey '^[^H' backward-kill-word                   # cmd <del>...................delete the word left of the cursor
 bindkey '^A' beginning-of-line                      # cmd <arrow-left>............move to the beginning of the line
 bindkey '^E' end-of-line                            # cmd <arrow-right>...........move to the end of the line
-bindkey '^[^[[B' kill-whole-line                    # cmd <arrow-down>............delete the whole line
+bindkey '^[[1;2B' down-line
+bindkey '^[[1;2A' up-line
+bindkey '^N' vi-find-next-char
+
+## Modifying-Text http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Modifying-Text
+bindkey ';6D' copy-prev-word # ctr shift <-
+
+## kill
+bindkey '^[^H' backward-kill-word                   # cmd <del>...................delete the word left of the cursor
+bindkey '^[csd' backward-kill-word
 bindkey '^X' delete-char                            # ctrl x......................delete the char under the cursor
-bindkey '^W' delete-word                            # ctrl w......................delete the word under the cursor
+bindkey '^[csku' kill-line
+bindkey '^[k' kill-region
+bindkey '^?' backward-delete-char                     # [Backspace] - delete backward
+if [[ "${terminfo[kdch1]}" != "" ]]; then
+    bindkey "${terminfo[kdch1]}" delete-char            # [Delete] - delete forward
+else
+    # fixes outputting tildes on <del>
+    bindkey "^[[3~" delete-char
+    bindkey "^[3;5~" delete-char
+    bindkey "\e[3~" delete-char
+fi
+#bindkey '^[^[[B' kill-whole-line                    # cmd <arrow-down>............delete the whole line
+
+## other
+bindkey '^[[5~' up-history
+# ctrl s
+bindkey '^[cks' accept-and-hold                        # ctrl n .................... multiselect in menu complete
 bindkey -s '^[^[[A' 'cd ..\n'                       # alt <arrow-up>..............cd ..
 bindkey -s '^L' 'ls -laH\n'                         # ctr l.......................ls -laH
-bindkey '^[[A' history-beginning-search-backward    # <arrow-up>..................history substring search backward
-bindkey '^[[B' history-beginning-search-forward     # <arrow-down>................history substring search forward
-# fixes outputting tildes on <del>
-bindkey '^[[3~' delete-char
-bindkey '^[3;5~' delete-char
+if [[ "${terminfo[kcbt]}" != "" ]]; then
+    bindkey "${terminfo[kcbt]}" reverse-menu-complete   # [Shift-Tab] - move through the completion menu backwards
+fi
+
+## history
+# bindkey '^[u' history-substring-search-up
+# bindkey '^[d' history-substring-search-down
+
+bindkey '^[u' history-search-multi-word
+bindkey '^[d' history-search-multi-word-backwards
+
+
+## mark
+# alt down
+bindkey '^[^[[B' set-mark-command
+# alt up
+bindkey '^[^[[A' deactivate-region
+
+function repeat-cmd () {
+    # repeat the last command
+    zle up-history
+    zle accept-line
+}
+
+zle -N repeat-cmd
+# ctrl l
+bindkey '^H' repeat-cmd
+
+function kill-first-word () {
+    # kill the first word on the cmdline and move cursor to beginning of line
+    zle beginning-of-line
+    zle forward-word
+    zle backward-kill-word
+    zle magic-space
+    zle backward-word
+}
+
+zle -N kill-first-word
+# ctrl shift f
+bindkey '^[cskf' kill-first-word
+
+function kill-word-under-cursor () {
+    # kill the word under the cursor
+    zle forward-word
+    zle backward-kill-word
+}
+
+zle -N kill-word-under-cursor
+# ctrl shift w
+bindkey '^[cskw' kill-word-under-cursor
+
+function copy-cmdline-to-clipboard () {
+    # Copy the current commandline to the system clipboard
+    zle kill-whole-line
+    print -rn -- $CUTBUFFER | pbcopy
+    zle undo
+}
+
+zle -N copy-cmdline-to-clipboard
+# esc c
+bindkey '^[c' copy-cmdline-to-clipboard
 
 function rationalise-dot() {
     # expands .... to ../../..
@@ -360,6 +455,14 @@ function backward-delete-path-part () {
 }
 zle -N backward-delete-path-part
 bindkey '^W' backward-delete-path-part
+
+source ~dotfiles/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+source ~dotfiles/zsh/plugins/history-search-multi-word/history-search-multi-word.plugin.zsh
+
+#source ~dotfiles/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+
+source ~dotfiles/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
 
 ## source completions and bindings
 source ~dotfiles/zsh/plugins/fzf/completion.zsh
@@ -394,3 +497,5 @@ export FZF_DEFAULT_OPTS="--multi --cycle --select-1 --exit-0
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 # TODO get cp working
 # export FZF_CTRL_T_OPTS="--bind 'ctrl-x:execute(echo {}|awk '{print \$2}'|pbcopy)+accept'"
+
+export PROMPT='%F{red}%n%f@%F{blue}%m%f %F{yellow}%1~% %# '

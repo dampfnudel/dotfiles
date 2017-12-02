@@ -318,6 +318,8 @@ alias fd="rg --files --no-ignore --hidden --follow -g '!{.git,node_modules}/*'"
 alias mkdir="mkdir -pv"
 # disk usage statistics default
 alias du="du -ach | sort"
+# continue the download in case of problems
+alias wget="wget -c"
 #+END_SRC
 
 ** Global aliases
@@ -478,27 +480,145 @@ function latest_in () {
 :PROPERTIES:
 :CUSTOM_ID: keybindings
 :END:
+http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html
+
+to find out what the terminal emulator sends:
+$ cat<RET><key-chard>
+if this isn't usable let the terminal emulator send escape codes
+
+Scrolling is done via cmd-up/down
 ** rebindings
+https://stackoverflow.com/questions/21946281/what-is-application-mode-in-terminals-zsh-terminfo
 #+BEGIN_SRC shell
-bindkey '^N' accept-and-hold                        # ctrl n .................... multiselect in menu complete
-bindkey '^[^[[D' backward-word                      # alt <arrow-left>............move a word backward
-bindkey '^[^[[C' forward-word                       # alt <arrow-right>...........move a word forward
-bindkey '^[^H' backward-kill-word                   # cmd <del>...................delete the word left of the cursor
-bindkey '^A' beginning-of-line                      # cmd <arrow-left>............move to the beginning of the line
-bindkey '^E' end-of-line                            # cmd <arrow-right>...........move to the end of the line
-bindkey '^[^[[B' kill-whole-line                    # cmd <arrow-down>............delete the whole line
-bindkey '^X' delete-char                            # ctrl x......................delete the char under the cursor
-bindkey '^W' delete-word                            # ctrl w......................delete the word under the cursor
-bindkey -s '^[^[[A' 'cd ..\n'                       # alt <arrow-up>..............cd ..
-bindkey -s '^L' 'ls -laH\n'                         # ctr l.......................ls -laH
-bindkey '^[[A' history-beginning-search-backward    # <arrow-up>..................history substring search backward
-bindkey '^[[B' history-beginning-search-forward     # <arrow-down>................history substring search forward
-# fixes outputting tildes on <del>
-bindkey '^[[3~' delete-char
-bindkey '^[3;5~' delete-char
+# Make sure that the terminal is in application mode when zle is active, since
+# only then values from $terminfo are valid
+if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
+    function zle-line-init() {
+        echoti smkx
+    }
+    function zle-line-finish() {
+        echoti rmkx
+    }
+    zle -N zle-line-init
+    zle -N zle-line-finish
+fi
 #+END_SRC
 
-** rationalise dot
+#+BEGIN_SRC shell
+## movement http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Movement
+bindkey '^[^[[D' backward-word                      # alt <arrow-left>............move a word backward
+bindkey '^[^[[C' forward-word                       # alt <arrow-right>...........move a word forward
+bindkey '^A' beginning-of-line                      # cmd <arrow-left>............move to the beginning of the line
+bindkey '^E' end-of-line                            # cmd <arrow-right>...........move to the end of the line
+bindkey '^[[1;2B' down-line
+bindkey '^[[1;2A' up-line
+bindkey '^N' vi-find-next-char
+
+## Modifying-Text http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Modifying-Text
+bindkey ';6D' copy-prev-word # ctr shift <-
+
+## kill
+bindkey '^[^H' backward-kill-word                   # cmd <del>...................delete the word left of the cursor
+bindkey '^[csd' backward-kill-word
+bindkey '^X' delete-char                            # ctrl x......................delete the char under the cursor
+bindkey '^[csku' kill-line
+bindkey '^[k' kill-region
+bindkey '^?' backward-delete-char                     # [Backspace] - delete backward
+if [[ "${terminfo[kdch1]}" != "" ]]; then
+    bindkey "${terminfo[kdch1]}" delete-char            # [Delete] - delete forward
+else
+    # fixes outputting tildes on <del>
+    bindkey "^[[3~" delete-char
+    bindkey "^[3;5~" delete-char
+    bindkey "\e[3~" delete-char
+fi
+#bindkey '^[^[[B' kill-whole-line                    # cmd <arrow-down>............delete the whole line
+
+## other
+bindkey '^[[5~' up-history
+# ctrl s
+bindkey '^[cks' accept-and-hold                        # ctrl n .................... multiselect in menu complete
+bindkey -s '^[^[[A' 'cd ..\n'                       # alt <arrow-up>..............cd ..
+bindkey -s '^L' 'ls -laH\n'                         # ctr l.......................ls -laH
+if [[ "${terminfo[kcbt]}" != "" ]]; then
+    bindkey "${terminfo[kcbt]}" reverse-menu-complete   # [Shift-Tab] - move through the completion menu backwards
+fi
+
+## history
+# bindkey '^[u' history-substring-search-up
+# bindkey '^[d' history-substring-search-down
+
+bindkey '^[u' history-search-multi-word
+bindkey '^[d' history-search-multi-word-backwards
+
+
+## mark
+# alt down
+bindkey '^[^[[B' set-mark-command
+# alt up
+bindkey '^[^[[A' deactivate-region
+#+END_SRC
+
+
+** custom zle widgets
+
+*** repeat last command
+#+BEGIN_SRC shell
+function repeat-cmd () {
+    # repeat the last command
+    zle up-history
+    zle accept-line
+}
+
+zle -N repeat-cmd
+# ctrl l
+bindkey '^H' repeat-cmd
+#+END_SRC
+
+*** kill first word
+#+BEGIN_SRC shell
+function kill-first-word () {
+    # kill the first word on the cmdline and move cursor to beginning of line
+    zle beginning-of-line
+    zle forward-word
+    zle backward-kill-word
+    zle magic-space
+    zle backward-word
+}
+
+zle -N kill-first-word
+# ctrl shift f
+bindkey '^[cskf' kill-first-word
+#+END_SRC
+
+*** kill word under cursor
+#+BEGIN_SRC shell
+function kill-word-under-cursor () {
+    # kill the word under the cursor
+    zle forward-word
+    zle backward-kill-word
+}
+
+zle -N kill-word-under-cursor
+# ctrl shift w
+bindkey '^[cskw' kill-word-under-cursor
+#+END_SRC
+
+*** cp cmdline
+#+BEGIN_SRC shell
+function copy-cmdline-to-clipboard () {
+    # Copy the current commandline to the system clipboard
+    zle kill-whole-line
+    print -rn -- $CUTBUFFER | pbcopy
+    zle undo
+}
+
+zle -N copy-cmdline-to-clipboard
+# esc c
+bindkey '^[c' copy-cmdline-to-clipboard
+#+END_SRC
+
+**** rationalise dot
 #+BEGIN_SRC shell
 function rationalise-dot() {
     # expands .... to ../../..
@@ -512,7 +632,7 @@ zle -N rationalise-dot
 bindkey . rationalise-dot
 #+END_SRC
 
-** path step
+**** path step
 #+BEGIN_SRC shell
 function backward-delete-path-part () {
     # backward delete until /
@@ -525,13 +645,33 @@ zle -N backward-delete-path-part
 bindkey '^W' backward-delete-path-part
 #+END_SRC
 
-
-
 * Plugins
 :PROPERTIES:
 :CUSTOM_ID: plugins
 :END:
-** fzf                                                              :plugin:
+** zsh-autosuggestions
+#+BEGIN_SRC shell
+source ~dotfiles/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+#+END_SRC
+** zsh-history-search-multi-word
+https://github.com/zdharma/history-search-multi-word
+#+BEGIN_SRC shell
+source ~dotfiles/zsh/plugins/history-search-multi-word/history-search-multi-word.plugin.zsh
+#+END_SRC
+
+** zsh-history-substring-search                                     :plugin:
+https://github.com/zsh-users/zsh-history-substring-search
+#+BEGIN_SRC shell
+#source ~dotfiles/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+#+END_SRC
+
+** fast-syntax-highlighting                                                           :plugin:
+https://github.com/zdharma/fast-syntax-highlighting
+#+BEGIN_SRC shell
+  source ~dotfiles/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+#+END_SRC
+
+** fzf                                                            :plugin:
 https://github.com/junegunn/fzf
 https://github.com/junegunn/fzf/wiki
 
@@ -644,6 +784,11 @@ export FZF_DEFAULT_OPTS="--multi --cycle --select-1 --exit-0
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 # TODO get cp working
 # export FZF_CTRL_T_OPTS="--bind 'ctrl-x:execute(echo {}|awk '{print \$2}'|pbcopy)+accept'"
+#+END_SRC
+
+* Theme
+#+BEGIN_SRC shell
+export PROMPT='%F{red}%n%f@%F{blue}%m%f %F{yellow}%1~% %# '
 #+END_SRC
 
 * Original zshrc
