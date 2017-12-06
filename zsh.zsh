@@ -79,6 +79,7 @@ hash -d music=$HOME/Music
 hash -d oh-my-zsh=$HOME/.oh-my-zsh
 hash -d org=$HOME/Documents/org
 hash -d pictures=$HOME/Pictures
+hash -d screenshots=~pictures/Screenshots
 hash -d regiobot=$HOME/Workspace/project-inquant/gitlab
 hash -d rezepte=$HOME/Documents/org/rezepte
 hash -d scripts=$HOME/Workspace/scripts
@@ -128,6 +129,7 @@ if [[ -n $SSH_CONNECTION ]]; then
     export EDITOR="$BIN/vim"
 else
     export EDITOR=~bin"/emacs"
+    export EDITOR=/usr/local/bin/emacs
     # TODO rm obsolete
     export EDITOR_TAB=${EDITOR}
     export VIM_EDITOR="$BIN/mvim"
@@ -141,6 +143,9 @@ export WORDCHARS='*?_-.[]~=/&;!#$%^(){}<>/'
 # $LS_COLORS
 # TODO 
 eval $(gdircolors -b "$DOTFILES/monobay.256dark")
+# used by k
+# export LSCOLORS='di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
+export LSCOLORS='exfxcxdxbxegedabagacad'
 
 # project amber
 export DJANGO_SETTINGS_MODULE=amber.settings
@@ -175,7 +180,7 @@ zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
 # caching
 zstyle ':completion:*' use-cache on
 # TODO required?
-zstyle ':completion:*' cache-path "$HOME/.zsh/cache" 
+zstyle ':completion:*' cache-path "$HOME/.zsh/cache"
 # ignore completion functions for commands you don’t have:
 zstyle ':completion:*:functions' ignored-patterns '_*'
 # don't complete uninteresting users
@@ -207,16 +212,135 @@ then
     fi
 fi
 
+# TODO section for overriding
+## list
+# use gnu ls for dircolors
+alias ls='gls --color=auto'
+# list details
+alias ll='ls -lah'
+# sort by size
+alias lss='ls -lahS'
+# sort by date
+alias lsd='ls -latr'
+# only today
+alias lst='find . -maxdepth 1 -type f -mtime 1'
+# numFiles: number of (non-hidden) files in current directory
+alias lsc='echo $(ls -1 | wc -l)'
+alias k='k -h'     # human readable sizes
+# disk usage statistics default
+alias du="du -ach | sort"
+# free diskspace with human readable size
+alias df='df -h'
+
+## tools
+# emacs
+alias e="eval $EDITOR"
+# vim
+alias cvim='/usr/local/bin/vim'
+# create parent directories on demand
+alias mkdir="mkdir -pv"
+# clipboard
+alias p='pbpaste'
+alias y='pbcopy'
+alias bpython='$WORKON_HOME/python3.4.1/bin/bpython'
+## find
 # ripgrep as find
 # TODO define in var
 alias fd="rg --files --no-ignore --hidden --follow -g '!{.git,node_modules}/*'"
-# create parent directories on demand
-alias mkdir="mkdir -pv"
-# disk usage statistics default
-alias du="du -ach | sort"
 # continue the download in case of problems
+alias grep='grep --color'
+## internet
 alias wget="wget -c"
+alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
+alias chrome_headless='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu'
+alias yt3='$WORKON_HOME/python3.4.1/bin/youtube-dl --verbose --extract-audio --audio-format mp3 --no-mtime --no-cache-dir'
+alias yt='$WORKON_HOME/python3.4.1/bin/youtube-dl --no-mtime --no-cache-dir'
+# weather
+alias wttr='curl -s http://wttr.in | tail +8 | head -30'
+# moonphase
+alias moon='curl -s wttr.in/Moon|head -25'
 
+# git
+alias gs='git status'
+alias gpl='git pull'
+alias gps='git push'
+alias gl='git log'
+alias gco='git checkout'
+
+alias git_push_fire='git add -A && git commit -a --allow-empty-message -m "" && git push'
+alias git_graph='git log --oneline --graph'
+alias git_branch='git branch | cut -c3-'
+alias git_undo_commit='git reset --soft HEAD~'
+# }
+
+# docker {
+alias dm='docker-machine'
+alias start_regiobot='docker-machine start regiobot && eval "$(docker-machine env regiobot)"'
+alias stop_regiobot='docker-machine stop regiobot'
+
+alias start_termxplorer='docker-machine start termxplorer && eval "$(docker-machine env termxplorer)"'
+alias stop_termxplorer='docker-machine stop termxplorer'
+
+# stop all containers
+alias docker_stop_all='docker stop $(docker ps -a -q)'
+# rm all containers
+alias docker_rm_all='docker rm $(docker ps -a -q)'
+# stop and rm all containers
+alias docker_nuke='docker_stop_all && docker_rm_all'
+# remove all images
+alias docker_rmi_all='docker rmi $(docker images -q)'
+
+# kill all running containers
+alias docker_kill_all='docker kill $(docker ps -q)'
+# delete all stopped containers
+alias docker_rm_stopped_containers='printf "\n>>> Deleting stopped containers\n\n" && docker rm $(docker ps -a -q)'
+# delete all untagged images
+alias docker_rmi_untagged='printf "\n>>> Deleting untagged images\n\n" && docker rmi $(docker images -q -f dangling=true)'
+# delete all stopped containers and untagged images
+alias docker_clean='docker_rm_stopped_containers || true && docker_rmi_untagged'
+
+## redirection
+# redirect stdout, stderr
+alias -g _no_output='> /dev/null 2>&1'
+# redirect stderr
+alias -g _no_stderr='2> /dev/null'
+# redirect stdout
+alias -g _no_stdout='&> /dev/null'
+
+## tools
+alias -g _vim="| eval ${EDITOR_TAB}"
+alias -g _y='| pbcopy'
+
+## variables
+# helpfer function
+# TODO fzf
+function li () {
+    # print the latest file or dir in $1
+    local idx dir
+    if [ $# -eq 0 ]; then dir="$(pwd)"; else dir="$1" fi
+    if [ -z "$2" ]; then idx="1"; else idx="$2"; fi
+    (cd "$dir" && realpath "$(ls -1t | head -n$idx | tail -1)")
+}
+function gru () {
+    # print the git remote url
+    git config --get remote.origin.url
+}
+function gbn () {
+    git branch|grep "\*"|awk '{print $2}'
+}
+
+# alias -g PASS='<(ypcat passwd)'
+# last downloaded file
+alias -g _ldf="\"$(li ~downloads)\""
+# last screenshot
+alias -g _lss="\"$(eval li ~screenshots)\""
+# on dual monitors
+alias -g _lss2="\"$(li ~screenshots 2)\""
+# git remote url
+alias -g _gru="\"$(gru)\""
+alias -g _gb="\"\$(git branch|grep \"\*\"|awk '{print \$2}')\""
+
+## filter
 # filter columns
 alias -g _awk1="|awk '{print \$1}'"
 alias -g _awk2="|awk '{print \$2}'"
@@ -226,10 +350,14 @@ alias -g _awk5="|awk '{print \$5}'"
 alias -g _awk6="|awk '{print \$6}'"
 # filter with fzf
 alias -g _f="|fzf"
+# pager
+alias -g _l="|less"
 # count lines
 alias -g _cl='|wc -l'
 # archives in pwd
 alias -g _acd='./(*.bz2|*.gz|*.tgz|*.zip|*.z)'
+## map
+alias -g _x='| xargs' # funky
 
 # TODO
 # open org-mode files in emacs
@@ -325,6 +453,10 @@ function latest_in () {
     ls -1t "$1" | fzf
 }
 
+function x () {
+    return "$(eval $@)"
+}
+
 # Make sure that the terminal is in application mode when zle is active, since
 # only then values from $terminfo are valid
 if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
@@ -338,6 +470,7 @@ if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
     zle -N zle-line-finish
 fi
 
+# TODO use terminfo
 ## movement http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Movement
 bindkey '^[^[[D' backward-word                      # alt <arrow-left>............move a word backward
 bindkey '^[^[[C' forward-word                       # alt <arrow-right>...........move a word forward
@@ -378,12 +511,8 @@ if [[ "${terminfo[kcbt]}" != "" ]]; then
 fi
 
 ## history
-# bindkey '^[u' history-substring-search-up
-# bindkey '^[d' history-substring-search-down
-
-bindkey '^[u' history-search-multi-word
-bindkey '^[d' history-search-multi-word-backwards
-
+bindkey "$terminfo[kcuu1]" history-substring-search-up
+bindkey "$terminfo[kcud1]" history-substring-search-down
 
 ## mark
 # alt down
@@ -401,12 +530,32 @@ zle -N repeat-cmd
 # ctrl l
 bindkey '^H' repeat-cmd
 
+function wrap-call () {
+    # wrap the cursor in "$()"
+    LBUFFER+="\"\$("
+    RBUFFER+=")\""
+}
+
+zle -N wrap-call
+# esc (
+bindkey '^[(' wrap-call
+
+function wrap-var () {
+    # wrap the cursor in "${}"
+    LBUFFER+="\"\${"
+    RBUFFER+="}\""
+}
+
+zle -N wrap-var
+# esc {
+bindkey '^[{' wrap-var
+
 function kill-first-word () {
     # kill the first word on the cmdline and move cursor to beginning of line
     zle beginning-of-line
     zle forward-word
     zle backward-kill-word
-    zle magic-space
+    LBUFFER+=' '
     zle backward-word
 }
 
@@ -458,11 +607,13 @@ bindkey '^W' backward-delete-path-part
 
 source ~dotfiles/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
-source ~dotfiles/zsh/plugins/history-search-multi-word/history-search-multi-word.plugin.zsh
+# source ~dotfiles/zsh/plugins/history-search-multi-word/history-search-multi-word.plugin.zsh
 
-#source ~dotfiles/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+source ~dotfiles/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 source ~dotfiles/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+
+source ~dotfiles/zsh/plugins/k/k.sh
 
 ## source completions and bindings
 source ~dotfiles/zsh/plugins/fzf/completion.zsh
@@ -498,4 +649,4 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 # TODO get cp working
 # export FZF_CTRL_T_OPTS="--bind 'ctrl-x:execute(echo {}|awk '{print \$2}'|pbcopy)+accept'"
 
-export PROMPT='%F{red}%n%f@%F{blue}%m%f %F{yellow}%1~% %# '
+export PROMPT='%F{red}%n%f@%F{blue}%m%f %F{yellow}%1~ % %# '
