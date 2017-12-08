@@ -304,36 +304,8 @@ alias -g _no_stdout='&> /dev/null'
 alias -g _vim="| eval ${EDITOR_TAB}"
 alias -g _y='| pbcopy'
 
-## variables
-# helpfer function
-# TODO fzf
-function li () {
-    # print the latest file or dir in $1
-    local idx dir
-    # no params: dir=pwd
-    if [ $# -eq 0 ]; then dir="$(pwd)"; else dir="$1" fi
-    # no index: index=last
-    if [ -z "$2" ]; then idx="1"; else idx="$2"; fi
-    (cd "$dir" && realpath "$(ls -1t | head -n$idx | tail -1)")
-}
-function gru () {
-    # print the git remote url
-    git config --get remote.origin.url
-}
-function gbn () {
-    git branch|grep "\*"|awk '{print $2}'
-}
-
+## files
 # alias -g PASS='<(ypcat passwd)'
-# last downloaded file
-alias -g _ldf="\"$(li ~downloads)\""
-# last screenshot
-alias -g _lss="\"$(eval li ~screenshots)\""
-# on dual monitors
-alias -g _lss2="\"$(li ~screenshots 2)\""
-# git remote url
-alias -g _gru="\"$(gru)\""
-alias -g _gb="\"\$(git branch|grep \"\*\"|awk '{print \$2}')\""
 
 ## filter
 # filter columns
@@ -484,7 +456,7 @@ function bcp() {
     for prog in $(echo $uninst);
     do; brew uninstall $prog; done;
     fi
-    }
+}
 
 function chrome_history () {
     # browse chrome history
@@ -526,14 +498,31 @@ function human_time_cat () {
     perl -lne 'm#: (\d+):\d+;(.+)# && printf "%s :: %s\n",scalar localtime $1,$2' $1
 }
 
-function latest_in () {
-    # select file in a given directory (sorted by dates)
-    if [ $# -eq 0 ]; then echo "Argument required"; return 1; fi
-    ls -1t "$1" | fzf
+# TODO fzf
+function li () {
+    # print the latest file or dir in $1
+    local idx dir
+    # no params: dir=pwd
+    if [ $# -eq 0 ]; then dir="$(pwd)"; else dir="$1" fi
+    # no index: index=last
+    if [ -z "$2" ]; then idx="1"; else idx="$2"; fi
+    (cd "$dir" && realpath "$(ls -1t | head -n$idx | tail -1)")
 }
 
-function x () {
-    return "$(eval $@)"
+function gru () {
+    # print the git remote url
+    git config --get remote.origin.url
+}
+
+function gbn () {
+    # print the git branch name
+    git branch|grep "\*"|awk '{print $2}'
+}
+
+function fli () {
+    # (fzf-)filter file in a given directory (sorted by dates)
+    if [ $# -eq 0 ]; then echo "Argument required"; return 1; fi
+    (cd "$1" && realpath "$(ls -1t | fzf)")
 }
 
 # Make sure that the terminal is in application mode when zle is active, since
@@ -713,7 +702,9 @@ export FZF_DEFAULT_OPTS="--multi --cycle --select-1 --exit-0
     --color fg:-1,bg:-1,hl:230,fg+:3,bg+:233,hl+:229
     --color info:150,prompt:110,spinner:150,pointer:167,marker:174
     --header='Anchored-match (^music, .mp3\$) | Exact-Match (’quoted) | Negation (!fire) | OR operator (^core go\$ | rb\$ | py\$)'
+    --preview-window right:40%
     --preview '[[ -d {} ]] && tree -C {} | head -200 ||
+               [[ \$(file --mime-type -b {}) =~ image ]] && imgcat --256 -w 80 {} 2> /dev/null ||
                  (highlight -O ansi -l {} ||
                   ls -lah {} &&
                   pygmentize {} ||
