@@ -16,6 +16,9 @@ new () {
     ln -s ~dotfiles/zsh.zsh ~/.zshrc
 }
 
+# https://www.iterm2.com/documentation-shell-integration.html
+# source ~dotfiles/zsh/iterm2_shell_integration/iterm2_shell_integration.zsh
+
 # allow to change to a directory by entering it as a command
 setopt auto_cd
 # prevent > redirection from truncating the given file if it already exists
@@ -306,6 +309,16 @@ alias -g _y='| pbcopy'
 
 ## files
 # alias -g PASS='<(ypcat passwd)'
+alias -g _brew='<(brew list)'
+alias -g _pip='<(pip freeze)'
+alias -g _gem='<(gem list | tail -n +1)'
+#  ¯\_(ツ)_/¯
+alias -g _npm="<(npm list -g --depth=0 2> /dev/null |cut -c5- | tail -n +2 | sed \$d)"
+# TODO function wrapper
+alias -g _shrugf="<(echo '¯\_(ツ)_/¯')"
+
+## variables
+alias -g _shrugv="${$(echo '¯\_(ツ)_/¯')}"
 
 ## filter
 # filter columns
@@ -332,6 +345,9 @@ alias -g map='_x'
 # TODO
 # open org-mode files in emacs
 alias -s org=emacs
+# TODO Glob
+alias -s jpg=imgcat
+alias -s png=imgcat
 
 # TODO rm
 # example fzf completion https://github.com/junegunn/fzf/wiki/Examples-(completion)
@@ -424,6 +440,12 @@ zle -C git-files menu-complete _git_status_files
 # $ git add <Escape>g<Tab>
 bindkey '\eg' git-files
 # }
+
+function get_shell_integration () {
+    # https://www.iterm2.com/documentation-shell-integration.html
+    curl -L https://iterm2.com/shell_integration/zsh \
+    -o ~dotfiles/zsh/iterm2_shell_integration/iterm2_shell_integration.zsh
+}
 
 function bip() {
     # Install (one or multiple) selected application(s)
@@ -701,12 +723,11 @@ export FZF_DEFAULT_OPTS="--multi --cycle --select-1 --exit-0
     --border --margin 1% --prompt 'ϟ ' --no-height --no-reverse
     --color fg:-1,bg:-1,hl:230,fg+:3,bg+:233,hl+:229
     --color info:150,prompt:110,spinner:150,pointer:167,marker:174
-    --header='Anchored-match (^music, .mp3\$) | Exact-Match (’quoted) | Negation (!fire) | OR operator (^core go\$ | rb\$ | py\$)'
+    --header='(^start) | (end\$) | (’exact) | (!not) | OR (^core go\$ | rb\$ | py\$)'
     --preview-window right:40%
     --preview '[[ -d {} ]] && tree -C {} | head -200 ||
-               [[ \$(file --mime-type -b {}) =~ image ]] && imgcat --256 -w 80 {} 2> /dev/null ||
-                 (highlight -O ansi -l {} ||
-                  ls -lah {} &&
+               [[ \$(file --mime-type -b {}) =~ image ]] && ls -lah {} && imgcat --256 -w 80 {} 2> /dev/null ||
+                 (ls -lah {} &&
                   pygmentize {} ||
                   cat {}) 2> /dev/null | head -500'
     --bind 'ctrl-e:execute(\$EDITOR {})+accept'
@@ -719,4 +740,4 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 # TODO get cp working
 # export FZF_CTRL_T_OPTS="--bind 'ctrl-x:execute(echo {}|awk '{print \$2}'|pbcopy)+accept'"
 
-export PROMPT='%F{red}%n%f@%F{blue}%m%f %F{yellow}%1~ % %# '
+export PROMPT='%F{green}%n%f@%F{blue}%m%f %F{red}%~ %f% %# '

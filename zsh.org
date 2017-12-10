@@ -56,6 +56,12 @@ new () {
 :CUSTOM_ID: environment
 :END:
 
+** iterm2 shell integration                                         :plugin:
+#+BEGIN_SRC shell
+  # https://www.iterm2.com/documentation-shell-integration.html
+  # source ~dotfiles/zsh/iterm2_shell_integration/iterm2_shell_integration.zsh
+#+END_SRC
+
 ** ZSH Options
 http://zsh.sourceforge.net/Doc/Release/Options.html
 
@@ -319,6 +325,22 @@ fi
 :CUSTOM_ID: aliases
 :END:
 
+              clipboard_plain_text () {
+                  pbpaste | textutil -convert txt -stdin -stdout -encoding 30 | pbcopy
+              }
+              print_shrug () {
+                  echo "¯\_(ツ)_/¯"
+              }
+              print_python_kws () {
+                  python -c "import keyword
+  for kw in keyword.kwlist:
+      print(kw)"
+              }
+              # >--< <- rm from clipboard entry
+              # >>> import hashlib
+              rm_prefix (){
+                  pbpaste|cut -c 4-|pbcopy
+              }
 #+BEGIN_SRC shell
 # TODO section for overriding
 ## list
@@ -416,6 +438,16 @@ alias -g _y='| pbcopy'
 
 ## files
 # alias -g PASS='<(ypcat passwd)'
+alias -g _brew='<(brew list)'
+alias -g _pip='<(pip freeze)'
+alias -g _gem='<(gem list | tail -n +1)'
+#  ¯\_(ツ)_/¯
+alias -g _npm="<(npm list -g --depth=0 2> /dev/null |cut -c5- | tail -n +2 | sed \$d)"
+# TODO function wrapper
+alias -g _shrugf="<(echo '¯\_(ツ)_/¯')"
+
+## variables
+alias -g _shrugv="${$(echo '¯\_(ツ)_/¯')}"
 
 ## filter
 # filter columns
@@ -445,6 +477,9 @@ alias -g map='_x'
 # TODO
 # open org-mode files in emacs
 alias -s org=emacs
+# TODO Glob
+alias -s jpg=imgcat
+alias -s png=imgcat
 #+END_SRC
 
 * Functions
@@ -549,6 +584,14 @@ bindkey '\eg' git-files
 
 #+END_SRC
 
+** OS
+#+BEGIN_SRC shell
+function get_shell_integration () {
+    # https://www.iterm2.com/documentation-shell-integration.html
+    curl -L https://iterm2.com/shell_integration/zsh \
+    -o ~dotfiles/zsh/iterm2_shell_integration/iterm2_shell_integration.zsh
+}
+#+END_SRC
 ** packages
 *** homebrew
 #+BEGIN_SRC shell
@@ -1003,12 +1046,11 @@ export FZF_DEFAULT_OPTS="--multi --cycle --select-1 --exit-0
     --border --margin 1% --prompt 'ϟ ' --no-height --no-reverse
     --color fg:-1,bg:-1,hl:230,fg+:3,bg+:233,hl+:229
     --color info:150,prompt:110,spinner:150,pointer:167,marker:174
-    --header='Anchored-match (^music, .mp3\$) | Exact-Match (’quoted) | Negation (!fire) | OR operator (^core go\$ | rb\$ | py\$)'
+    --header='(^start) | (end\$) | (’exact) | (!not) | OR (^core go\$ | rb\$ | py\$)'
     --preview-window right:40%
     --preview '[[ -d {} ]] && tree -C {} | head -200 ||
-               [[ \$(file --mime-type -b {}) =~ image ]] && imgcat --256 -w 80 {} 2> /dev/null ||
-                 (highlight -O ansi -l {} ||
-                  ls -lah {} &&
+               [[ \$(file --mime-type -b {}) =~ image ]] && ls -lah {} && imgcat --256 -w 80 {} 2> /dev/null ||
+                 (ls -lah {} &&
                   pygmentize {} ||
                   cat {}) 2> /dev/null | head -500'
     --bind 'ctrl-e:execute(\$EDITOR {})+accept'
@@ -1023,8 +1065,11 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 #+END_SRC
 
 * Theme
+** TODO fzf
+** TODO from vim
+** TODO basecolor16
 #+BEGIN_SRC shell
-export PROMPT='%F{red}%n%f@%F{blue}%m%f %F{yellow}%1~ % %# '
+export PROMPT='%F{green}%n%f@%F{blue}%m%f %F{red}%~ %f% %# '
 #+END_SRC
 
 * Original zshrc
@@ -1322,7 +1367,7 @@ alias fzf_ag='ag -g "" | fzf'
               }
               # reverse line order of file
               tac () {
-                  sed '1!G;h;$!d' $1
+                  sed '1!G;h;$!d' "$1"
               }
               mk_zip_bomb () {
                   dd if=/dev/zero bs=1M count=10240 | gzip > 10G.gzip
@@ -2237,6 +2282,7 @@ alias fzf_ag='ag -g "" | fzf'
               # serve wd
               serve () {
                   printip
+                  # TODO check version
                   # python 2
                   # python -m SimpleHTTPServer
                   python3 -m http.server
@@ -2323,4 +2369,113 @@ alias fzf_ag='ag -g "" | fzf'
   # }}}
 
   test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+  
+
+
+cdf () {  # short for cdfinder
+  cd "`osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)'`"
+}
+# Copy w/ progress
+cp_p () {
+  rsync -WavP --human-readable --progress $1 $2
+}
+
+# who is using the laptop's iSight camera?
+camerausedby () {
+  echo "Checking to see who is using the iSight camera… 📷"
+  usedby=$(lsof | grep -w "AppleCamera\|USBVDC\|iSight" | awk '{printf $2"\n"}' | xargs ps)
+  echo -e "Recent camera uses:\n$usedby"
+}
+
+# animated gifs from any video
+# from Alex Sexton gist.github.com/SlexAxton/4989674
+gifify () {
+  if [[ -n "$1" ]]; then
+  if [[ $2 == '--good' ]]; then
+    ffmpeg -i "$1" -r 10 -vcodec png out-static-%05d.png
+    time convert -verbose +dither -layers Optimize -resize 900x900\> out-static*.png  GIF:- | gifsicle --colors 128 --delay=5 --loop --optimize=3 --multifile - > "$1.gif"
+    rm out-static*.png
+  else
+    ffmpeg -i "$1" -s 600x400 -pix_fmt rgb24 -r 10 -f gif - | gifsicle --optimize=3 --delay=3 > "$1.gif"
+  fi
+  else
+  echo "proper usage: gifify <input_movie.mov>. You DO need to include extension."
+  fi
+}
+
+# turn that video into webm.
+# brew reinstall ffmpeg --with-libvpx
+webmify () {
+  ffmpeg -i "$1" -vcodec libvpx -acodec libvorbis -isync -copyts -aq 80 -threads 3 -qmax 30 -y "$2" "$1.webm"
+}
+# Get week number
+alias week='date +%V'
+
+# Get macOS Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
+alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; sudo gem update --system; sudo gem update; sudo gem cleanup'
+
+alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias localip="ipconfig getifaddr en0"
+alias ips="ifconfig -a | grep -o 'inet6\? \(addr:\)\?\s\?\(\(\([0-9]\+\.\)\{3\}[0-9]\+\)\|[a-fA-F0-9:]\+\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
+
+# JavaScriptCore REPL
+
+jscbin="/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc";
+[ -e "${jscbin}" ] && alias jsc="${jscbin}";
+unset jscbin;
+
+# Trim new lines and copy to clipboard
+alias c="tr -d '\n' | pbcopy"
+
+# Hide/show all desktop icons (useful when presenting)
+alias hidedesktop="defaults write com.apple.finder CreateDesktop -bool false && killall Finder"
+alias showdesktop="defaults write com.apple.finder CreateDesktop -bool true && killall Finder"
+
+
+# URL-encode strings
+alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1]);"'
+# Merge PDF files
+# Usage: `mergepdf -o output.pdf input{1,2,3}.pdf`
+alias mergepdf='/System/Library/Automator/Combine\ PDF\ Pages.action/Contents/Resources/join.py'
+
+# Intuitive map function
+# For example, to list all directories that contain a certain file:
+# find . -name .gitattributes | map dirname
+alias map="xargs -n1"
+
+# One of @janmoesen’s ProTip™s
+for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
+	alias "${method}"="lwp-request -m '${method}'"
+done
+
+# Stuff I never really use but cannot delete either because of http://xkcd.com/530/
+alias stfu="osascript -e 'set volume output muted true'"
+alias pumpitup="osascript -e 'set volume output volume 100'"
+
+# Lock the screen (when going AFK)
+alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
+
+# Reload the shell (i.e. invoke as a login shell)
+alias reload="exec ${SHELL} -l"
+
+# Print each PATH entry on a separate line
+alias path='echo -e ${PATH//:/\\n}'
+
+# Syntax-highlight JSON strings or files
+# Usage: `json '{"foo":42}'` or `echo '{"foo":42}' | json`
+function json() {
+	if [ -t 0 ]; then # argument
+		python -mjson.tool <<< "$*" | pygmentize -l javascript;
+	else # pipe
+		python -mjson.tool | pygmentize -l javascript;
+	fi;
+}
+
+  eg(){
+  # https://news.ycombinator.com/item?id=10797303
+      MAN_KEEP_FORMATTING=1 man "$@" 2>/dev/null \
+          | sed --quiet --expression='/^E\(\x08.\)X\(\x08.\)\?A\(\x08.\)\?M\(\x08.\)\?P\(\x08.\)\?L\(\x08.\)\?E/{:a;p;n;/^[^ ]/q;ba}' \
+          | ${MANPAGER:-${PAGER:-pager -s}}
+  }
+
 #+END_SRC
