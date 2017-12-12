@@ -13,7 +13,12 @@
 ASCII-Art credits: http://patorjk.com/software/taag/#p=testall&h=0&v=0&f=ANSI%20Shadow&t=.emacsrc
 
 * setup
-
+#+BEGIN_SRC elisp
+  ;; (server-start)
+(require 'server)
+(unless (server-running-p)
+  (server-start))
+#+END_SRC
 ** persistence files
 
 #+BEGIN_SRC sh :tangle no
