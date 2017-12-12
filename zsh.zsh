@@ -317,10 +317,10 @@ alias -g _gem='<(gem list | tail -n +1)'
 #  ¯\_(ツ)_/¯
 alias -g _npm="<(npm list -g --depth=0 2> /dev/null |cut -c5- | tail -n +2 | sed \$d)"
 # TODO function wrapper
-alias -g _shrugf="<(echo '¯\_(ツ)_/¯')"
+alias -g _shrugf='<(echo "¯\\_(ツ)_/¯")'
 
 ## variables
-alias -g _shrugv="${$(echo '¯\_(ツ)_/¯')}"
+alias -g _shrugv='${$(echo "¯\\_(ツ)_/¯")}'
 
 ## filter
 # filter columns
