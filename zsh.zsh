@@ -235,6 +235,8 @@ alias k='k -h'     # human readable sizes
 alias du="du -ach | sort"
 # free diskspace with human readable size
 alias df='df -h'
+# stat with human readable times
+alias stat='stat -x'
 
 ## tools
 # emacs
@@ -348,6 +350,27 @@ alias -s org=emacs
 # TODO Glob
 alias -s jpg=imgcat
 alias -s png=imgcat
+
+function __expect () {
+    # check if the expected arg amount $1 matches the passed arg amount $2
+    # usage:
+    # __expect 1 "$#" || return 1
+    # TODO get args implicit from last command
+    local params_expected params_given
+    arguments_expected="$1"
+    arguments_given="$2"
+    if [[ "$arguments_expected" == "$arguments_given" ]]
+    then
+        return 0
+    # TODO handle
+    elif [[ "$arguments_expected" < "$arguments_given" ]]
+    then
+        return 0
+    else
+        echo "$arguments_expected arguments required"
+        return 1
+    fi
+}
 
 # TODO rm
 # example fzf completion https://github.com/junegunn/fzf/wiki/Examples-(completion)
@@ -499,7 +522,29 @@ function chrome_history () {
     open "$entry"
 }
 
+function cat_links () {
+    # extract the links from a given url
+    __expect 1 "$#" || return 1
+    curl "$@" | sed -n 's/.*href="\([^"]*\).*/\1/p'
+}
+
+function print_external_ip () {
+    # print the external ip
+    curl ipecho.net/plain
+}
+
+clipboard_plain_text () {
+    # convert clipboard content to plain text
+    pbpaste | textutil -convert txt -stdin -stdout -encoding 30 | pbcopy
+}
+
+function clipboard_rm_python () {
+    # rm >>> from clipboard entry
+    pbpaste | cut -c 4- | pbcopy
+}
+
 function fdr() {
+    # TODO fcd & fcd_up
     # fdr - cd to selected parent directory
     local declare dirs=()
     get_parent_dirs() {
@@ -514,10 +559,24 @@ function fdr() {
     cd "$DIR"
 }
 
-function human_time_cat () {
+function cat_human_time () {
     # print unix timestamps in human readable form
-    if [ $# -eq 0 ]; then echo "Argument required"; return 1; fi
-    perl -lne 'm#: (\d+):\d+;(.+)# && printf "%s :: %s\n",scalar localtime $1,$2' $1
+    __expect 1 "$#" || return 1
+    perl -lne 'm#: (\d+):\d+;(.+)# && printf "%s :: %s\n",scalar localtime $1,$2' "$1"
+}
+
+function tac () {
+    # reverse line order of file
+    __expect 1 "$#" || return 1
+    sed '1!G;h;$!d' "$@"
+}
+
+function print_timestamp () {
+    echo $(date +%Y-%m-%d-%H-%M-%S)
+}
+
+function print_datestamp () {
+    echo $(date +%Y-%m-%d)
 }
 
 # TODO fzf
@@ -539,6 +598,38 @@ function gru () {
 function gbn () {
     # print the git branch name
     git branch|grep "\*"|awk '{print $2}'
+}
+
+lscat () {
+    # print a separated list of files in dir $1
+    local dir
+    if [ $# -eq 0 ]; then dir="$(pwd)"; else dir="$1" fi
+    find "$dir" -maxdepth 1 -type f -print | while read -r d
+    do
+        echo ""
+        echo "=-=-= $d =-=-="
+        echo "------------------------------------------------"
+        echo ""
+        pygmentize "$d" || cat "$d"
+        echo ""
+    done
+}
+
+count_files () {
+    # count files in dir $1
+    local dir
+    if [ $# -eq 0 ]; then dir="$(pwd)"; else dir="$1" fi
+    for d in $(find "$dir" -type d -print);
+    do
+        files=$(find "$d" -maxdepth 1 -type f | wc -l )
+        echo "$d : $files"
+    done
+}
+
+function kill_lines_containing () {
+    # delete lines containing pattern $1 in file $2
+    if [ $# -lt 2 ]; then echo "Usage: kill_lines_containing <PATTERN> <FILE>"; return 1; fi
+    sed -i '' "/$1/d" "$2"
 }
 
 function fli () {

@@ -361,6 +361,8 @@ alias k='k -h'     # human readable sizes
 alias du="du -ach | sort"
 # free diskspace with human readable size
 alias df='df -h'
+# stat with human readable times
+alias stat='stat -x'
 
 ## tools
 # emacs
@@ -488,7 +490,31 @@ alias -s png=imgcat
 :END:
 # TODO echo $nameddirs|tr " " "\n"|fzf
 
-** Functions with keybindings
+** Helper functions 
+#+BEGIN_SRC shell
+function __expect () {
+    # check if the expected arg amount $1 matches the passed arg amount $2
+    # usage:
+    # __expect 1 "$#" || return 1
+    # TODO get args implicit from last command
+    local params_expected params_given
+    arguments_expected="$1"
+    arguments_given="$2"
+    if [[ "$arguments_expected" == "$arguments_given" ]]
+    then
+        return 0
+    # TODO handle
+    elif [[ "$arguments_expected" < "$arguments_given" ]]
+    then
+        return 0
+    else
+        echo "$arguments_expected arguments required"
+        return 1
+    fi
+}
+#+END_SRC
+
+** functions with keybindings
 #+BEGIN_SRC shell
 # TODO rm
 # example fzf completion https://github.com/junegunn/fzf/wiki/Examples-(completion)
@@ -649,12 +675,36 @@ function chrome_history () {
     echo "$entry"
     open "$entry"
 }
+
+function cat_links () {
+    # extract the links from a given url
+    __expect 1 "$#" || return 1
+    curl "$@" | sed -n 's/.*href="\([^"]*\).*/\1/p'
+}
+
+function print_external_ip () {
+    # print the external ip
+    curl ipecho.net/plain
+}
 #+END_SRC
 
 ** Clipboard
+#+BEGIN_SRC shell
+clipboard_plain_text () {
+    # convert clipboard content to plain text
+    pbpaste | textutil -convert txt -stdin -stdout -encoding 30 | pbcopy
+}
+
+function clipboard_rm_python () {
+    # rm >>> from clipboard entry
+    pbpaste | cut -c 4- | pbcopy
+}
+
+#+END_SRC
 ** cd
 #+BEGIN_SRC shell
 function fdr() {
+    # TODO fcd & fcd_up
     # fdr - cd to selected parent directory
     local declare dirs=()
     get_parent_dirs() {
@@ -671,39 +721,92 @@ function fdr() {
 #+END_SRC
 
 ** Print / echo
+
 #+BEGIN_SRC shell
-function human_time_cat () {
+function cat_human_time () {
     # print unix timestamps in human readable form
-    if [ $# -eq 0 ]; then echo "Argument required"; return 1; fi
-    perl -lne 'm#: (\d+):\d+;(.+)# && printf "%s :: %s\n",scalar localtime $1,$2' $1
+    __expect 1 "$#" || return 1
+    perl -lne 'm#: (\d+):\d+;(.+)# && printf "%s :: %s\n",scalar localtime $1,$2' "$1"
 }
+
+function tac () {
+    # reverse line order of file
+    __expect 1 "$#" || return 1
+    sed '1!G;h;$!d' "$@"
+}
+
+function print_timestamp () {
+    echo $(date +%Y-%m-%d-%H-%M-%S)
+}
+
+function print_datestamp () {
+    echo $(date +%Y-%m-%d)
+}
+
 #+END_SRC
 
 ** List
+TODO wrapper function for single & multiple files
 #+BEGIN_SRC shell
-# TODO fzf
-function li () {
-    # print the latest file or dir in $1
-    local idx dir
-    # no params: dir=pwd
-    if [ $# -eq 0 ]; then dir="$(pwd)"; else dir="$1" fi
-    # no index: index=last
-    if [ -z "$2" ]; then idx="1"; else idx="$2"; fi
-    (cd "$dir" && realpath "$(ls -1t | head -n$idx | tail -1)")
-}
+  # TODO fzf
+  function li () {
+      # print the latest file or dir in $1
+      local idx dir
+      # no params: dir=pwd
+      if [ $# -eq 0 ]; then dir="$(pwd)"; else dir="$1" fi
+      # no index: index=last
+      if [ -z "$2" ]; then idx="1"; else idx="$2"; fi
+      (cd "$dir" && realpath "$(ls -1t | head -n$idx | tail -1)")
+  }
 
-function gru () {
-    # print the git remote url
-    git config --get remote.origin.url
-}
+  function gru () {
+      # print the git remote url
+      git config --get remote.origin.url
+  }
 
-function gbn () {
-    # print the git branch name
-    git branch|grep "\*"|awk '{print $2}'
-}
+  function gbn () {
+      # print the git branch name
+      git branch|grep "\*"|awk '{print $2}'
+  }
+
+  lscat () {
+      # print a separated list of files in dir $1
+      local dir
+      if [ $# -eq 0 ]; then dir="$(pwd)"; else dir="$1" fi
+      find "$dir" -maxdepth 1 -type f -print | while read -r d
+      do
+          echo ""
+          echo "=-=-= $d =-=-="
+          echo "------------------------------------------------"
+          echo ""
+          pygmentize "$d" || cat "$d"
+          echo ""
+      done
+  }
+
+  count_files () {
+      # count files in dir $1
+      local dir
+      if [ $# -eq 0 ]; then dir="$(pwd)"; else dir="$1" fi
+      for d in $(find "$dir" -type d -print);
+      do
+          files=$(find "$d" -maxdepth 1 -type f | wc -l )
+          echo "$d : $files"
+      done
+  }
 #+END_SRC
 
 ** File
+
+** Modify
+#+BEGIN_SRC shell
+function kill_lines_containing () {
+    # delete lines containing pattern $1 in file $2
+    if [ $# -lt 2 ]; then echo "Usage: kill_lines_containing <PATTERN> <FILE>"; return 1; fi
+    sed -i '' "/$1/d" "$2"
+}
+
+#+END_SRC
 ** Find
 ** Select / filter
 # TODO Searching file contents
@@ -719,8 +822,982 @@ function fli () {
 #+END_SRC
 
 ** Directory
+** old
+  # functions {{{
+# tools {
+print_shrug () {
+    echo "¯\_(ツ)_/¯"
+}
+print_python_kws () {
+    python -c "import keyword
+for kw in keyword.kwlist:
+print(kw)"
+}
+mk_zip_bomb () {
+    dd if=/dev/zero bs=1M count=10240 | gzip > 10G.gzip
+}
+list_background_images () {
+    local url=$1
+    curl $url|awk -F\" '{for(i=0;++i<=NF;){if($i ~ /^http/ && $i !~ "google\|cache:"){print $i}}}'|grep '.*\.\(jpg\|JPG\|png\|PNG\|gif\|GIF\)'
+}
+# }
+# fileoperations {
+rename_prefix_iterator () {
+local prefix=$1
+local pattern=$2
+i=1
+for file in *$pattern*; do
+    filename=$(basename "$file")
+    extension="${filename##*.}"
+    filename="${filename%.*}"
+    cp $file $(printf "$prefix-%0.3d.$extension" $i)
+    i=$((i + 1))
+done
+}
+# }
+# echo {
+# 
+# get the last file of the given directory
+echo_lf () {
+echo "$1/$(ls -1t $1/ | head -n1)"
+}
+# }
 
-** Internet
+# list {
+
+recipes () {
+(cd ~org/rezepte && ls -1a|sed -e 's/\.org//g' -e 's/_/ /g')
+}
+escape_spaces () {
+echo "${(q)1}"
+}
+# print a directory tree
+dir_tree () {
+ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/'
+}
+
+# ff:  find a file under the current directory
+ff () { /usr/bin/find . -name "$@" ; }
+
+# ff:  fuzzy find file under the current directory
+fff () { /usr/bin/find . -name "*$@*" ; }
+
+# ffs: to find a file whose name starts with a given string
+ffs () { /usr/bin/find . -name "$@"'*' ; }
+
+# ffe: to find a file whose name ends with a given string
+ffe () { /usr/bin/find . -name '*'"$@" ; }
+
+# fd: find a directory
+fd () { /usr/bin/find . -type d -name '*'"$@" ; }
+
+# ffd: fuzzy find a directory
+ffd () { /usr/bin/find . -type d -name "*$@*" ; }
+
+# ffg:  to find a file under the current git directory
+ffg () { /usr/bin/find `git rev-parse --show-toplevel` -name "$@" ; }
+
+# ffsg: to find a file whose name starts with a given string within the current git dir
+ffsg () { /usr/bin/find `git rev-parse --show-toplevel` -name "$@"'*' ; }
+
+# ffeg: to find a file whose name ends with a given string within the current git dir
+ffeg () { /usr/bin/find `git rev-parse --show-toplevel` -name '*'"$@" ; }
+
+# fdg: find a directory within the current git dir
+fdg () { /usr/bin/find `git rev-parse --show-toplevel` -type d -name '*'"$@" ; }
+
+# ag within the git dir
+agg () { /usr/local/bin/ag "$@" `git rev-parse --show-toplevel` ; }
+gagg () { agg "$@" ; }
+
+# search for a file using Spotlight's metadata
+spotlight () { mdfind "kMDItemDisplayName == '$@'wc"; }
+
+# TODO FIXME
+f_spotlight () {
+smart_open $(spotlight "$@" | fzf --select-1)
+}
+
+# show the SpotLight comment for a file
+spotlight_comment () { mdls "$1" | grep kMDItemFinderComment ; }
+
+# locaterecent: to search for files created since yesterday using Spotlight
+# this is an illustration of using $time in a query
+# see: http://developer.apple.com/documentation/Carbon/Conceptual/SpotlightQuery/index.html
+# TODO: day param
+spotlight_recent_created () {
+mdfind 'kMDItemFSCreationDate >= $time.yesterday' | sed '/^\/Users\/mbayer\//!d' | sed '/^\/Users\/mbayer\/Library\//d' | sed '/pyc$/d'
+}
+
+mru () {
+find ~ \( -path '*/\.*' -o -path '/Users/mbayer/Library*' -o -path '/Users/mbayer/Pictures/Fotos-Mediathek.photoslibrary*' -o -path '/Users/mbayer/Workspace/Envs*' \) -prune -o \( -name '*\.pyc' \) -prune -o -type f -mtime -7 -perm -g+r,u+r,o+r -print | sed '/Dropbox.*Icon*/d'
+}
+
+f_mru () {
+smart_open $(mru | fzf)
+}
+
+# list_all_apps: list all applications on the system
+list_all_apps () { mdfind 'kMDItemContentTypeTree == "com.apple.application"c' ; }
+
+# find_larger: find files larger than a certain size (in bytes)
+find_larger () { /usr/bin/find . -type f -size +${1}c ; }
+
+# findword: search for a word in the Unix word list
+findword () { /usr/bin/grep ^"$@"$ /usr/share/dict/words ; }
+
+# dictionary lookup
+# dict_lookup is a python script which queries osx dict
+dict () {
+dict_lookup "$@"|tr '|' '\n'|sed 's/^ //g'
+}
+
+# fzf {
+# open screenshot
+f_screenshot () {
+    local screenshot_path screenshot
+    screenshot_path="$HOME/Pictures/Screenshots"
+    out=$(ls -r ${screenshot_path} | grep Bildschirmfoto | fzf --expect=ctrl-y)
+    key=$(head -1 <<< "$out")
+    screenshot=$(head -2 <<< "$out" | tail -1)
+    echo "$screenshot_path/${(q)screenshot}"
+    [ "$key" = ctrl-y ] && echo "$screenshot_path/${(q)screenshot}" | pbcopy || $(open $screenshot_path/$screenshot)
+}
+
+# fzf open
+# fe [FUZZY PATTERN] - Open the selected file with the default editor
+#   - Bypass fuzzy finder if there's only one match (--select-1)
+#   - Exit if there's no match (--exit-0)
+# you can press
+#   - CTRL-O to open with `open` command,
+#   - CTRL-E or Enter key to open with the $EDITOR
+f_open () {
+    local out file key
+    out=$(fzf --query="$1" --exit-0 --select-1 --exit-0 --cycle --expect=ctrl-o,ctrl-e --preview "head -$LINES {}")
+    key=$(head -1 <<< "$out")
+    file=$(head -2 <<< "$out" | tail -1)
+    if [ -n "$file" ]; then
+        # [ "$key" = ctrl-o ] && open "$file" || eval ${EDITOR_TAB} "$file"
+        [ "$key" = ctrl-o ] && open "$file" || smart_open "$file"
+        # echo "$file"
+    fi
+}
+alias fo='f_open'
+
+# open a file at path
+fo_at () {
+    (cd "$1" && fo)
+}
+
+# open a file under a hashed path
+f_hash () {
+    local scope=$(hash -d | grep -v '_' | sed 's/=.*//' | grep "$1")
+    if [[ "$scope" != "" ]]; then
+        local hash_path=$(hash -d | grep -v '_' | sed 's/.*=//' | grep "$scope")
+        (cd "$hash_path" && fo)
+    else
+        echo "unknown hash: $1"
+    fi
+}
+
+org () { (cd ~org && fo "$1") }
+dotfile () { (cd ~dotfiles && fo "$1") }
+gist () { (cd ~gists && fo "$1") }
+gist_search () { (cd ~gists && ag -C 5 "$1") }
+
+# fzf cd - cd to selected directory
+f_cd () {
+    local dir
+    dir=$(/usr/bin/find ${1:-*} -path '/*/\.*' -prune \
+                    -o -type d -print 2> /dev/null | fzf +m) &&
+    realpath "$dir"
+    cd "$dir"
+}
+alias fcd='f_cd'
+
+# fcd starting from $HOME
+f_gcd () {
+    local dir
+    dir=$(/usr/bin/find ${1:-*} -path $(echo $HOME)'/*/\.*' -prune \
+                    -o -type d -print 2> /dev/null | fzf +m) &&
+    cd "$dir"
+}
+alias fgcd='f_cd'
+
+f_dirs () {
+    local dir
+    dir=$(dirs | awk '{print $2}' | fzf)
+    dn=$(dirname "$dir")
+    echo $dn
+    cd $dn
+}
+
+# search for file contents
+f_ag () {
+    ag "$1" --nobreak --nonumbers --noheading . | fzf
+}
+alias fag='f_ag'
+
+# fbr - checkout git branch (including remote branches)
+f_git_checkout () {
+    local branches branch
+    branches=$(git branch --all | grep -v HEAD) &&
+    branch=$(echo "$branches" |
+            fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+    git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+}
+
+# fco - checkout git branch/tag
+f_git_checkout_tag () {
+    local tags branches target
+    tags=$(
+    git tag | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}') || return
+    branches=$(
+    git branch --all | grep -v HEAD             |
+    sed "s/.* //"    | sed "s#remotes/[^/]*/##" |
+    sort -u          | awk '{print "\x1b[34;1mbranch\x1b[m\t" $1}') || return
+    target=$(
+    (echo "$tags"; echo "$branches") |
+    fzf-tmux -l30 -- --no-hscroll --ansi +m -d "\t" -n 2) || return
+    git checkout $(echo "$target" | awk '{print $2}')
+}
+
+# fcoc - checkout git commit
+f_git_checkout_commit () {
+    local commits commit
+    commits=$(git log --pretty=oneline --abbrev-commit --reverse) &&
+    commit=$(echo "$commits" | fzf --tac +s +m -e) &&
+    git checkout $(echo "$commit" | sed "s/ .*//")
+}
+
+# fshow - git commit browser
+f_git_log () {
+    git log --graph --color=always \
+        --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
+    fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
+        --bind "ctrl-m:execute:
+                (grep -o '[a-f0-9]\{7\}' | head -1 |
+                xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
+                {}
+FZF-EOF"
+}
+
+# pick a container id from all containers
+f_docker_container_id () {
+    local selection c_id
+    selection=$(docker ps -a | fzf --reverse --header-lines=1 --prompt="🐳  ")
+    c_id=$(echo $selection | awk '{print $1}')
+    echo $c_id | pbcopy
+    echo "copied:"
+    echo $c_id
+}
+
+f_docker_exec_select () {
+    local selection c_id cmd
+    selection=$(docker ps | fzf --reverse --header-lines=1 --prompt="🐳  ")
+    c_id=$(echo $selection | awk '{print $1}')
+    cmd="docker exec -it $c_id /bin/bash"
+    echo $cmd
+    eval $cmd
+}
+alias docker_shell='f_docker_exec_select'
+
+# pick a container id from all running containers
+f_docker_container_running_id () {
+    local selection c_id
+    selection=$(docker ps | fzf --reverse --header-lines=1 --prompt="🐳  ")
+    c_id=$(echo $selection | awk '{print $1}')
+    echo $c_id | pbcopy
+    echo "copied:"
+    echo $c_id
+}
+
+# pick an image name
+f_docker_image_name () {
+    local selection c_id
+    selection=$(docker ps -a | fzf --reverse --header-lines=1 --prompt="🐳  ")
+    c_id=$(echo $selection | awk '{print $2}')
+    echo $c_id | pbcopy
+    echo "copied:"
+    echo $c_id
+}
+
+# c - browse chrome history
+f_chrome_history () {
+        local cols sep
+        cols=$(( COLUMNS / 3 ))
+        sep='{{::}}'
+
+        # Copy History DB to circumvent the lock
+        # - See http://stackoverflow.com/questions/8936878 for the file path
+        cp -f ~/Library/Application\ Support/Google/Chrome/Default/History /tmp/h
+
+        sqlite3 -separator $sep /tmp/h \
+        "select substr(title, 1, $cols), url
+        from urls order by last_visit_time desc" |
+        awk -F $sep '{printf "%-'$cols's  \x1b[36m%s\n", $1, $2}' |
+        fzf --ansi --multi | sed 's#.*\(https*://\)#\1#' | xargs open
+}
+alias chrome_history='f_chrome_history'
+
+# browse chrome bookmarks
+f_chrome_bookmarks () {
+    $HOME/Workspace/scripts/fzf_chrome_bookmarks.rb
+}
+alias chrome_bookmarks='f_chrome_bookmarks'
+# }
+# }
+
+# print {
+# pretty print json
+# pjson '{"test": "test"}'
+# pjson myjsonfile.json
+# pjson '{"test": "test"}' myjsonfile.json
+pjson () {
+if [ $# -gt 0 ];
+    then
+    for arg in $@
+    do
+        if [ -f $arg ];
+            then
+            less $arg | python -m json.tool
+        else
+            echo "$arg" | python -m json.tool
+        fi
+    done
+fi
+}
+# }
+
+# vim {
+smart_open () {
+# escape spaces
+local filename cmd cmd_dir cmd_text cmd_arbitrary
+filename=${(q)1}
+
+cmd=""
+cmd_dir="cd $filename"
+cmd_text="${EDITOR_TAB} $filename"
+cmd_arbitrary="open $filename"
+
+# if directory
+if [[ -d "$filename" ]]; then
+    cmd=$cmd_dir
+else
+    # special case handling
+    local file_extension file_exceptions
+    file_extension="${filename##*.}"
+    file_exceptions=(csv org)
+    for i in "${file_exceptions[@]}"
+    do
+        if [[ "$i" == "$file_extension" ]]; then
+            cmd=$cmd_arbitrary
+        fi
+    done
+
+    # skip if it was special case
+    if [[ "$cmd" == "" ]]; then
+        # if meta information is text
+        if [[ $(file "$filename" | awk '{print $NF}') == 'text' ]]; then
+            cmd=$cmd_text
+        else
+            # fallback
+            cmd=$cmd_arbitrary
+        fi
+    fi
+fi
+
+if [[ $cmd != '' ]]; then
+    echo $filename
+    eval ${cmd}
+else
+    echo "nothing to do here"
+fi
+}
+
+# open files from asgard
+asgard_open () {
+mvim -c "echo :set buftype: \" \"" --remote-tab-silent scp://asgard//"$@"
+}
+
+# start vim with python 2 venv then switch back
+pvim () {
+venv="${VIRTUAL_ENV##*/}"
+if [[ $venv != "" ]]
+then
+    workon python2.7.5
+    mvim
+    workon $venv
+else
+    mvim
+fi
+}
+# }
+
+# emacs {
+emacs () {
+if [ $# -eq 0 ]; then
+    # open -a /usr/local/Cellar/emacs/25.2/Emacs.app/
+    eval ${EDITOR}
+    return 0
+fi
+if [ "$1" = "--debug-init" ]; then
+    eval ${EDITOR} --args --debug-init
+    return 0
+fi
+for var in "$@"; do
+    touch "$var"
+    eval "${EDITOR} $var"
+done
+}
+alias e='emacs'
+
+tangle () {
+FILE=$(realpath $1)
+open -a /usr/local/Cellar/emacs/25.2/Emacs.app --args --eval "(progn
+    (require 'org)
+    (find-file (expand-file-name \"$FILE\"))
+    (org-babel-tangle))"
+}
+
+old () {
+rm ~/.zshrc
+ln -s ~dotfiles/zshrc.zsh ~/.zshrc
+}
+
+new () {
+rm ~/.zshrc
+ln -s ~dotfiles/zsh.zsh ~/.zshrc
+}
+
+# }
+
+# vim {
+vim () {
+if [ $# -eq 0 ]; then
+    # open -a Emacs.app
+    eval ${VIM_EDITOR}
+    return 0
+fi
+
+eval ${VIM_EDITOR_TAB} "$@"
+}
+# }
+
+# git {
+# git diff
+gd () {
+git diff --color $1 $2|diff-so-fancy
+}
+
+# git add
+ga () {
+git add $@
+}
+
+# git commit -m
+gc () {
+git commit -m "$@"
+}
+
+# cd to git root
+cdg () {
+cd `git rev-parse --show-toplevel`
+}
+
+# git status file list
+git_status_files () {
+git status --porcelain | awk '{print $2 }'
+}
+
+# show which branch the current one is forked from
+git_parent_branch () {
+local current_branch=`git rev-parse --abbrev-ref HEAD`
+git show-branch -a | ack '\*' | ack -v "$current_branch" | head -n1 | sed 's/.*\[\(.*\)\].*/\1/' | sed 's/[\^~].*//'
+}
+
+# list git tree
+git_tree () {
+(git ls-tree -r --name-only HEAD || /usr/bin/find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//) 2> /dev/null
+}
+
+
+# pull all repositories under $pwd
+# git_pull_rec () {
+#     /usr/bin/find . -type d -depth 1 -exec git --git-dir={}/.git --work-tree=$PWD/{} pull origin master \;
+# }
+
+# git push -u origin {BRANCH_NAME}
+git_push_branch () {
+git push -u origin "$(git branch --no-color | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')"
+}
+
+# show the git log as json
+git_log_json () {
+git log --pretty=format:'{%n  "commit": "%H",%n  "abbreviated_commit": "%h",%n  "tree": "%T",%n  "abbreviated_tree": "%t",%n  "parent": "%P",%n  "abbreviated_parent": "%p",%n  "refs": "%D",%n  "encoding": "%e",%n  "subject": "%s",%n  "sanitized_subject_line": "%f",%n  "body": "%b",%n  "commit_notes": "%N",%n  "verification_flag": "%G?",%n  "signer": "%GS",%n  "signer_key": "%GK",%n  "author": {%n    "name": "%aN",%n    "email": "%aE",%n    "date": "%aD"%n  },%n  "commiter": {%n    "name": "%cN",%n    "email": "%cE",%n    "date": "%cD"%n  }%n},'
+}
+
+# open a gist repository in the browser
+git_gist_remote_url () {
+local gist_url
+gist_url="https://gist.github.com/embayer/"$(git config --get remote.origin.url | cut -c24- | sed 's/\.git$//')
+echo "$gist_url"
+open "$gist_url"
+}
+# }
+
+# docker {
+# regiobot {
+# init regiobot docker
+rg_init () {
+    cd ~/Workspace/regiobot/regiobot/
+    docker-machine stop regiobot
+    docker-machine start regiobot
+    eval "$(docker-machine env regiobot)"
+    make up
+}
+
+# open a bash session in the regiobot docker
+rg_shell () {
+    eval "$(docker-machine env regiobot)"
+    docker exec -it $(docker ps | awk '{ if ($2 == "regiobot_django") print $1 }') /bin/bash
+}
+
+import_shell () {
+    eval "$(docker-machine env regiobot)"
+    docker exec -it $(docker ps | awk '{ if ($2 == "rgimport_rgimport") print $1 }') /bin/bash
+}
+# }
+# }
+
+# trac {
+# cartman wrapper
+trac () {
+$WORKON_HOME/python2.7.5/bin/cm "$@" 2>/dev/null
+}
+
+# comment on a ticket
+trac_comment () {
+# trac_comment {ticket_nr} "{comment}"
+trac comment "$1" -m "$2"
+}
+
+# view ticket status
+trac_status () {
+trac status "$@"
+}
+
+# accept a ticket
+trac_accept () {
+trac status "$1" accept
+}
+
+# view a ticket by nr
+# -o -> open in browser
+trac_view () {
+local ticket_nr
+ticket_nr=$1
+if [[ ! $ticket_nr == '' ]]; then
+    local ticket_url
+    ticket_url=https://trac.inquant.de/regioyal/ticket/$ticket_nr
+
+    if [[ "$2" == "-o" ]]; then
+        echo "🐾  $ticket"
+        echo "🔗  $ticket_url"
+        open https://trac.inquant.de/regioyal/ticket/$ticket_nr
+    else
+        local ticket_description
+        ticket_description=`trac view $ticket_nr`
+        echo "🐾  $ticket_description"
+        echo ""
+        echo ""
+        echo "------------------------------------------------"
+        echo "🔗  $ticket_url"
+    fi
+fi
+}
+
+# search ticket titles via https://pypi.python.org/pypi/cartman/0.2.3
+trac_ticket () {
+    local ticket ticket_nr
+    # sort numerical
+    ticket=$(trac report 3 | sort -t '#' -k 2n | fzf)
+    ticket_nr=`echo $ticket | awk '{print $1}' | sed 's/[^0-9]*//g'`
+
+    if [[ ! $ticket_nr == '' ]];then
+        trac_view $ticket_nr $1
+    fi
+}
+
+# search tickets (trac_search "404 pages" -o)
+trac_search () {
+    local ticket ticket_nr
+    ticket=$(trac search "$1" | fzf)
+    ticket_nr=`echo $ticket | awk '{print $1}' | sed 's/[^0-9]*//g'`
+
+    if [[ ! $ticket_nr == '' ]];then
+        local last_param
+        eval last_param=\$$#
+        if [[ $last_param == '-o' ]];then
+            trac_view $ticket_nr $last_param
+        else
+            trac_view $ticket_nr
+        fi
+    fi
+}
+# }
+
+# actions {
+
+# convert all xlsx files in pwd to csv
+# pip install xlsx2csv required
+xlsx2csv_in_dir () {
+for filename in ./*.xlsx; do xlsx2csv $filename ${filename:r}.csv; done
+}
+# colored man pages
+man () {
+env \
+LESS_TERMCAP_mb=$(printf "\e[1;31m") \
+LESS_TERMCAP_md=$(printf "\e[1;31m") \
+LESS_TERMCAP_me=$(printf "\e[0m") \
+LESS_TERMCAP_se=$(printf "\e[0m") \
+LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
+LESS_TERMCAP_ue=$(printf "\e[0m") \
+LESS_TERMCAP_us=$(printf "\e[1;32m") \
+    man "$@"
+}
+
+
+diff_sorted () {
+diff <(sort "$1") <(sort "$2")
+}
+
+# escape spaces
+esc () {
+echo ${(q)@}
+}
+
+# print time logged in
+print_uptime () {
+last | grep `whoami` | grep -v logged | cut -c61-71 | sed -e 's/[()]//g' | awk '{ sub("\\+", ":");split($1,a,":");if(a[3]){print a[1]*60*60+a[2]*60+a[3]} else {print a[1]*60+a[2] }; }' | paste -s -d+ - | bc | awk '{printf "%dh:%dm:%ds\n",$1/(60*60),$1%(60*60)/60,$1%60}'
+}
+
+
+# print a divider
+div () {
+echo ""
+imgcat ~dropbox/Bilder/Art/MC-Escher-Metamorphosis.jpg
+}
+# create an executable script
+mk_script () {
+(($# > 0)) && {
+    touch "$1"
+    chmod +x "$1"
+    eval ${EDITOR_TAB} "$1"
+}
+}
+
+mkdir_cd () {
+mkdir $1 && cd $_
+}
+alias mkcd='mkdir_cd'
+
+# move file/dir to trash
+trash () { mv "$@" $HOME/.Trash/. ; }
+
+# backup the current directory at the parent directoy
+# use encryption with -e
+bu () {
+dname=$(basename $(pwd))
+cd ..
+if [[ "$1" == "-e" ]]; then
+    buname=$dname""_$(date +%d%m%y-%H-%M-%S).tar.gz.enc
+    tar cz "$dname/" | openssl enc -aes-256-cbc -e > "$buname"
+else
+    buname=$dname""_$(date +%d%m%y-%H-%M-%S).tar.gz
+    tar czf "$buname" "$dname/"
+fi
+echo "-> ../$buname"
+cd -  >/dev/null 2>&1
+}
+
+# convert a given zshmarks bookmarks file to zsh named directories
+bookmarks_to_hashes () {
+cat "$@" | awk '(FS = "|") && (NF) { gsub(/\$HOME/, "~", $1); print "hash -d " $2 "=" $1 }'
+}
+
+# lookup dict.cc
+de () { dict.cc.py de en "$1"; }
+# lookup dict.cc for english words
+en () { dict.cc.py en de "$1"; }
+
+# copy the current working dir to clipboard
+copy_pwd () { pwd | pbcopy }
+
+# copy the last command to clipboard
+copy_last_cmd () {
+# echo "!!" | pbcopy
+history | tail -1 | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}' | pbcopy
+}
+
+# calculator
+= () {
+calc="${@//p/+}"
+calc="${calc//x/*}"
+echo "$(($calc))"
+}
+
+# show clock
+clock () {
+while sleep 1;do tput sc;tput cup 0 $(($(tput cols)-29));date;tput rc;done &
+}
+
+# explain tools
+explain () {
+if [ "$#" -eq 0 ]; then
+while read  -p "Command: " cmd; do
+    curl -Gs "https://www.mankier.com/api/explain/?cols="$(tput cols) --data-urlencode "q=$cmd"
+done
+echo "Bye!"
+elif [ "$#" -eq 1 ]; then
+curl -Gs "https://www.mankier.com/api/explain/?cols="$(tput cols) --data-urlencode "q=$1"
+else
+echo "Usage"
+echo "explain                  interactive mode."
+echo "explain 'cmd -o | ...'   one quoted command to explain it."
+fi
+}
+
+# osx {
+pomodoro () {
+    # TODO: tags, exercises, postpone
+    # Basso.aiff  Blow.aiff  Bottle.aiff  Frog.aiff  Funk.aiff  Glass.aiff  Hero.aiff  Morse.aiff  Ping.aiff  Pop.aiff  Purr.aiff  Sosumi.aiff  Submarine.aiff  Tink.aiff
+    local title="Pomodoro"
+    local subtitle="time for a break"
+    local soundname="Hero"
+    if [[ "$1" == "" ]]; then
+        local notification="a task"
+    else
+        local notification="$1"
+    fi
+    local timestamp=$(date +%d.%m.%Y-%H:%M:%S)
+    # TODO: display end time
+    echo "$timestamp\t$notification""\r"
+    echo "$timestamp\t$notification""\r" >> ~/.pomodoro
+
+    local secs=$((1))
+    # display a timer
+    while [ $secs -gt 0 ]; do
+        # TODO: format minutes
+        echo -ne "$secs\033[0K\r"
+        sleep 1
+        : $((secs--))
+    done
+    echo "display notification \"$notification\" with title \"$title\" subtitle \"$subtitle\" sound name \"$soundname\""
+    osascript -e "display notification \"$notification\" with title \"$title\" subtitle \"$subtitle\" sound name \"$soundname\""
+}
+alias pom='pomodoro'
+pomo () {
+    blocks
+    pomodoro "$1"
+    blocks
+}
+
+pomodoro_today () {
+    local pomodoros=$(grep -o "$(date +%d.%m.%Y)" ~/.pomodoro | wc -l|awk '{print $1}')
+    echo "$pomodoros pomodoros today: ${(l:$pomodoros::🍅:)}\n"
+    cat ~/.pomodoro | grep "$(date +%d.%m.%Y)" --color=never | cut -c 12-
+}
+
+# say
+# test voices
+say_test () {
+    say -v '?' | awk '{print $1}' | while read voice; do printf "using $voice...\n"; say -v $voice "hello, this is me using the $voice voice"; sleep 1; done
+}
+
+lol () { say -v Hysterical 'hahahahahahaha oh really?' }
+
+sing_song () {
+    songs=(
+        "say -v Alex Dum dum dee dum dum dum dum dee Dum dum dee dum dum dum dum dee dum dee dum dum dum de dum dum dum dee dum dee dum dum dee dummmmmmmmmmmmmmmmm" \
+        "say -v Anna di di di di di di di di di di di di di di di di di di di di di di di di di di" \
+        "say -v Cellos oh This is a ponci song ponci song ponci song this is the ponsiano song ive ever ever heard So why keep you listening listening listening while you are supposed to hack to hack to hack to hack its because i hate bill gates hate bill gates hate bill gates its because i hate bill gates more than anything else No its because windows life windows life windows life and you better get a macintosh and iPod now" \
+        "say -v Good oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooo" \
+        "say -v Bad oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooo")
+    ponysay $songs[$1]
+    eval ${songs[$1]}
+}
+
+# set alarm clock with say
+alarm_msg () {
+    echo "alarm in ""$1""m"
+    local secs=$(($1 * 60))
+    # display a timer
+    while [ $secs -gt 0 ]; do
+        # TODO: format minutes
+        echo -ne "$secs\033[0K\r"
+        sleep 1
+        : $((secs--))
+    done
+
+    say -v Zarvox "$2"
+}
+alarm () {
+    echo "alarm in ""$1""m"
+    local secs=$(($1 * 60))
+    # display a timer
+    while [ $secs -gt 0 ]; do
+        # TODO: format minutes
+        echo -ne "$secs\033[0K\r"
+        sleep 1
+        : $((secs--))
+    done
+    sing_song 1
+}
+# eject all mountable volumes
+eject () {
+    osascript -e 'tell application "Finder" to eject (every disk whose ejectable is true)'
+}
+
+# change working directory to Finder path
+cdf () {
+    cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')"
+}
+
+# toggle show/hide hidden files in finder
+toggle_hidden () {
+    isVisible=$(defaults read com.apple.finder AppleShowAllFiles)
+
+    # toggle visibility based on variables value
+    if [ ${isVisible} = FALSE ]
+    then
+        defaults write com.apple.finder AppleShowAllFiles TRUE
+    else
+        defaults write com.apple.finder AppleShowAllFiles FALSE
+    fi
+
+    # force changes by restarting Finder
+    killall Finder
+}
+# }
+
+# archives {
+# zipf: to create a ZIP archive of a file or folder
+zipf () { zip -r "$1".zip "$1" ; }
+
+# extract an archive
+# TODO target
+extract () {
+    if [ -f $1 ] ; then
+        case $1 in
+            ,*.tar.bz2)  tar xjf $1      ;;
+            ,*.tar.gz)   tar xzf $1      ;;
+            ,*.bz2)      bunzip2 $1      ;;
+            ,*.rar)      rar x $1        ;;
+            ,*.gz)       gunzip $1       ;;
+            ,*.tar)      tar xf $1       ;;
+            ,*.tbz2)     tar xjf $1      ;;
+            ,*.tgz)      tar xzf $1      ;;
+            ,*.zip)      unzip $1        ;;
+            ,*.Z)        uncompress $1   ;;
+            ,*)          echo "'$1' cannot be extracted via extract()" ;;
+    esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
+# }
+
+# network {
+# serve wd
+serve () {
+    printip
+    # TODO check version
+    # python 2
+    # python -m SimpleHTTPServer
+    python3 -m http.server
+}
+
+serve_bash () {
+    printip | awk '{print $1":8080"}'
+    while true; do { echo -e 'HTTP/1.1 200 OK\r\n'; \
+    cat "$1"; } | nc -l 8080; done
+}
+
+# open a url
+op () {
+    typeset -A mapping
+    mapping=(
+        google https://www.google.de/
+        spotify https://play.spotify.com/collection/songs
+    )
+    open $mapping[$@]
+}
+# }
+
+# color {
+# show available color codes
+typeset -Ag FX FG BG
+
+FX=(
+    reset     "%{[00m%}"
+    bold      "%{[01m%}" no-bold      "%{[22m%}"
+    italic    "%{[03m%}" no-italic    "%{[23m%}"
+    underline "%{[04m%}" no-underline "%{[24m%}"
+    blink     "%{[05m%}" no-blink     "%{[25m%}"
+    reverse   "%{[07m%}" no-reverse   "%{[27m%}"
+)
+
+for color in {000..255}; do
+    FG[$color]="%{[38;5;${color}m%}"
+    BG[$color]="%{[48;5;${color}m%}"
+done
+
+ZSH_SPECTRUM_TEXT=${ZSH_SPECTRUM_TEXT:-Arma virumque cano Troiae qui primus ab oris}
+
+# Show all 256 colors with color number
+spectrum_ls () {
+    for code in {000..255}; do
+    print -P -- "$code: %F{$code}$ZSH_SPECTRUM_TEXT%f"
+    done
+}
+
+# Show all 256 colors where the background is set to specific color
+spectrum_bls () {
+    for code in {000..255}; do
+    print -P -- "$BG[$code]$code: $ZSH_SPECTRUM_TEXT %{$reset_color%}"
+    done
+}
+
+# TODO bold
+# }
+
+# fun {
+# nyan cat
+nyan () { telnet nyancat.dakko.us }
+
+# starwars
+starwars () { telnet towel.blinkenlights.nl }
+
+# mandelbrot
+mandelbrot () {
+    local lines columns colour a b p q i pnew
+    ((columns=COLUMNS-1, lines=LINES-1, colour=0))
+    for ((b=-1.5; b<=1.5; b+=3.0/lines)) do
+        for ((a=-2.0; a<=1; a+=3.0/columns)) do
+            for ((p=0.0, q=0.0, i=0; p*p+q*q < 4 && i < 32; i++)) do
+                ((pnew=p*p-q*q+a, q=2*p*q+b, p=pnew))
+            done
+            ((colour=(i/4)%8))
+            echo -n "\\e[4${colour}m "
+        done
+        echo
+    done
+}
+          # }
+      # }
+  # }}}
+
 
 * Keybindings
 :PROPERTIES:
@@ -1347,1026 +2424,6 @@ alias fzf_ag='ag -g "" | fzf'
   # }}}
 
 
-  # functions {{{
-              # tools {
-              clipboard_plain_text () {
-                  pbpaste | textutil -convert txt -stdin -stdout -encoding 30 | pbcopy
-              }
-              print_shrug () {
-                  echo "¯\_(ツ)_/¯"
-              }
-              print_python_kws () {
-                  python -c "import keyword
-  for kw in keyword.kwlist:
-      print(kw)"
-              }
-              # >--< <- rm from clipboard entry
-              # >>> import hashlib
-              rm_prefix (){
-                  pbpaste|cut -c 4-|pbcopy
-              }
-              # reverse line order of file
-              tac () {
-                  sed '1!G;h;$!d' "$1"
-              }
-              mk_zip_bomb () {
-                  dd if=/dev/zero bs=1M count=10240 | gzip > 10G.gzip
-              }
-              list_background_images () {
-                  local url=$1
-                  curl $url|awk -F\" '{for(i=0;++i<=NF;){if($i ~ /^http/ && $i !~ "google\|cache:"){print $i}}}'|grep '.*\.\(jpg\|JPG\|png\|PNG\|gif\|GIF\)'
-              }
-              list_urls () {
-                  local url=$1
-                  curl $url|sed -n 's/.*href="\([^"]*\).*/\1/p'
-              }
-              # }
-      # fileoperations {
-          rename_prefix_iterator () {
-              local prefix=$1
-              local pattern=$2
-              i=1
-              for file in *$pattern*; do
-                  filename=$(basename "$file")
-                  extension="${filename##*.}"
-                  filename="${filename%.*}"
-                  cp $file $(printf "$prefix-%0.3d.$extension" $i)
-                  i=$((i + 1))
-              done
-          }
-      # }
-      # echo {
-          # 
-          echo_external_ip () {
-              curl ipecho.net/plain
-          }
-          # get the last file of the given directory
-          echo_lf () {
-              echo "$1/$(ls -1t $1/ | head -n1)"
-          }
-          echo_timestamp () {
-              echo $(date +%Y-%m-%d-%H-%M-%S)
-          }
-          echo_datestamp () {
-              echo $(date +%Y-%m-%d)
-          }
-      # }
-
-      # list {
-          starcat () {
-              for i in *; do
-                  echo ""
-                  echo "=-=-= $i =-=-="
-                  echo "------------------------------------------------"
-                  echo ""
-                  cat "$i"
-                  echo ""
-              done
-          }
-
-          recipes () {
-              (cd ~org/rezepte && ls -1a|sed -e 's/\.org//g' -e 's/_/ /g')
-          }
-          escape_spaces () {
-              echo "${(q)1}"
-          }
-          # print a directory tree
-          dir_tree () {
-              ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/'
-          }
-          # count files
-          count () {
-              for dir in $( /usr/bin/find . -type d -print );
-              do
-                  files=$( /usr/bin/find $dir -maxdepth 1 -type f | wc -l )
-                  echo "$dir : $files"
-              done
-          }
-
-          # showTimes: show the modification, metadata-change, and access times of a file
-          showtimes () { stat -f "%N:   %m %c %a" "$@" ; }
-
-          # ff:  find a file under the current directory
-          ff () { /usr/bin/find . -name "$@" ; }
-
-          # ff:  fuzzy find file under the current directory
-          fff () { /usr/bin/find . -name "*$@*" ; }
-
-          # ffs: to find a file whose name starts with a given string
-          ffs () { /usr/bin/find . -name "$@"'*' ; }
-
-          # ffe: to find a file whose name ends with a given string
-          ffe () { /usr/bin/find . -name '*'"$@" ; }
-
-          # fd: find a directory
-          fd () { /usr/bin/find . -type d -name '*'"$@" ; }
-
-          # ffd: fuzzy find a directory
-          ffd () { /usr/bin/find . -type d -name "*$@*" ; }
-
-          # ffg:  to find a file under the current git directory
-          ffg () { /usr/bin/find `git rev-parse --show-toplevel` -name "$@" ; }
-
-          # ffsg: to find a file whose name starts with a given string within the current git dir
-          ffsg () { /usr/bin/find `git rev-parse --show-toplevel` -name "$@"'*' ; }
-
-          # ffeg: to find a file whose name ends with a given string within the current git dir
-          ffeg () { /usr/bin/find `git rev-parse --show-toplevel` -name '*'"$@" ; }
-
-          # fdg: find a directory within the current git dir
-          fdg () { /usr/bin/find `git rev-parse --show-toplevel` -type d -name '*'"$@" ; }
-
-          # ag within the git dir
-          agg () { /usr/local/bin/ag "$@" `git rev-parse --show-toplevel` ; }
-          gagg () { agg "$@" ; }
-
-          # search for a file using Spotlight's metadata
-          spotlight () { mdfind "kMDItemDisplayName == '$@'wc"; }
-
-          # TODO FIXME
-          f_spotlight () {
-              smart_open $(spotlight "$@" | fzf --select-1)
-          }
-
-          # show the SpotLight comment for a file
-          spotlight_comment () { mdls "$1" | grep kMDItemFinderComment ; }
-
-          # locaterecent: to search for files created since yesterday using Spotlight
-          # this is an illustration of using $time in a query
-          # see: http://developer.apple.com/documentation/Carbon/Conceptual/SpotlightQuery/index.html
-          # TODO: day param
-          spotlight_recent_created () {
-              mdfind 'kMDItemFSCreationDate >= $time.yesterday' | sed '/^\/Users\/mbayer\//!d' | sed '/^\/Users\/mbayer\/Library\//d' | sed '/pyc$/d'
-          }
-
-          mru () {
-              find ~ \( -path '*/\.*' -o -path '/Users/mbayer/Library*' -o -path '/Users/mbayer/Pictures/Fotos-Mediathek.photoslibrary*' -o -path '/Users/mbayer/Workspace/Envs*' \) -prune -o \( -name '*\.pyc' \) -prune -o -type f -mtime -7 -perm -g+r,u+r,o+r -print | sed '/Dropbox.*Icon*/d'
-          }
-
-          f_mru () {
-              smart_open $(mru | fzf)
-          }
-
-          # list_all_apps: list all applications on the system
-          list_all_apps () { mdfind 'kMDItemContentTypeTree == "com.apple.application"c' ; }
-
-          # find_larger: find files larger than a certain size (in bytes)
-          find_larger () { /usr/bin/find . -type f -size +${1}c ; }
-
-          # findword: search for a word in the Unix word list
-          findword () { /usr/bin/grep ^"$@"$ /usr/share/dict/words ; }
-
-          # dictionary lookup
-          # dict_lookup is a python script which queries osx dict
-          dict () {
-              dict_lookup "$@"|tr '|' '\n'|sed 's/^ //g'
-          }
-
-          # fzf {
-              # open screenshot
-              f_screenshot () {
-                  local screenshot_path screenshot
-                  screenshot_path="$HOME/Pictures/Screenshots"
-                  out=$(ls -r ${screenshot_path} | grep Bildschirmfoto | fzf --expect=ctrl-y)
-                  key=$(head -1 <<< "$out")
-                  screenshot=$(head -2 <<< "$out" | tail -1)
-                  echo "$screenshot_path/${(q)screenshot}"
-                  [ "$key" = ctrl-y ] && echo "$screenshot_path/${(q)screenshot}" | pbcopy || $(open $screenshot_path/$screenshot)
-              }
-
-              # fzf open
-              # fe [FUZZY PATTERN] - Open the selected file with the default editor
-              #   - Bypass fuzzy finder if there's only one match (--select-1)
-              #   - Exit if there's no match (--exit-0)
-              # you can press
-              #   - CTRL-O to open with `open` command,
-              #   - CTRL-E or Enter key to open with the $EDITOR
-              f_open () {
-                  local out file key
-                  out=$(fzf --query="$1" --exit-0 --select-1 --exit-0 --cycle --expect=ctrl-o,ctrl-e --preview "head -$LINES {}")
-                  key=$(head -1 <<< "$out")
-                  file=$(head -2 <<< "$out" | tail -1)
-                  if [ -n "$file" ]; then
-                      # [ "$key" = ctrl-o ] && open "$file" || eval ${EDITOR_TAB} "$file"
-                      [ "$key" = ctrl-o ] && open "$file" || smart_open "$file"
-                      # echo "$file"
-                  fi
-              }
-              alias fo='f_open'
-
-              # open a file at path
-              fo_at () {
-                  (cd "$1" && fo)
-              }
-
-              # open a file under a hashed path
-              f_hash () {
-                  local scope=$(hash -d | grep -v '_' | sed 's/=.*//' | grep "$1")
-                  if [[ "$scope" != "" ]]; then
-                      local hash_path=$(hash -d | grep -v '_' | sed 's/.*=//' | grep "$scope")
-                      (cd "$hash_path" && fo)
-                  else
-                      echo "unknown hash: $1"
-                  fi
-              }
-
-              org () { (cd ~org && fo "$1") }
-              dotfile () { (cd ~dotfiles && fo "$1") }
-              gist () { (cd ~gists && fo "$1") }
-              gist_search () { (cd ~gists && ag -C 5 "$1") }
-
-              # fzf cd - cd to selected directory
-              f_cd () {
-                local dir
-                dir=$(/usr/bin/find ${1:-*} -path '/*/\.*' -prune \
-                                -o -type d -print 2> /dev/null | fzf +m) &&
-                realpath "$dir"
-                cd "$dir"
-              }
-              alias fcd='f_cd'
-
-              # fcd starting from $HOME
-              f_gcd () {
-                local dir
-                dir=$(/usr/bin/find ${1:-*} -path $(echo $HOME)'/*/\.*' -prune \
-                                -o -type d -print 2> /dev/null | fzf +m) &&
-                cd "$dir"
-              }
-              alias fgcd='f_cd'
-
-              f_dirs () {
-                  local dir
-                  dir=$(dirs | awk '{print $2}' | fzf)
-                  dn=$(dirname "$dir")
-                  echo $dn
-                  cd $dn
-              }
-
-              # search for file contents
-              f_ag () {
-                  ag "$1" --nobreak --nonumbers --noheading . | fzf
-              }
-              alias fag='f_ag'
-
-              # fbr - checkout git branch (including remote branches)
-              f_git_checkout () {
-                local branches branch
-                branches=$(git branch --all | grep -v HEAD) &&
-                branch=$(echo "$branches" |
-                         fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
-                git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
-              }
-
-              # fco - checkout git branch/tag
-              f_git_checkout_tag () {
-                local tags branches target
-                tags=$(
-                  git tag | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}') || return
-                branches=$(
-                  git branch --all | grep -v HEAD             |
-                  sed "s/.* //"    | sed "s#remotes/[^/]*/##" |
-                  sort -u          | awk '{print "\x1b[34;1mbranch\x1b[m\t" $1}') || return
-                target=$(
-                  (echo "$tags"; echo "$branches") |
-                  fzf-tmux -l30 -- --no-hscroll --ansi +m -d "\t" -n 2) || return
-                git checkout $(echo "$target" | awk '{print $2}')
-              }
-
-              # fcoc - checkout git commit
-              f_git_checkout_commit () {
-                local commits commit
-                commits=$(git log --pretty=oneline --abbrev-commit --reverse) &&
-                commit=$(echo "$commits" | fzf --tac +s +m -e) &&
-                git checkout $(echo "$commit" | sed "s/ .*//")
-              }
-
-              # fshow - git commit browser
-              f_git_log () {
-                git log --graph --color=always \
-                    --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
-                fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
-                    --bind "ctrl-m:execute:
-                              (grep -o '[a-f0-9]\{7\}' | head -1 |
-                              xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
-                              {}
-  FZF-EOF"
-              }
-
-              # pick a container id from all containers
-              f_docker_container_id () {
-                  local selection c_id
-                  selection=$(docker ps -a | fzf --reverse --header-lines=1 --prompt="🐳  ")
-                  c_id=$(echo $selection | awk '{print $1}')
-                  echo $c_id | pbcopy
-                  echo "copied:"
-                  echo $c_id
-              }
-
-              f_docker_exec_select () {
-                  local selection c_id cmd
-                  selection=$(docker ps | fzf --reverse --header-lines=1 --prompt="🐳  ")
-                  c_id=$(echo $selection | awk '{print $1}')
-                  cmd="docker exec -it $c_id /bin/bash"
-                  echo $cmd
-                  eval $cmd
-              }
-              alias docker_shell='f_docker_exec_select'
-
-              # pick a container id from all running containers
-              f_docker_container_running_id () {
-                  local selection c_id
-                  selection=$(docker ps | fzf --reverse --header-lines=1 --prompt="🐳  ")
-                  c_id=$(echo $selection | awk '{print $1}')
-                  echo $c_id | pbcopy
-                  echo "copied:"
-                  echo $c_id
-              }
-
-              # pick an image name
-              f_docker_image_name () {
-                  local selection c_id
-                  selection=$(docker ps -a | fzf --reverse --header-lines=1 --prompt="🐳  ")
-                  c_id=$(echo $selection | awk '{print $2}')
-                  echo $c_id | pbcopy
-                  echo "copied:"
-                  echo $c_id
-              }
-
-              # c - browse chrome history
-              f_chrome_history () {
-                    local cols sep
-                    cols=$(( COLUMNS / 3 ))
-                    sep='{{::}}'
-
-                    # Copy History DB to circumvent the lock
-                    # - See http://stackoverflow.com/questions/8936878 for the file path
-                    cp -f ~/Library/Application\ Support/Google/Chrome/Default/History /tmp/h
-
-                    sqlite3 -separator $sep /tmp/h \
-                      "select substr(title, 1, $cols), url
-                       from urls order by last_visit_time desc" |
-                    awk -F $sep '{printf "%-'$cols's  \x1b[36m%s\n", $1, $2}' |
-                    fzf --ansi --multi | sed 's#.*\(https*://\)#\1#' | xargs open
-              }
-              alias chrome_history='f_chrome_history'
-
-              # browse chrome bookmarks
-              f_chrome_bookmarks () {
-                  $HOME/Workspace/scripts/fzf_chrome_bookmarks.rb
-              }
-              alias chrome_bookmarks='f_chrome_bookmarks'
-          # }
-      # }
-
-      # print {
-          # pretty print json
-          # pjson '{"test": "test"}'
-          # pjson myjsonfile.json
-          # pjson '{"test": "test"}' myjsonfile.json
-          pjson () {
-              if [ $# -gt 0 ];
-                  then
-                  for arg in $@
-                  do
-                      if [ -f $arg ];
-                          then
-                          less $arg | python -m json.tool
-                      else
-                          echo "$arg" | python -m json.tool
-                      fi
-                  done
-              fi
-          }
-      # }
-
-      # vim {
-          smart_open () {
-              # escape spaces
-              local filename cmd cmd_dir cmd_text cmd_arbitrary
-              filename=${(q)1}
-
-              cmd=""
-              cmd_dir="cd $filename"
-              cmd_text="${EDITOR_TAB} $filename"
-              cmd_arbitrary="open $filename"
-
-              # if directory
-              if [[ -d "$filename" ]]; then
-                  cmd=$cmd_dir
-              else
-                  # special case handling
-                  local file_extension file_exceptions
-                  file_extension="${filename##*.}"
-                  file_exceptions=(csv org)
-                  for i in "${file_exceptions[@]}"
-                  do
-                      if [[ "$i" == "$file_extension" ]]; then
-                          cmd=$cmd_arbitrary
-                      fi
-                  done
-
-                  # skip if it was special case
-                  if [[ "$cmd" == "" ]]; then
-                      # if meta information is text
-                      if [[ $(file "$filename" | awk '{print $NF}') == 'text' ]]; then
-                          cmd=$cmd_text
-                      else
-                          # fallback
-                          cmd=$cmd_arbitrary
-                      fi
-                  fi
-              fi
-
-              if [[ $cmd != '' ]]; then
-                  echo $filename
-                  eval ${cmd}
-              else
-                  echo "nothing to do here"
-              fi
-          }
-
-          # open files from asgard
-          asgard_open () {
-              mvim -c "echo :set buftype: \" \"" --remote-tab-silent scp://asgard//"$@"
-          }
-
-          # start vim with python 2 venv then switch back
-          pvim () {
-              venv="${VIRTUAL_ENV##*/}"
-              if [[ $venv != "" ]]
-              then
-                  workon python2.7.5
-                  mvim
-                  workon $venv
-              else
-                  mvim
-              fi
-          }
-      # }
-
-      # emacs {
-          emacs () {
-              if [ $# -eq 0 ]; then
-                  # open -a /usr/local/Cellar/emacs/25.2/Emacs.app/
-                  eval ${EDITOR}
-                  return 0
-              fi
-              if [ "$1" = "--debug-init" ]; then
-                  eval ${EDITOR} --args --debug-init
-                  return 0
-              fi
-              for var in "$@"; do
-                  touch "$var"
-                  eval "${EDITOR} $var"
-              done
-          }
-          alias e='emacs'
-
-          tangle () {
-              FILE=$(realpath $1)
-              open -a /usr/local/Cellar/emacs/25.2/Emacs.app --args --eval "(progn
-                  (require 'org)
-                  (find-file (expand-file-name \"$FILE\"))
-                  (org-babel-tangle))"
-          }
-
-          old () {
-              rm ~/.zshrc
-              ln -s ~dotfiles/zshrc.zsh ~/.zshrc
-          }
-
-          new () {
-              rm ~/.zshrc
-              ln -s ~dotfiles/zsh.zsh ~/.zshrc
-          }
-
-      # }
-
-      # vim {
-          vim () {
-              if [ $# -eq 0 ]; then
-                  # open -a Emacs.app
-                  eval ${VIM_EDITOR}
-                  return 0
-              fi
-
-              eval ${VIM_EDITOR_TAB} "$@"
-          }
-      # }
-
-      # git {
-          # git diff
-          gd () {
-              git diff --color $1 $2|diff-so-fancy
-          }
-
-          # git add
-          ga () {
-              git add $@
-          }
-
-          # git commit -m
-          gc () {
-              git commit -m "$@"
-          }
-
-          # cd to git root
-          cdg () {
-              cd `git rev-parse --show-toplevel`
-          }
-
-          # git status file list
-          git_status_files () {
-              git status --porcelain | awk '{print $2 }'
-          }
-
-          # show which branch the current one is forked from
-          git_parent_branch () {
-              local current_branch=`git rev-parse --abbrev-ref HEAD`
-              git show-branch -a | ack '\*' | ack -v "$current_branch" | head -n1 | sed 's/.*\[\(.*\)\].*/\1/' | sed 's/[\^~].*//'
-          }
-
-          # list git tree
-          git_tree () {
-              (git ls-tree -r --name-only HEAD || /usr/bin/find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//) 2> /dev/null
-          }
-
-
-          # pull all repositories under $pwd
-          # git_pull_rec () {
-          #     /usr/bin/find . -type d -depth 1 -exec git --git-dir={}/.git --work-tree=$PWD/{} pull origin master \;
-          # }
-
-          # git push -u origin {BRANCH_NAME}
-          git_push_branch () {
-              git push -u origin "$(git branch --no-color | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')"
-          }
-
-          # show the git log as json
-          git_log_json () {
-              git log --pretty=format:'{%n  "commit": "%H",%n  "abbreviated_commit": "%h",%n  "tree": "%T",%n  "abbreviated_tree": "%t",%n  "parent": "%P",%n  "abbreviated_parent": "%p",%n  "refs": "%D",%n  "encoding": "%e",%n  "subject": "%s",%n  "sanitized_subject_line": "%f",%n  "body": "%b",%n  "commit_notes": "%N",%n  "verification_flag": "%G?",%n  "signer": "%GS",%n  "signer_key": "%GK",%n  "author": {%n    "name": "%aN",%n    "email": "%aE",%n    "date": "%aD"%n  },%n  "commiter": {%n    "name": "%cN",%n    "email": "%cE",%n    "date": "%cD"%n  }%n},'
-          }
-
-          # open a gist repository in the browser
-          git_gist_remote_url () {
-              local gist_url
-              gist_url="https://gist.github.com/embayer/"$(git config --get remote.origin.url | cut -c24- | sed 's/\.git$//')
-              echo "$gist_url"
-              open "$gist_url"
-          }
-      # }
-
-      # docker {
-          # regiobot {
-              # init regiobot docker
-              rg_init () {
-                  cd ~/Workspace/regiobot/regiobot/
-                  docker-machine stop regiobot
-                  docker-machine start regiobot
-                  eval "$(docker-machine env regiobot)"
-                  make up
-              }
-
-              # open a bash session in the regiobot docker
-              rg_shell () {
-                  eval "$(docker-machine env regiobot)"
-                  docker exec -it $(docker ps | awk '{ if ($2 == "regiobot_django") print $1 }') /bin/bash
-              }
-
-              import_shell () {
-                  eval "$(docker-machine env regiobot)"
-                  docker exec -it $(docker ps | awk '{ if ($2 == "rgimport_rgimport") print $1 }') /bin/bash
-              }
-          # }
-      # }
-
-      # trac {
-          # cartman wrapper
-          trac () {
-              $WORKON_HOME/python2.7.5/bin/cm "$@" 2>/dev/null
-          }
-
-          # comment on a ticket
-          trac_comment () {
-              # trac_comment {ticket_nr} "{comment}"
-              trac comment "$1" -m "$2"
-          }
-
-          # view ticket status
-          trac_status () {
-              trac status "$@"
-          }
-
-          # accept a ticket
-          trac_accept () {
-              trac status "$1" accept
-          }
-
-          # view a ticket by nr
-          # -o -> open in browser
-          trac_view () {
-              local ticket_nr
-              ticket_nr=$1
-              if [[ ! $ticket_nr == '' ]]; then
-                  local ticket_url
-                  ticket_url=https://trac.inquant.de/regioyal/ticket/$ticket_nr
-
-                  if [[ "$2" == "-o" ]]; then
-                      echo "🐾  $ticket"
-                      echo "🔗  $ticket_url"
-                      open https://trac.inquant.de/regioyal/ticket/$ticket_nr
-                  else
-                      local ticket_description
-                      ticket_description=`trac view $ticket_nr`
-                      echo "🐾  $ticket_description"
-                      echo ""
-                      echo ""
-                      echo "------------------------------------------------"
-                      echo "🔗  $ticket_url"
-                  fi
-              fi
-          }
-
-          # search ticket titles via https://pypi.python.org/pypi/cartman/0.2.3
-          trac_ticket () {
-                local ticket ticket_nr
-                # sort numerical
-                ticket=$(trac report 3 | sort -t '#' -k 2n | fzf)
-                ticket_nr=`echo $ticket | awk '{print $1}' | sed 's/[^0-9]*//g'`
-
-                  if [[ ! $ticket_nr == '' ]];then
-                      trac_view $ticket_nr $1
-                  fi
-          }
-
-          # search tickets (trac_search "404 pages" -o)
-          trac_search () {
-                local ticket ticket_nr
-                ticket=$(trac search "$1" | fzf)
-                ticket_nr=`echo $ticket | awk '{print $1}' | sed 's/[^0-9]*//g'`
-
-                  if [[ ! $ticket_nr == '' ]];then
-                      local last_param
-                      eval last_param=\$$#
-                      if [[ $last_param == '-o' ]];then
-                          trac_view $ticket_nr $last_param
-                      else
-                          trac_view $ticket_nr
-                      fi
-                  fi
-          }
-      # }
-
-      # actions {
-
-          # convert all xlsx files in pwd to csv
-          # pip install xlsx2csv required
-          xlsx2csv_in_dir () {
-               for filename in ./*.xlsx; do xlsx2csv $filename ${filename:r}.csv; done
-          }
-          # colored man pages
-          man () {
-              env \
-              LESS_TERMCAP_mb=$(printf "\e[1;31m") \
-              LESS_TERMCAP_md=$(printf "\e[1;31m") \
-              LESS_TERMCAP_me=$(printf "\e[0m") \
-              LESS_TERMCAP_se=$(printf "\e[0m") \
-              LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
-              LESS_TERMCAP_ue=$(printf "\e[0m") \
-              LESS_TERMCAP_us=$(printf "\e[1;32m") \
-                  man "$@"
-          }
-
-
-          diff_sorted () {
-              diff <(sort "$1") <(sort "$2")
-          }
-
-          # escape spaces
-          esc () {
-              echo ${(q)@}
-          }
-
-          # print time logged in
-          print_uptime () {
-              last | grep `whoami` | grep -v logged | cut -c61-71 | sed -e 's/[()]//g' | awk '{ sub("\\+", ":");split($1,a,":");if(a[3]){print a[1]*60*60+a[2]*60+a[3]} else {print a[1]*60+a[2] }; }' | paste -s -d+ - | bc | awk '{printf "%dh:%dm:%ds\n",$1/(60*60),$1%(60*60)/60,$1%60}'
-          }
-
-
-          # print a divider
-          div () {
-              echo ""
-              imgcat ~dropbox/Bilder/Art/MC-Escher-Metamorphosis.jpg
-          }
-          # create an executable script
-          mk_script () {
-              (($# > 0)) && {
-                  touch "$1"
-                  chmod +x "$1"
-                  eval ${EDITOR_TAB} "$1"
-              }
-          }
-
-          mkdir_cd () {
-              mkdir $1 && cd $_
-          }
-          alias mkcd='mkdir_cd'
-
-          # move file/dir to trash
-          trash () { mv "$@" $HOME/.Trash/. ; }
-
-          # backup the current directory at the parent directoy
-          # use encryption with -e
-          bu () {
-              dname=$(basename $(pwd))
-              cd ..
-              if [[ "$1" == "-e" ]]; then
-                  buname=$dname""_$(date +%d%m%y-%H-%M-%S).tar.gz.enc
-                  tar cz "$dname/" | openssl enc -aes-256-cbc -e > "$buname"
-              else
-                  buname=$dname""_$(date +%d%m%y-%H-%M-%S).tar.gz
-                  tar czf "$buname" "$dname/"
-              fi
-              echo "-> ../$buname"
-              cd -  >/dev/null 2>&1
-          }
-
-          # convert a given zshmarks bookmarks file to zsh named directories
-          bookmarks_to_hashes () {
-              cat "$@" | awk '(FS = "|") && (NF) { gsub(/\$HOME/, "~", $1); print "hash -d " $2 "=" $1 }'
-          }
-
-          # lookup dict.cc
-          de () { dict.cc.py de en "$1"; }
-          # lookup dict.cc for english words
-          en () { dict.cc.py en de "$1"; }
-
-          # copy the current working dir to clipboard
-          copy_pwd () { pwd | pbcopy }
-
-          # copy the last command to clipboard
-          copy_last_cmd () {
-              # echo "!!" | pbcopy
-              history | tail -1 | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}' | pbcopy
-          }
-
-          # calculator
-          = () {
-              calc="${@//p/+}"
-              calc="${calc//x/*}"
-              echo "$(($calc))"
-          }
-
-          # show clock
-          clock () {
-              while sleep 1;do tput sc;tput cup 0 $(($(tput cols)-29));date;tput rc;done &
-          }
-
-          # explain tools
-          explain () {
-            if [ "$#" -eq 0 ]; then
-              while read  -p "Command: " cmd; do
-                curl -Gs "https://www.mankier.com/api/explain/?cols="$(tput cols) --data-urlencode "q=$cmd"
-              done
-              echo "Bye!"
-            elif [ "$#" -eq 1 ]; then
-              curl -Gs "https://www.mankier.com/api/explain/?cols="$(tput cols) --data-urlencode "q=$1"
-            else
-              echo "Usage"
-              echo "explain                  interactive mode."
-              echo "explain 'cmd -o | ...'   one quoted command to explain it."
-            fi
-          }
-
-          # osx {
-              pomodoro () {
-                  # TODO: tags, exercises, postpone
-                  # Basso.aiff  Blow.aiff  Bottle.aiff  Frog.aiff  Funk.aiff  Glass.aiff  Hero.aiff  Morse.aiff  Ping.aiff  Pop.aiff  Purr.aiff  Sosumi.aiff  Submarine.aiff  Tink.aiff
-                  local title="Pomodoro"
-                  local subtitle="time for a break"
-                  local soundname="Hero"
-                  if [[ "$1" == "" ]]; then
-                      local notification="a task"
-                  else
-                      local notification="$1"
-                  fi
-                  local timestamp=$(date +%d.%m.%Y-%H:%M:%S)
-                  # TODO: display end time
-                  echo "$timestamp\t$notification""\r"
-                  echo "$timestamp\t$notification""\r" >> ~/.pomodoro
-
-                  local secs=$((1))
-                  # display a timer
-                  while [ $secs -gt 0 ]; do
-                      # TODO: format minutes
-                      echo -ne "$secs\033[0K\r"
-                      sleep 1
-                      : $((secs--))
-                  done
-                  echo "display notification \"$notification\" with title \"$title\" subtitle \"$subtitle\" sound name \"$soundname\""
-                  osascript -e "display notification \"$notification\" with title \"$title\" subtitle \"$subtitle\" sound name \"$soundname\""
-              }
-              alias pom='pomodoro'
-              pomo () {
-                  blocks
-                  pomodoro "$1"
-                  blocks
-              }
-
-              pomodoro_today () {
-                  local pomodoros=$(grep -o "$(date +%d.%m.%Y)" ~/.pomodoro | wc -l|awk '{print $1}')
-                  echo "$pomodoros pomodoros today: ${(l:$pomodoros::🍅:)}\n"
-                  cat ~/.pomodoro | grep "$(date +%d.%m.%Y)" --color=never | cut -c 12-
-              }
-
-              # say
-              # test voices
-              say_test () {
-                  say -v '?' | awk '{print $1}' | while read voice; do printf "using $voice...\n"; say -v $voice "hello, this is me using the $voice voice"; sleep 1; done
-              }
-
-              lol () { say -v Hysterical 'hahahahahahaha oh really?' }
-
-              sing_song () {
-                  songs=(
-                      "say -v Alex Dum dum dee dum dum dum dum dee Dum dum dee dum dum dum dum dee dum dee dum dum dum de dum dum dum dee dum dee dum dum dee dummmmmmmmmmmmmmmmm" \
-                      "say -v Anna di di di di di di di di di di di di di di di di di di di di di di di di di di" \
-                      "say -v Cellos oh This is a ponci song ponci song ponci song this is the ponsiano song ive ever ever heard So why keep you listening listening listening while you are supposed to hack to hack to hack to hack its because i hate bill gates hate bill gates hate bill gates its because i hate bill gates more than anything else No its because windows life windows life windows life and you better get a macintosh and iPod now" \
-                      "say -v Good oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooo" \
-                      "say -v Bad oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooo oooooooooooooooooooooooooooooooooooooooo­oooooooooooooooooooooooooooooooooooooooo­oooooooooo")
-                  ponysay $songs[$1]
-                  eval ${songs[$1]}
-              }
-
-              # set alarm clock with say
-              alarm_msg () {
-                  echo "alarm in ""$1""m"
-                  local secs=$(($1 * 60))
-                  # display a timer
-                  while [ $secs -gt 0 ]; do
-                      # TODO: format minutes
-                      echo -ne "$secs\033[0K\r"
-                      sleep 1
-                      : $((secs--))
-                  done
-
-                  say -v Zarvox "$2"
-              }
-              alarm () {
-                  echo "alarm in ""$1""m"
-                  local secs=$(($1 * 60))
-                  # display a timer
-                  while [ $secs -gt 0 ]; do
-                      # TODO: format minutes
-                      echo -ne "$secs\033[0K\r"
-                      sleep 1
-                      : $((secs--))
-                  done
-                  sing_song 1
-              }
-              # eject all mountable volumes
-              eject () {
-                  osascript -e 'tell application "Finder" to eject (every disk whose ejectable is true)'
-              }
-
-              # change working directory to Finder path
-              cdf () {
-                  cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')"
-              }
-
-              # toggle show/hide hidden files in finder
-              toggle_hidden () {
-                  isVisible=$(defaults read com.apple.finder AppleShowAllFiles)
-
-                  # toggle visibility based on variables value
-                  if [ ${isVisible} = FALSE ]
-                  then
-                      defaults write com.apple.finder AppleShowAllFiles TRUE
-                  else
-                      defaults write com.apple.finder AppleShowAllFiles FALSE
-                  fi
-
-                  # force changes by restarting Finder
-                  killall Finder
-              }
-          # }
-
-          # archives {
-              # zipf: to create a ZIP archive of a file or folder
-              zipf () { zip -r "$1".zip "$1" ; }
-
-              # extract an archive
-              # TODO target
-              extract () {
-                  if [ -f $1 ] ; then
-                      case $1 in
-                          ,*.tar.bz2)  tar xjf $1      ;;
-                          ,*.tar.gz)   tar xzf $1      ;;
-                          ,*.bz2)      bunzip2 $1      ;;
-                          ,*.rar)      rar x $1        ;;
-                          ,*.gz)       gunzip $1       ;;
-                          ,*.tar)      tar xf $1       ;;
-                          ,*.tbz2)     tar xjf $1      ;;
-                          ,*.tgz)      tar xzf $1      ;;
-                          ,*.zip)      unzip $1        ;;
-                          ,*.Z)        uncompress $1   ;;
-                          ,*)          echo "'$1' cannot be extracted via extract()" ;;
-                  esac
-                  else
-                      echo "'$1' is not a valid file"
-                  fi
-              }
-          # }
-
-          # network {
-              # serve wd
-              serve () {
-                  printip
-                  # TODO check version
-                  # python 2
-                  # python -m SimpleHTTPServer
-                  python3 -m http.server
-              }
-
-              serve_bash () {
-                  printip | awk '{print $1":8080"}'
-                  while true; do { echo -e 'HTTP/1.1 200 OK\r\n'; \
-                  cat "$1"; } | nc -l 8080; done
-              }
-
-              # open a url
-              op () {
-                  typeset -A mapping
-                  mapping=(
-                      google https://www.google.de/
-                      spotify https://play.spotify.com/collection/songs
-                  )
-                  open $mapping[$@]
-              }
-          # }
-
-          # color {
-              # show available color codes
-              typeset -Ag FX FG BG
-
-              FX=(
-                  reset     "%{[00m%}"
-                  bold      "%{[01m%}" no-bold      "%{[22m%}"
-                  italic    "%{[03m%}" no-italic    "%{[23m%}"
-                  underline "%{[04m%}" no-underline "%{[24m%}"
-                  blink     "%{[05m%}" no-blink     "%{[25m%}"
-                  reverse   "%{[07m%}" no-reverse   "%{[27m%}"
-              )
-
-              for color in {000..255}; do
-                  FG[$color]="%{[38;5;${color}m%}"
-                  BG[$color]="%{[48;5;${color}m%}"
-              done
-
-              ZSH_SPECTRUM_TEXT=${ZSH_SPECTRUM_TEXT:-Arma virumque cano Troiae qui primus ab oris}
-
-              # Show all 256 colors with color number
-              spectrum_ls () {
-                for code in {000..255}; do
-                  print -P -- "$code: %F{$code}$ZSH_SPECTRUM_TEXT%f"
-                done
-              }
-
-              # Show all 256 colors where the background is set to specific color
-              spectrum_bls () {
-                for code in {000..255}; do
-                  print -P -- "$BG[$code]$code: $ZSH_SPECTRUM_TEXT %{$reset_color%}"
-                done
-              }
-
-              # TODO bold
-          # }
-
-          # fun {
-              # nyan cat
-              nyan () { telnet nyancat.dakko.us }
-
-              # starwars
-              starwars () { telnet towel.blinkenlights.nl }
-
-              # mandelbrot
-              mandelbrot () {
-                 local lines columns colour a b p q i pnew
-                 ((columns=COLUMNS-1, lines=LINES-1, colour=0))
-                 for ((b=-1.5; b<=1.5; b+=3.0/lines)) do
-                     for ((a=-2.0; a<=1; a+=3.0/columns)) do
-                         for ((p=0.0, q=0.0, i=0; p*p+q*q < 4 && i < 32; i++)) do
-                             ((pnew=p*p-q*q+a, q=2*p*q+b, p=pnew))
-                         done
-                         ((colour=(i/4)%8))
-                          echo -n "\\e[4${colour}m "
-                      done
-                      echo
-                  done
-              }
-          # }
-      # }
-  # }}}
 
   test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
   
