@@ -4,3 +4,21 @@
 [submodule "gists"]
 	path = gists
 	url = git@github.com:embayer/gists.git
+[submodule "ascii-art"]
+	path = ascii-art
+	url = git@github.com:embayer/ascii-art.git
+[submodule "themes"]
+	path = themes
+	url = git@github.com:embayer/themes.git
+[submodule "zsh/plugins/zsh-history-substring-search"]
+	path = zsh/plugins/zsh-history-substring-search
+	url = https://github.com/zsh-users/zsh-history-substring-search.git
+[submodule "zsh/plugins/zsh-autosuggestions"]
+	path = zsh/plugins/zsh-autosuggestions
+	url = https://github.com/zsh-users/zsh-autosuggestions.git
+[submodule "zsh/plugins/forgit"]
+	path = zsh/plugins/forgit
+	url = https://github.com/wfxr/forgit.git
+[submodule "zsh/plugins/fast-syntax-highlighting"]
+	path = zsh/plugins/fast-syntax-highlighting
+	url = https://github.com/zdharma/fast-syntax-highlighting.git
