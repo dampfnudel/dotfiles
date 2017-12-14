@@ -288,6 +288,7 @@ alias pip_update_all="pip freeze --local | grep -v '^\-e' | cut -d = -f 1  | xar
 alias osx_show_hidden='defaults write com.apple.Finder AppleShowAllFiles YES && killall Finder'
 alias osx_hide_hidden='defaults write com.apple.Finder AppleShowAllFiles NO && killall Finder'
 alias osx_empty_trash="rm -rf ~/.Trash/."
+alias fix_carriage_return="tr '\r' '\n' <"
 
 ## cleanup
 # TODO as functions
@@ -356,6 +357,7 @@ function __expect () {
     # usage:
     # __expect 1 "$#" || return 1
     # TODO get args implicit from last command
+    echo ${!!$#}
     local params_expected params_given
     arguments_expected="$1"
     arguments_given="$2"
@@ -370,6 +372,9 @@ function __expect () {
         echo "$arguments_expected arguments required"
         return 1
     fi
+}
+test () {
+__expect 2
 }
 
 # TODO rm
@@ -522,6 +527,12 @@ function chrome_history () {
     open "$entry"
 }
 
+function chrome_print_tabs () {
+    # list the opened tabs in google chrome
+    osascript -e 'set text item delimiters to linefeed' -e'tell app "google chrome" to url of tabs of window 1 as text' | tail -n +1
+
+}
+
 function cat_links () {
     # extract the links from a given url
     __expect 1 "$#" || return 1
@@ -636,6 +647,13 @@ function fli () {
     # (fzf-)filter file in a given directory (sorted by dates)
     if [ $# -eq 0 ]; then echo "Argument required"; return 1; fi
     (cd "$1" && realpath "$(ls -1t | fzf)")
+}
+
+function redirect_top () {
+    # 
+    touch ~tmp/redirect_top_tmp && rm ~tmp/redirect_top_tmp
+    echo -e "$1" | cat - "$2" > ~tmp/redirect_top_tmp && mv ~tmp/redirect_top_tmp "$2"
+    # echo -e "task goes here\n$(cat todo.txt)" > todo.txt
 }
 
 # Make sure that the terminal is in application mode when zle is active, since
