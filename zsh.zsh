@@ -357,7 +357,6 @@ function __expect () {
     # usage:
     # __expect 1 "$#" || return 1
     # TODO get args implicit from last command
-    echo ${!!$#}
     local params_expected params_given
     arguments_expected="$1"
     arguments_given="$2"
@@ -636,6 +635,10 @@ count_files () {
         echo "$d : $files"
     done
 }
+function list_all_apps () {
+    # list all applications on the system
+    mdfind 'kMDItemContentTypeTree == "com.apple.application"c'
+}
 
 function kill_lines_containing () {
     # delete lines containing pattern $1 in file $2
@@ -643,16 +646,99 @@ function kill_lines_containing () {
     sed -i '' "/$1/d" "$2"
 }
 
+function ff () {
+    # find a file under the current directory
+    # rg --files --hidden --follow -g "$@"
+    find . -name "$@"
+}
+
+function fff () {
+    # fuzzy find file under the current directory
+    find . -name "*$@*"
+}
+
+function ffs () {
+    # find a file whose name starts with a given string
+    find . -name "$@"'*'
+}
+
+function ffe () {
+    # find a file whose name ends with a given string
+    find . -name '*'"$@"
+}
+
+function fd () {
+    # find a directory
+    find . -type d -name '*'"$@"
+}
+
+function ffd () {
+    # fuzzy find a directory
+    find . -type d -name "*$@*"
+}
+
+# git repo
+function ffg () {
+    # find a file under the current git repo
+    find $(git rev-parse --show-toplevel) -name "$@"
+}
+
+function ffsg () {
+    # find a file whose name starts with a given string within the current git repo
+    find $(git rev-parse --show-toplevel) -name "$@"'*'
+}
+
+function ffeg () {
+    # find a file whose name ends with a given string within the current git repo
+    find $(git rev-parse --show-toplevel) -name '*'"$@"
+}
+
+function fdg () {
+    # find a directory within the current git repo
+    find $(git rev-parse --show-toplevel) -type d -name '*'"$@"
+}
+
+function rgg () {
+    # rg within the git dir
+    /usr/local/bin/ag "$@" $(git rev-parse --show-toplevel)
+}
+
+## Spotlight
+function fs () {
+    # find file using Spotlight
+    mdfind "kMDItemDisplayName == '$@'wc"
+}
+
+function fs_type () {
+    # find file by filetype using Spotlight
+    # ex: ft video || ft bild || ft pdf
+    # c means case insensitive
+    mdfind 'kMDItemKind == "*'"$1"'*"c'
+}
+
+function fs_recent() {
+    # find files created since $1 days using Spotlight
+    mdfind -onlyin ~ '(kMDItemContentCreationDate > "$time.today(-'"$1"')") (kMDItemContentCreationDate < ")'
+}
+
+function findword () {
+    # lookup words
+    grep ^"$@"$ /usr/share/dict/words
+}
+
 function fli () {
     # (fzf-)filter file in a given directory (sorted by dates)
-    if [ $# -eq 0 ]; then echo "Argument required"; return 1; fi
+    __expect 1 "$#" || return 1
     (cd "$1" && realpath "$(ls -1t | fzf)")
 }
 
-function redirect_top () {
-    # 
-    touch ~tmp/redirect_top_tmp && rm ~tmp/redirect_top_tmp
-    echo -e "$1" | cat - "$2" > ~tmp/redirect_top_tmp && mv ~tmp/redirect_top_tmp "$2"
+function append_above () {
+    __expect 2 "$#" || return 1
+    # like >> but on top instead of below
+    # ex: append_above ${$(chrome_print_tabs)} somefile
+    local tmpfile=/tmp/append_above_tmp
+    touch $tmpfile && rm $tmpfile
+    echo -e "$1" | cat - "$2" > $tmpfile && mv $tmpfile "$2"
     # echo -e "task goes here\n$(cat todo.txt)" > todo.txt
 }
 
