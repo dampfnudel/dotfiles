@@ -327,22 +327,6 @@ fi
 :CUSTOM_ID: aliases
 :END:
 
-              clipboard_plain_text () {
-                  pbpaste | textutil -convert txt -stdin -stdout -encoding 30 | pbcopy
-              }
-              print_shrug () {
-                  echo "¯\_(ツ)_/¯"
-              }
-              print_python_kws () {
-                  python -c "import keyword
-  for kw in keyword.kwlist:
-      print(kw)"
-              }
-              # >--< <- rm from clipboard entry
-              # >>> import hashlib
-              rm_prefix (){
-                  pbpaste|cut -c 4-|pbcopy
-              }
 #+BEGIN_SRC shell
 # TODO section for overriding
 ## list
@@ -377,13 +361,9 @@ alias mkdir="mkdir -pv"
 alias p='pbpaste'
 alias y='pbcopy'
 alias bpython='$WORKON_HOME/python3.4.1/bin/bpython'
-## find
-# ripgrep as find
-# TODO define in var
-alias fd="rg --files --no-ignore --hidden --follow -g '!{.git,node_modules}/*'"
-# continue the download in case of problems
 alias grep='grep --color'
 ## internet
+# continue the download in case of problems
 alias wget="wget -c"
 alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
 alias chrome_headless='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu'
@@ -495,6 +475,13 @@ alias -s png=imgcat
 
 ** Helper functions
 #+BEGIN_SRC shell
+# called on every cd
+chpwd () {
+    # put the current directory in the title/tab bar
+    # -P option treat its arguments like a prompt string; otherwise the %~ would not be expanded. -n suppresses the terminating newline
+    print -Pn "\e]1;%~\a"
+}
+
 function __expect () {
     # check if the expected arg amount $1 matches the passed arg amount $2
     # usage:
@@ -624,6 +611,34 @@ function get_shell_integration () {
     -o ~dotfiles/zsh/iterm2_shell_integration/iterm2_shell_integration.zsh
 }
 #+END_SRC
+*** iterm2
+#+BEGIN_SRC shell
+function iterm_rename_tab () {
+    echo -ne "\033]0;"$@"\007"
+}
+
+function iterm_set_tabcolor {
+    case $1 in
+        green)
+        echo -e "\033]6;1;bg;red;brightness;57\a"
+        echo -e "\033]6;1;bg;green;brightness;197\a"
+        echo -e "\033]6;1;bg;blue;brightness;77\a"
+        ;;
+    red)
+        echo -e "\033]6;1;bg;red;brightness;270\a"
+        echo -e "\033]6;1;bg;green;brightness;60\a"
+        echo -e "\033]6;1;bg;blue;brightness;83\a"
+        ;;
+    orange)
+        echo -e "\033]6;1;bg;red;brightness;227\a"
+        echo -e "\033]6;1;bg;green;brightness;143\a"
+        echo -e "\033]6;1;bg;blue;brightness;10\a"
+        ;;
+    esac
+}
+#+END_SRC
+hello there
+
 ** packages
 *** homebrew
 #+BEGIN_SRC shell
@@ -708,11 +723,11 @@ clipboard_plain_text () {
 }
 
 function clipboard_rm_python () {
-    # rm >>> from clipboard entry
+    # rm ">>> " "from clipboard entry
     pbpaste | cut -c 4- | pbcopy
 }
-
 #+END_SRC
+
 ** cd
 #+BEGIN_SRC shell
 function fdr() {
@@ -904,12 +919,15 @@ function fs_recent() {
     mdfind -onlyin ~ '(kMDItemContentCreationDate > "$time.today(-'"$1"')") (kMDItemContentCreationDate < ")'
 }
 
-function findword () {
+function f_word () {
     # lookup words
     grep ^"$@"$ /usr/share/dict/words
 }
 
-
+f_larger () {
+    # find files larger than a certain size (in bytes)
+    find . -type f -size +${1}c
+}
 #+END_SRC
 
 ** Select / filter
@@ -934,6 +952,343 @@ function append_above () {
     # echo -e "task goes here\n$(cat todo.txt)" > todo.txt
 }
 #+END_SRC
+
+** old
+#+BEGIN_SRC shell
+fcd () {
+    # fzf cd - cd to selected directory
+    local dir
+    dir=$(find ${1:-*} -path '/*/\.*' -prune \
+        -o -type d -print 2> /dev/null | fzf) &&
+        realpath "$dir"
+    cd "$dir"
+}
+
+rg_fzf () {
+    # search for file contents; select with fzf
+    rg --files-with-matches "$@" | fzf
+}
+
+pjson () {
+    # pretty print json
+    # ex:
+    # pjson '{"test": "test"}'
+    # pjson myjsonfile.json
+    # pjson '{"test": "test"}' myjsonfile.json
+    if [ $# -gt 0 ];
+    then
+        for arg in $@
+        do
+            if [ -f $arg ];
+            then
+                less $arg | python -m json.tool
+            else
+                echo "$arg" | python -m json.tool
+            fi
+        done
+    fi
+}
+
+vim () {
+    if [ $# -eq 0 ]; then
+        # open -a Emacs.app
+        eval ${VIM_EDITOR}
+        return 0
+    fi
+
+    eval ${VIM_EDITOR_TAB} "$@"
+}
+
+# TODO as var alias
+gcd () {
+    # cd to git root
+    cd "$(git rev-parse --show-toplevel)"
+}
+
+git_status_files () {
+    # git status file list
+    git status --porcelain | awk '{print $2 }'
+}
+
+# TODO as var alias
+git_parent_branch () {
+    # show which branch the current one is forked from
+    local current_branch=`git rev-parse --abbrev-ref HEAD`
+    git show-branch -a | ack '\*' | ack -v "$current_branch" | head -n1 | sed 's/.*\[\(.*\)\].*/\1/' | sed 's/[\^~].*//'
+}
+
+git_tree () {
+    # list git tree
+    (git ls-tree -r --name-only HEAD || find . -path "*/\.*" -prune -o -type f -print -o -type l -print | sed s/^..//) 2> /dev/null
+}
+
+# git push -u origin {BRANCH_NAME}
+git_push_branch () {
+    git push -u origin "$(git branch --no-color | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')"
+}
+
+# show the git log as json
+git_log_json () {
+    git log --pretty=format:'{%n  "commit": "%H",%n  "abbreviated_commit": "%h",%n  "tree": "%T",%n  "abbreviated_tree": "%t",%n  "parent": "%P",%n  "abbreviated_parent": "%p",%n  "refs": "%D",%n  "encoding": "%e",%n  "subject": "%s",%n  "sanitized_subject_line": "%f",%n  "body": "%b",%n  "commit_notes": "%N",%n  "verification_flag": "%G?",%n  "signer": "%GS",%n  "signer_key": "%GK",%n  "author": {%n    "name": "%aN",%n    "email": "%aE",%n    "date": "%aD"%n  },%n  "commiter": {%n    "name": "%cN",%n    "email": "%cE",%n    "date": "%cD"%n  }%n},'
+}
+function man () {
+# colored man pages
+    env \
+        LESS_TERMCAP_mb=$(printf "\e[1;31m") \
+        LESS_TERMCAP_md=$(printf "\e[1;31m") \
+        LESS_TERMCAP_me=$(printf "\e[0m") \
+        LESS_TERMCAP_se=$(printf "\e[0m") \
+        LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
+        LESS_TERMCAP_ue=$(printf "\e[0m") \
+        LESS_TERMCAP_us=$(printf "\e[1;32m") \
+        man "$@"
+}
+
+
+diff_sorted () {
+    diff <(sort "$1") <(sort "$2")
+}
+
+# TODO shebang
+# TODO mkorg, mkgpg
+mk_script () {
+    # create an executable script
+    touch "$1"
+    chmod +x "$1"
+    eval ${EDITOR} "$1"
+}
+
+mkcd () {
+    mkdir $1 && cd $_
+}
+
+trash () {
+    # move file/dir to trash
+    mv "$@" "~/.Trash/."
+}
+
+bu () {
+    # backup the current directory at the parent directoy
+    # use encryption with -e
+    dname=$(basename $(pwd))
+    cd ..
+    if [[ "$1" == "-e" ]]; then
+        buname=$dname""_$(date +%d%m%y-%H-%M-%S).tar.gz.enc
+        tar cz "$dname/" | openssl enc -aes-256-cbc -e > "$buname"
+    else
+        buname=$dname""_$(date +%d%m%y-%H-%M-%S).tar.gz
+        tar czf "$buname" "$dname/"
+    fi
+    echo "-> ../$buname"
+    cd -  >/dev/null 2>&1
+}
+
+# lookup dict.cc
+de () {
+    # translate de -> en
+    dict.cc.py de en "$1"
+}
+# lookup dict.cc for english words
+en () {
+    # translate en -> de
+    dict.cc.py en de "$1"
+}
+
+cp_pwd () {
+    # copy the current working dir to clipboard
+    pwd | pbcopy
+}
+
+= () {
+    # calculator
+    calc="${@//p/+}"
+    calc="${calc//x/*}"
+    echo "$(($calc))"
+}
+
+clock () {
+    # show clock
+    while sleep 1;
+    do
+        tput sc
+        tput cup 0 $(($(tput cols)-29))
+        date;tput rc
+    done &
+}
+
+explain () {
+    # explain tools
+    # https://www.mankier.com/blog/explaining-shell-commands-in-the-shell.html
+    if [ "$#" -eq 0 ]; then
+        while read  -p "Command: " cmd; do
+            curl -Gs "https://www.mankier.com/api/explain/?cols="$(tput cols) --data-urlencode "q=$cmd"
+        done
+        echo "Bye!"
+    elif [ "$#" -eq 1 ]; then
+        curl -Gs "https://www.mankier.com/api/explain/?cols="$(tput cols) --data-urlencode "q=$1"
+    else
+        echo "Usage"
+        echo "explain                  interactive mode."
+        echo "explain 'cmd -o | ...'   one quoted command to explain it."
+    fi
+}
+
+    alarm () {
+        echo "alarm in ""$1""m"
+
+        local secs=$(($1 * 60))
+        # display a timer
+        while [ $secs -gt 0 ]; do
+            # TODO: format minutes
+            echo -ne "$secs\033[0K\r"
+            sleep 1
+            : $((secs--))
+        done
+
+        if [[ "$#" > 1 ]]
+        then
+            say "$2"
+        else
+            say "alarm, alarm, alarm"
+        fi
+
+        # display a notification
+        local title="Alarm"
+        local subtitle="$1 minutes since"
+        local notification="$(date +%d.%m.%Y-%H:%M:%S)"
+        local soundname="Hero"
+
+        # TODO make function
+        osascript -e "display notification \"$notification\" with title \"$title\" subtitle \"$subtitle\" sound name \"$soundname\""
+    }
+
+    eject () {
+        # eject all mountable volumes
+        osascript -e 'tell application "Finder" to eject (every disk whose ejectable is true)'
+    }
+
+    cdf () {
+        # change working directory to Finder path
+        cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')"
+    }
+
+    toggle_hidden () {
+        # toggle show/hide hidden files in finder
+        local isVisible=$(defaults read com.apple.finder AppleShowAllFiles)
+
+        # toggle visibility based on variables value
+        if [ ${isVisible} = FALSE ]
+        then
+            defaults write com.apple.finder AppleShowAllFiles TRUE
+        else
+            defaults write com.apple.finder AppleShowAllFiles FALSE
+        fi
+
+        # force changes by restarting Finder
+        killall Finder
+    }
+
+    zipf () {
+        # create a ZIP archive of a file or folder
+        zip -r "$1".zip "$1"
+    }
+
+    # TODO target
+    extract () {
+        # extract an archive
+        if [ -f $1 ] ; then
+            case $1 in
+                ,*.tar.bz2)  tar xjf $1      ;;
+                ,*.tar.gz)   tar xzf $1      ;;
+                ,*.bz2)      bunzip2 $1      ;;
+                ,*.rar)      rar x $1        ;;
+                ,*.gz)       gunzip $1       ;;
+                ,*.tar)      tar xf $1       ;;
+                ,*.tbz2)     tar xjf $1      ;;
+                ,*.tgz)      tar xzf $1      ;;
+                ,*.zip)      unzip $1        ;;
+                ,*.Z)        uncompress $1   ;;
+                ,*)          echo "'$1' cannot be extracted via extract()" ;;
+            esac
+        else
+            echo "'$1' is not a valid file"
+        fi
+    }
+
+    # network {
+    serve () {
+        # serve pwd
+        print_ip | awk '{print $1":8000"}'
+        # TODO check version
+        # python 2
+        # python -m SimpleHTTPServer
+        python3 -m http.server
+    }
+
+    serve_bash () {
+        # serve pwd
+        print_ip | awk '{print $1":8080"}'
+        while true; do { echo -e 'HTTP/1.1 200 OK\r\n'; \
+            cat "$1"; } | nc -l 8080; done
+    }
+
+
+    ls_spectrum () {
+        # show all 256 colors with color number
+        typeset -Ag FX FG BG
+
+        local FX=(
+            reset     "%{[00m%}"
+            bold      "%{[01m%}" no-bold      "%{[22m%}"
+            italic    "%{[03m%}" no-italic    "%{[23m%}"
+            underline "%{[04m%}" no-underline "%{[24m%}"
+            blink     "%{[05m%}" no-blink     "%{[25m%}"
+            reverse   "%{[07m%}" no-reverse   "%{[27m%}"
+        )
+
+        for color in {000..255}; do
+            FG[$color]="%{[38;5;${color}m%}"
+            BG[$color]="%{[48;5;${color}m%}"
+        done
+
+        local ZSH_SPECTRUM_TEXT=${ZSH_SPECTRUM_TEXT:-Arma virumque cano Troiae qui primus ab oris}
+
+        for code in {000..255}; do
+            print -P -- "$code: %F{$code}$ZSH_SPECTRUM_TEXT%f"
+        done
+    }
+
+    ls_spectrum_bg () {
+        # show all 256 colors where the background is set to specific color
+        typeset -Ag FX FG BG
+
+        local FX=(
+            reset     "%{[00m%}"
+            bold      "%{[01m%}" no-bold      "%{[22m%}"
+            italic    "%{[03m%}" no-italic    "%{[23m%}"
+            underline "%{[04m%}" no-underline "%{[24m%}"
+            blink     "%{[05m%}" no-blink     "%{[25m%}"
+            reverse   "%{[07m%}" no-reverse   "%{[27m%}"
+        )
+
+        for color in {000..255}; do
+            FG[$color]="%{[38;5;${color}m%}"
+            BG[$color]="%{[48;5;${color}m%}"
+        done
+
+        local ZSH_SPECTRUM_TEXT=${ZSH_SPECTRUM_TEXT:-Arma virumque cano Troiae qui primus ab oris}
+        for code in {000..255}; do
+            print -P -- "$BG[$code]$code: $ZSH_SPECTRUM_TEXT %{$reset_color%}"
+        done
+    }
+
+    nyan () {
+        # miau miau miau miau miau
+        telnet nyancat.dakko.us
+    }
+#+END_SRC
+
+
 
 * Keybindings
 :PROPERTIES:
@@ -1562,7 +1917,6 @@ alias fzf_ag='ag -g "" | fzf'
 
 
   test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-  
 
 
 cdf () {  # short for cdfinder
