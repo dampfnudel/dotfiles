@@ -143,8 +143,8 @@ fi
 export WORDCHARS='*?_-.[]~=/&;!#$%^(){}<>/'
 
 # $LS_COLORS
-# TODO 
-eval $(gdircolors -b "$DOTFILES/monobay.256dark")
+# TODO
+eval $(gdircolors -b "$DOTFILES/themes/dircolors/zenburn.256dark")
 # used by k
 # export LSCOLORS='di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
 export LSCOLORS='exfxcxdxbxegedabagacad'
@@ -765,13 +765,10 @@ function fli () {
 }
 
 function append_above () {
-    __expect 2 "$#" || return 1
+    __expect 1 "$#" || return 1
     # like >> but on top instead of below
-    # ex: append_above ${$(chrome_print_tabs)} somefile
-    local tmpfile=/tmp/append_above_tmp
-    touch $tmpfile && rm $tmpfile
-    echo -e "$1" | cat - "$2" > $tmpfile && mv $tmpfile "$2"
-    # echo -e "task goes here\n$(cat todo.txt)" > todo.txt
+    # ex: chrome_print_tabs | append_above somefile
+    cat - "$1" | sponge "$1"
 }
 
 fcd () {
@@ -1104,6 +1101,11 @@ explain () {
     nyan () {
         # miau miau miau miau miau
         telnet nyancat.dakko.us
+    }
+
+    tron () {
+        # wasd movement
+        ssh sshtron.zachlatta.com
     }
 
 # Make sure that the terminal is in application mode when zle is active, since
