@@ -1127,18 +1127,16 @@ bindkey '^[^[[D' backward-word                      # alt <arrow-left>..........
 bindkey '^[^[[C' forward-word                       # alt <arrow-right>...........move a word forward
 bindkey '^A' beginning-of-line                      # cmd <arrow-left>............move to the beginning of the line
 bindkey '^E' end-of-line                            # cmd <arrow-right>...........move to the end of the line
-bindkey '^[[1;2B' down-line
-bindkey '^[[1;2A' up-line
+# bindkey '^[[1;2B' down-line
+# bindkey '^[[1;2A' up-line
 bindkey '^N' vi-find-next-char
 
 ## Modifying-Text http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Modifying-Text
-bindkey ';6D' copy-prev-word # ctr shift <-
+bindkey '^[[1;6D' copy-prev-word # ctr shift <-
 
 ## kill
 bindkey '^[^H' backward-kill-word                   # cmd <del>...................delete the word left of the cursor
-bindkey '^[csd' backward-kill-word
 bindkey '^X' delete-char                            # ctrl x......................delete the char under the cursor
-bindkey '^[csku' kill-line
 bindkey '^[k' kill-region
 bindkey '^?' backward-delete-char                     # [Backspace] - delete backward
 if [[ "${terminfo[kdch1]}" != "" ]]; then
@@ -1149,14 +1147,13 @@ else
     bindkey "^[3;5~" delete-char
     bindkey "\e[3~" delete-char
 fi
-#bindkey '^[^[[B' kill-whole-line                    # cmd <arrow-down>............delete the whole line
 
-## other
-bindkey '^[[5~' up-history
-# ctrl s
-bindkey '^[cks' accept-and-hold                        # ctrl n .................... multiselect in menu complete
-bindkey -s '^[^[[A' 'cd ..\n'                       # alt <arrow-up>..............cd ..
-bindkey -s '^L' 'ls -laH\n'                         # ctr l.......................ls -laH
+# eval
+bindkey -s '^L' 'ls -laH\n'
+bindkey -s '^K' 'cd ..\n'
+
+# menu select
+bindkey '^[cks' accept-and-hold
 if [[ "${terminfo[kcbt]}" != "" ]]; then
     bindkey "${terminfo[kcbt]}" reverse-menu-complete   # [Shift-Tab] - move through the completion menu backwards
 fi
@@ -1165,10 +1162,8 @@ fi
 bindkey "$terminfo[kcuu1]" history-substring-search-up
 bindkey "$terminfo[kcud1]" history-substring-search-down
 
-## mark
-# alt down
+## mark / region
 bindkey '^[^[[B' set-mark-command
-# alt up
 bindkey '^[^[[A' deactivate-region
 
 function repeat-cmd () {

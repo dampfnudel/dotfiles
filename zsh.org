@@ -1300,7 +1300,13 @@ http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html
 
 to find out what the terminal emulator sends:
 $ cat<RET><key-chard>
+or
+sed -n l<RET>
+
 if this isn't usable let the terminal emulator send escape codes
+
+look up what key corresponds to a given sequence
+$ infocmp -L1 | grep -F '=\E[Z'
 
 Scrolling is done via cmd-up/down
 ** rebindings
@@ -1320,6 +1326,26 @@ if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
 fi
 #+END_SRC
 
+| keychord        | widget                        | description                    |
+|-----------------+-------------------------------+--------------------------------|
+| Alt-Left        | backward-word                 |                                |
+| Alt-Right       | forward-word                  |                                |
+| Cmd-Left        | beginning-of-line             |                                |
+| Cmd-Right       | end-of-line                   |                                |
+| Ctrl-N          | vi-find-next-char             |                                |
+| Ctrl-Shift-Left | copy-prev-word                | clone previous word            |
+| Cmd-Backspace   | backward-kill-word            |                                |
+| Ctrl-X          | delete-char                   |                                |
+| Ctrl-K          | cd ..                         |                                |
+| Ctrl-L          | ls -lah                       |                                |
+| Ctrl-S          | accept-and-hold               | multiselect in menu completion |
+| Shift-Tab       | reverse-menu-complete         |                                |
+| Up              | history-substring-search-up   |                                |
+| Down            | history-substring-search-down |                                |
+| Alt-Down        | set-mark-command              |                                |
+| Alt-Up          | deactivate-region             |                                |
+|-----------------+-------------------------------+--------------------------------|
+
 #+BEGIN_SRC shell
 # TODO use terminfo
 ## movement http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Movement
@@ -1327,18 +1353,16 @@ bindkey '^[^[[D' backward-word                      # alt <arrow-left>..........
 bindkey '^[^[[C' forward-word                       # alt <arrow-right>...........move a word forward
 bindkey '^A' beginning-of-line                      # cmd <arrow-left>............move to the beginning of the line
 bindkey '^E' end-of-line                            # cmd <arrow-right>...........move to the end of the line
-bindkey '^[[1;2B' down-line
-bindkey '^[[1;2A' up-line
+# bindkey '^[[1;2B' down-line
+# bindkey '^[[1;2A' up-line
 bindkey '^N' vi-find-next-char
 
 ## Modifying-Text http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Modifying-Text
-bindkey ';6D' copy-prev-word # ctr shift <-
+bindkey '^[[1;6D' copy-prev-word # ctr shift <-
 
 ## kill
 bindkey '^[^H' backward-kill-word                   # cmd <del>...................delete the word left of the cursor
-bindkey '^[csd' backward-kill-word
 bindkey '^X' delete-char                            # ctrl x......................delete the char under the cursor
-bindkey '^[csku' kill-line
 bindkey '^[k' kill-region
 bindkey '^?' backward-delete-char                     # [Backspace] - delete backward
 if [[ "${terminfo[kdch1]}" != "" ]]; then
@@ -1349,14 +1373,13 @@ else
     bindkey "^[3;5~" delete-char
     bindkey "\e[3~" delete-char
 fi
-#bindkey '^[^[[B' kill-whole-line                    # cmd <arrow-down>............delete the whole line
 
-## other
-bindkey '^[[5~' up-history
-# ctrl s
-bindkey '^[cks' accept-and-hold                        # ctrl n .................... multiselect in menu complete
-bindkey -s '^[^[[A' 'cd ..\n'                       # alt <arrow-up>..............cd ..
-bindkey -s '^L' 'ls -laH\n'                         # ctr l.......................ls -laH
+# eval
+bindkey -s '^L' 'ls -laH\n'
+bindkey -s '^K' 'cd ..\n'
+
+# menu select
+bindkey '^[cks' accept-and-hold
 if [[ "${terminfo[kcbt]}" != "" ]]; then
     bindkey "${terminfo[kcbt]}" reverse-menu-complete   # [Shift-Tab] - move through the completion menu backwards
 fi
@@ -1365,10 +1388,8 @@ fi
 bindkey "$terminfo[kcuu1]" history-substring-search-up
 bindkey "$terminfo[kcud1]" history-substring-search-down
 
-## mark
-# alt down
+## mark / region
 bindkey '^[^[[B' set-mark-command
-# alt up
 bindkey '^[^[[A' deactivate-region
 #+END_SRC
 
