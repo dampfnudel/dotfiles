@@ -42593,17 +42593,17 @@
 	<key>NSWindow Frame Preferences</key>
 	<string>504 421 606 456 0 0 1440 877 </string>
 	<key>NSWindow Frame SUUpdateAlert</key>
-	<string>650 500 620 392 0 0 1920 1058 </string>
+	<string>410 365 620 392 0 0 1440 878 </string>
 	<key>NSWindow Frame SessionsPreferences</key>
-	<string>424 181 606 469 0 0 1920 1058 </string>
+	<string>424 262 606 469 0 0 1920 1058 </string>
 	<key>NSWindow Frame SharedPreferences</key>
-	<string>545 352 796 473 0 0 1920 1058 </string>
+	<string>29 348 937 512 0 0 1440 878 </string>
 	<key>NSWindow Frame UKCrashReporter</key>
 	<string>155 474 592 584 0 0 1920 1058 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>3 4 954 874 0 0 1440 878 </string>
+	<string>0 4 1920 1054 0 0 1920 1058 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
-	<string>-1400 185 1440 513 0 0 1440 878 </string>
+	<string>0 131 1290 567 0 0 1440 878 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
 	<string>630 472 1290 567 0 0 1920 1058 </string>
 	<key>NSWindow Frame iTerm Window 3</key>
@@ -42799,14 +42799,16 @@
 			<true/>
 			<key>Background Color</key>
 			<dict>
+				<key>Alpha Component</key>
+				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.33333333333333331</real>
+				<real>0.31495098862797022</real>
 				<key>Color Space</key>
 				<string>sRGB</string>
 				<key>Green Component</key>
-				<real>0.29803921568627451</real>
+				<real>0.3333333432674408</real>
 				<key>Red Component</key>
-				<real>0.23529411764705882</real>
+				<real>0.23529411852359772</real>
 			</dict>
 			<key>Background Image Is Tiled</key>
 			<false/>
@@ -42905,14 +42907,16 @@
 			<false/>
 			<key>Foreground Color</key>
 			<dict>
+				<key>Alpha Component</key>
+				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.8666666666666667</real>
+				<real>0.59136632006101308</real>
 				<key>Color Space</key>
 				<string>sRGB</string>
 				<key>Green Component</key>
-				<real>0.83137254901960789</real>
+				<real>0.705413818359375</real>
 				<key>Red Component</key>
-				<real>0.77254901960784317</real>
+				<real>0.56802517734467983</real>
 			</dict>
 			<key>Guid</key>
 			<string>AA8D6E9C-6C82-424F-9EBE-88C5EFDCC457</string>
@@ -44372,7 +44376,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2017-11-04T12:06:07Z</date>
+	<date>2017-12-17T14:17:31Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>SavePasteHistory</key>
@@ -44443,7 +44447,7 @@
 	<key>findRegex_iTerm</key>
 	<false/>
 	<key>iTerm Version</key>
-	<string>3.1.4</string>
+	<string>3.1.5</string>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>0</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
