@@ -1,160 +1,143 @@
-# GIT heart FZF
-# -------------
+#! /usr/bin/env zsh
 
-## git-functions
-is_in_git_repo() {
-  git rev-parse HEAD > /dev/null 2>&1
-}
+# git functions utilizing fzf
+#
+# https://github.com/junegunn/fzf/wiki/Examples#git
+# https://junegunn.kr/2016/07/fzf-git
+# https://gist.github.com/junegunn/8b572b8d4b5eddd8b85e5f4d40f17236
+# https://github.com/wfxr/forgit
 
-fzf-down() {
-  fzf --height 50% "$@" --border
-}
-wfxr::fzf() {
-    fzf --border \
-        --ansi \
-        --cycle \
-        --reverse \
-        --bind='alt-v:page-up' \
-        --bind='ctrl-v:page-down' \
-        --bind='alt-k:preview-up,alt-p:preview-up' \
-        --bind='alt-j:preview-down,alt-n:preview-down' \
-        --bind='alt-a:select-all' \
-        --bind='ctrl-r:toggle-all' \
-        --bind='ctrl-s:toggle-sort' \
-        --bind='?:toggle-preview' \
-        --preview-window="right:60%" \
-        --bind='alt-w:toggle-preview-wrap' "$@"
-}
-
-gf() {
-  is_in_git_repo || return
-  git -c color.status=always status --short |
-  fzf-down -m --ansi --nth 2..,.. \
-    --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -500' |
-  cut -c4- | sed 's/.* -> //'
-}
-
-gb() {
-  is_in_git_repo || return
-  git branch -a --color=always | grep -v '/HEAD\s' | sort |
-  fzf-down --ansi --multi --tac --preview-window right:70% \
-    --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1) | head -'$LINES |
-  sed 's/^..//' | cut -d' ' -f1 |
-  sed 's#^remotes/##'
-}
-
-gt() {
-  is_in_git_repo || return
-  git tag --sort -version:refname |
-  fzf-down --multi --preview-window right:70% \
-    --preview 'git show --color=always {} | head -'$LINES
-}
-
-gh() {
-  is_in_git_repo || return
-  git log --date=short --format="%C(green)%C(bold)%cd %C(auto)%h%d %s (%an)" --graph --color=always |
-  fzf-down --ansi --no-sort --reverse --multi --bind 'ctrl-s:toggle-sort' \
-    --header 'Press CTRL-S to toggle sort' \
-    --preview 'grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git show --color=always | head -'$LINES |
-  grep -o "[a-f0-9]\{7,\}"
-}
-
-gr() {
-  is_in_git_repo || return
-  git remote -v | awk '{print $1 "\t" $2}' | uniq |
-  fzf-down --tac \
-    --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" {1} | head -200' |
-  cut -d$'\t' -f1
-}
-join-lines() {
-  local item
-  while read item; do
-    echo -n "${(q)item} "
-  done
-}
-
-## key-binding
-bind-git-helper() {
-  local char
-  for c in $@; do
-    eval "fzf-g$c-widget() { local result=\$(g$c | join-lines); zle reset-prompt; LBUFFER+=\$result }"
-    eval "zle -N fzf-g$c-widget"
-    eval "bindkey '^g^$c' fzf-g$c-widget"
-  done
-}
-bind-git-helper f b t r h
-unset -f bind-git-helper
-#----------
-wfxr::fzf() {
-    fzf --border \
-        --ansi \
-        --cycle \
-        --reverse \
-        --height '80%' \
-        --bind='alt-v:page-up' \
-        --bind='ctrl-v:page-down' \
-        --bind='alt-k:preview-up,alt-p:preview-up' \
-        --bind='alt-j:preview-down,alt-n:preview-down' \
-        --bind='alt-a:select-all' \
-        --bind='ctrl-r:toggle-all' \
-        --bind='ctrl-s:toggle-sort' \
-        --bind='?:toggle-preview' \
-        --preview-window="right:60%" \
-        --bind='alt-w:toggle-preview-wrap' "$@"
-}
-
-wfxr::fzf() {
-    fzf --border \
-        --ansi \
-        --cycle \
-        --reverse \
-        --bind='alt-v:page-up' \
-        --bind='ctrl-v:page-down' \
-        --bind='alt-k:preview-up,alt-p:preview-up' \
-        --bind='alt-j:preview-down,alt-n:preview-down' \
-        --bind='alt-a:select-all' \
-        --bind='ctrl-r:toggle-all' \
-        --bind='ctrl-s:toggle-sort' \
-        --bind='?:toggle-preview' \
-        --preview-window="right:60%" \
-        --bind='alt-w:toggle-preview-wrap' "$@"
-}
-
-# diff is fancy with diff-so-fancy!
+# if available:
+# diff with diff-so-fancy
+# https://github.com/so-fancy/diff-so-fancy
+# emojies with emojify
+# https://github.com/mrowa44/emojify
 (( $+commands[diff-so-fancy] )) && fancy='|diff-so-fancy'
 (( $+commands[emojify] )) && emojify='|emojify'
 
-unalias glo gd ga gi &>/dev/null
-
-inside_work_tree() {
+function is_in_git_repo () {
     git rev-parse --is-inside-work-tree >/dev/null
 }
-# git commit browser
-glo() {
-    inside_work_tree || return 1
+
+function fzf_git () {
+    HEADER="?:toggle-preview alt-v:page-up ctrl-v:page-down alt-k:preview-up alt-j:preview-down alt-a:select-all ctrl-r:toggle-all ctrl-s:toggle-sort alt-w:toggle-preview-wrap"
+    fzf --border \
+        --ansi \
+        --cycle \
+        --reverse \
+        --bind='alt-v:page-up' \
+        --bind='ctrl-v:page-down' \
+        --bind='alt-k:preview-up,alt-p:preview-up' \
+        --bind='alt-j:preview-down,alt-n:preview-down' \
+        --bind='alt-a:select-all' \
+        --bind='ctrl-r:toggle-all' \
+        --bind='ctrl-s:toggle-sort' \
+        --bind='?:toggle-preview' \
+        --preview-window="right:60%" \
+        --header="$HEADER" \
+        --bind='alt-w:toggle-preview-wrap' "$@"
+}
+
+function git_file_fzf () {
+    # print a selected index file
+    is_in_git_repo || return
+    git -c color.status=always status --short |
+    fzf_git -m --ansi --nth 2..,.. \
+        --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -500' |
+    cut -c4- | sed 's/.* -> //'
+}
+alias gf='git_file_fzf'
+
+function git_branch_fzf () {
+    # print a selected branch name
+    is_in_git_repo || return
+    git branch -a --color=always | grep -v '/HEAD\s' | sort |
+    fzf_git --ansi --multi --tac --preview-window right:70% \
+        --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1) | head -'$LINES |
+    sed 's/^..//' | cut -d' ' -f1 |
+    sed 's#^remotes/##'
+}
+alias gb='git_branch_fzf'
+
+function git_tag_fzf () {
+    # print a selected tag name
+    is_in_git_repo || return
+    git tag --sort -version:refname |
+    fzf_git --multi --preview-window right:70% \
+        --preview 'git show --color=always {} | head -'$LINES
+}
+
+function git_hash_fzf () {
+    # print the hash of a selected commit
+    is_in_git_repo || return
     local cmd="echo {} |grep -o '[a-f0-9]\{7\}' |head -1 |xargs -I% git show --color=always % $emojify $fancy"
-    eval "git log --graph --color=always --format='%C(auto)%h%d %s %C(black)%C(bold)%cr' $@ $emojify" |
-        wfxr::fzf -e +s --tiebreak=index \
+    git log --graph --color=always --format='%C(auto)%h%d %s %C(black)%C(bold)%cr %C(blue) (%an)' $@ |
+    fzf_git -e +s --tiebreak=index --preview="$cmd" |
+    grep -o "[a-f0-9]\{7,\}"
+}
+
+function git_remote_fzf () {
+    # print the selected remote
+    is_in_git_repo || return
+    git remote -v | awk '{print $1 "\t" $2}' | uniq |
+    fzf_git --tac \
+        --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" {1} | head -200' |
+    cut -d$'\t' -f1
+}
+
+function join_lines () {
+    local item
+    while read item; do
+        echo -n "${(q)item} "
+    done
+}
+
+# keybindings
+# insert the selection into the current commandline with a keybinding
+function bind_git_helper () {
+    local c="$1"
+    local f="$2"
+    eval "fzf-g$c-widget () { local result=\$($f | join_lines); zle reset-prompt; LBUFFER+=\$result }"
+    eval "zle -N fzf-g$c-widget"
+    # prefix Ctrl-G
+    eval "bindkey '^g^$c' fzf-g$c-widget"
+}
+bind_git_helper f git_file_fzf
+bind_git_helper b git_branch_fzf
+bind_git_helper t git_tag_fzf
+bind_git_helper h git_hash_fzf
+bind_git_helper r git_remote_fzf
+unset -f bind_git_helper
+
+# functions with direct actions
+function git_log_fzf () {
+    # git commit browser
+    is_in_git_repo || return 1
+    local cmd="echo {} |grep -o '[a-f0-9]\{7\}' |head -1 |xargs -I% git show --color=always % $emojify $fancy"
+    eval "git log --graph --color=always --format='%C(auto)%h%d %s %C(black)%C(bold)%cr %C(blue) (%an)' $@ $emojify" |
+        fzf_git -e +s --tiebreak=index \
             --bind="enter:execute($cmd |less -R)" \
             --preview="$cmd"
 }
-# git diff brower
-gd() {
-    inside_work_tree || return 1
+
+function git_diff_fzf () {
+    # git diff brower
+    is_in_git_repo || return
     local cmd="git diff --color=always -- {} $emojify $fancy"
     git ls-files --modified |
-        wfxr::fzf -e -0 \
+        fzf_git -e -0 \
             --bind="enter:execute($cmd |less -R)" \
             --preview="$cmd"
 }
-# git add selector
-ga() {
-    inside_work_tree || return 1
+
+function git_add_fzf () {
+    # git add selector
+    is_in_git_repo || return 1
     # '31m' matches red color to filter out added files which is all green
     local files=$(git -c color.status=always status --short |
         grep 31m |
         awk '{printf "[%10s]  ", $1; $1=""; print $0}' |
-        wfxr::fzf -e -0 -m --nth 2..,.. \
+        fzf_git -e -0 -m --nth 2..,.. \
             --preview="git diff --color=always -- {-1} $emojify $fancy" |
         cut -d] -f2 |
         sed 's/.* -> //') # for rename case
@@ -162,28 +145,29 @@ ga() {
 }
 
 # git ignore generator
+# https://www.gitignore.io/api/
 export giCache=~/.giCache
 export giIndex=$giCache/.list
-gi() {
-    [ -f $giIndex ] || gi-update-index
+
+function git_ignore_fzf () {
+    [ -f $giIndex ] || gi_update_index
     local preview="echo {} |awk '{print \$2}' |xargs -I% bash -c 'cat $giCache/% 2>/dev/null || (curl -sL https://www.gitignore.io/api/% |tee $giCache/%)'"
     IFS=$'\n'
     [[ $# -gt 0 ]] && args=($@) || args=($(cat $giIndex |nl -nrn -w4 -s'  ' |fzf -m --preview="$preview" --preview-window="right:70%" |awk '{print $2}'))
-    gi-get ${args[@]}
+    gi_get ${args[@]}
 }
-GI() {
-    inside_work_tree || return 1
-    gi >> .gitignore
-}
-gi-update-index() {
+
+function gi_update_index () {
     mkdir -p $giCache
     curl -sL https://www.gitignore.io/api/list |tr ',' '\n' > $giIndex
 }
-gi-get() {
+
+function gi_get () {
     mkdir -p $giCache
     echo $@ |xargs -I{} bash -c "cat $giCache/{} 2>/dev/null || (curl -sL https://www.gitignore.io/api/{} |tee $giCache/{})"
 }
-gi-clean() {
+
+function gi_clean () {
     setopt localoptions rmstarsilent
     [[ -d $giCache ]] && rm -rf $giCache/*
 }

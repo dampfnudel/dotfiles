@@ -1349,10 +1349,11 @@ source ~dotfiles/zsh/plugins/k/k.sh
 
 ## source completions and bindings
 source ~dotfiles/zsh/plugins/fzf/completion.zsh
+source ~dotfiles/zsh/plugins/fzf/fzf-git.zsh
 # https://junegunn.kr/2016/07/fzf-git/
-source ~dotfiles/zsh/plugins/fzf/git-completion.zsh
+# source ~dotfiles/zsh/plugins/fzf/git-completion.zsh
 # TODO steal, fullscreen
-source ~dotfiles/zsh/plugins/forgit/forgit.plugin.zsh
+# source ~dotfiles/zsh/plugins/forgit/forgit.plugin.zsh
 
 ## default commands
 export FZF_DEFAULT_COMMAND="
@@ -1362,6 +1363,7 @@ export FZF_DEFAULT_COMMAND="
 # TODO preview with someting fast, fallback to pygmentize
 export FZF_DEFAULT_OPTS="--multi --cycle --select-1 --exit-0
     --border --margin 1% --prompt 'ϟ ' --no-height --no-reverse
+    --reverse
     --color fg:-1,bg:-1,hl:230,fg+:3,bg+:233,hl+:229
     --color info:150,prompt:110,spinner:150,pointer:167,marker:174
     --header='(^start) | (end\$) | (’exact) | (!not) | OR (^core go\$ | rb\$ | py\$)'
@@ -1371,6 +1373,7 @@ export FZF_DEFAULT_OPTS="--multi --cycle --select-1 --exit-0
                  (ls -lah {} &&
                   pygmentize {} ||
                   cat {}) 2> /dev/null | head -500'
+    --bind='?:toggle-preview'
     --bind 'ctrl-e:execute(\$EDITOR {})+accept'
     --bind 'ctrl-o:execute(open {})+accept'
     --bind 'ctrl-y:execute(echo {}|pbcopy)+accept'
