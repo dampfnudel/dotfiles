@@ -171,3 +171,41 @@ function gi_clean () {
     setopt localoptions rmstarsilent
     [[ -d $giCache ]] && rm -rf $giCache/*
 }
+
+function git_stash_fzf () {
+    while out=$(git stash list "$@" |
+                fzf --ansi --no-sort --reverse --print-query --query="$query"      \
+                    --expect=ctrl-m,ctrl-b,del,ctrl-a);
+    do
+        # Tokenize selection by newline
+        selection=("${(f)out}")
+
+        # Keep the query accross fzf calls
+        query="$selection[1]"
+
+        # Represents the stash, e.g. stash{1}
+        reflog_selector=$(echo "$selection[3]" | cut -d ':' -f 1)
+
+        case "$selection[2]" in
+            # enter or ctrl-m is just a diff
+            ctrl-m)
+                git show --patience --color=always -p "$reflog_selector" | less -R
+                ;;
+            # ctrl-b checks out the stash as a branch
+            ctrl-b)
+                sha=$(echo "$selection[3]" | grep -o '[a-f0-9]\{7\}')
+                git stash branch "stash-$sha" "$reflog_selector"
+                break
+                ;;
+            ctrl-a)
+                sha=$(echo "$selection[3]" | grep -o '[a-f0-9]\{7\}')
+                git stash apply
+                break
+                ;;
+            # del will drop the stash
+            del)
+                git stash drop "$reflog_selector"
+                ;;
+        esac
+    done
+}
