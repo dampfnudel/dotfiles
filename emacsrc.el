@@ -190,32 +190,32 @@ the tangled file is compiled."
 (global-linum-mode -1)
 (line-number-mode -1)
 
-;; ;;
-y & n instead of yes & no
+;; y & n instead of yes & no
 (fset 'yes-or-no-p 'y-or-n-p)
 
+; #slowemacs
 ;; 80-column-ruler
-(add-to-list 'load-path (expand-file-name
-    (concat user-emacs-directory "other-srcs/Fill-Column-Indicator")))
-(setq fci-rule-column 81)
-(require 'fill-column-indicator)
-
-(setq-default fill-column 80)
-(setq-default auto-fill-function 'do-auto-fill)
-
-;; TODO define list of used programming languages (prog-mode doesn't work with js)
-(add-hook 'python-mode-hook 'turn-on-fci-mode)
-(add-hook 'js-mode-hook 'turn-on-fci-mode)
-
-;; highlight current line
-(global-hl-line-mode)
-;; disable hl-line-mode slows down emacs in certain modes
-;; M-x cutomize-themes
-(add-hook 'special-mode-hook (lambda () (hl-line-mode -1)))
-;; M-x package-list-packages
-(add-hook 'package-menu-mode-hook (lambda () (hl-line-mode -1)))
-;; magit
-(add-hook 'magit-mode-hook (lambda () (global-hl-line-mode -1)))
+;; (add-to-list 'load-path (expand-file-name
+;;     (concat user-emacs-directory "other-srcs/Fill-Column-Indicator")))
+;; (setq fci-rule-column 81)
+;; (require 'fill-column-indicator)
+;; 
+;; (setq-default fill-column 80)
+;; (setq-default auto-fill-function 'do-auto-fill)
+;; 
+;; ;; TODO define list of used programming languages (prog-mode doesn't work with js)
+;; (add-hook 'python-mode-hook 'turn-on-fci-mode)
+;; (add-hook 'js-mode-hook 'turn-on-fci-mode)
+;; 
+;; ;; highlight current line
+;; (global-hl-line-mode)
+;; ;; disable hl-line-mode slows down emacs in certain modes
+;; ;; M-x cutomize-themes
+;; (add-hook 'special-mode-hook (lambda () (hl-line-mode -1)))
+;; ;; M-x package-list-packages
+;; (add-hook 'package-menu-mode-hook (lambda () (hl-line-mode -1)))
+;; ;; magit
+;; (add-hook 'magit-mode-hook (lambda () (global-hl-line-mode -1)))
 ; https://stackoverflow.com/questions/6837511/automatically-disable-a-global-minor-mode-for-a-specific-major-mode
 ;(define-global-minor-mode my-global-centered-cursor-mode global-undo-tree-mode
 ;  (lambda ()
@@ -226,8 +226,9 @@ y & n instead of yes & no
 ;(my-global-centered-cursor-mode 1)
 
 
+; #slowemacs
 ;; wrap long lines
-(global-visual-line-mode)
+;;(global-visual-line-mode)
 ;(set-default 'truncate-lines t)
 
 ;; start fullscreen
@@ -324,6 +325,7 @@ y & n instead of yes & no
 (setq-default evil-symbol-word-search t)
 
 ;; org-mode for .org-files
+; #slowemacs
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 ;; required by require
 (setq org-log-done t)
@@ -434,8 +436,11 @@ y & n instead of yes & no
 
 ;; required by require
 ;; snippet direcories
-;; ~/emacs.d/elpa/yasnippet-20161022.646/snippets
-;; ~/emacs.d/snippets
+;; TODO always use latest default collection
+(setq yas-snippet-dirs
+      '("~/Settings/dotfiles/emacs/snippets"               ;; personal snippets
+        "~/.emacs.d/elpa/yasnippet-20170923.1646/snippets" ;; the default collection
+        ))
 
 ;; required by require
 (global-git-gutter-mode +1)
@@ -453,13 +458,13 @@ y & n instead of yes & no
 (add-hook 'after-init-hook 'global-company-mode)
 
 ;; fix the company popup (80-column-ruler break it)
-(defun on-off-fci-before-company(command)
-  (when (string= "show" command)
-    (turn-off-fci-mode))
-  (when (string= "hide" command)
-    (turn-on-fci-mode)))
+;(defun on-off-fci-before-company(command)
+;  (when (string= "show" command)
+;    (turn-off-fci-mode))
+;  (when (string= "hide" command)
+;    (turn-on-fci-mode)))
 
-(advice-add 'company-call-frontends :before #'on-off-fci-before-company)
+;(advice-add 'company-call-frontends :before #'on-off-fci-before-company)
 
 ;; complete with tab
 ;(defun complete-or-indent ()
@@ -625,6 +630,8 @@ y & n instead of yes & no
 
 (require 'projectile)
 (projectile-mode)
+;; https://github.com/bbatsov/projectile/issues/657
+(setq projectile-mode-line " P")
 
 (setq google-translate-default-source-language "en"
       google-translate-default-target-language "de")
@@ -870,7 +877,6 @@ y & n instead of yes & no
   (interactive)
   (insert "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC"))
 
-;; (server-start)
 (require 'server)
 (unless (server-running-p)
   (server-start))
