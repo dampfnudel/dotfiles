@@ -60,7 +60,6 @@ setopt complete_in_word
 # if a completion is performed with the cursor within a word, and a full completion is inserted, the cursor is moved to the end of the word. That is, the cursor is moved to the end of the word if either a single match is inserted or menu completion is performed.
 setopt always_to_end
 
-export HOME=/Users/mbayer
 # projects
 hash -d ai=$HOME/Workspace/ai
 hash -d amber=$HOME/Workspace/amber
@@ -71,9 +70,9 @@ hash -d impure=$HOME/Workspace/impure
 # system
 hash -d bin=$HOME/bin
 hash -d desktop=$HOME/Desktop
-hash -d dev=$HOME/Workspace
+hash -d dev=$HOME/dev
 hash -d documents=$HOME/Documents
-hash -d dotfiles=$HOME/Settings/dotfiles
+hash -d dotfiles=$HOME/dotfiles
 hash -d downloads=$HOME/Downloads
 hash -d dropbox=$HOME/Dropbox
 hash -d emacs.d=$HOME/.emacs.d
@@ -86,6 +85,7 @@ hash -d screenshots=~pictures/Screenshots
 hash -d regiobot=$HOME/Workspace/project-inquant/gitlab
 hash -d rezepte=$HOME/Documents/org/rezepte
 hash -d scripts=$HOME/Workspace/scripts
+hash -d scripts=$HOME/dev/scripts
 hash -d settings=$HOME/Settings
 hash -d tmp=$HOME/tmp
 hash -d trash=$HOME/.Trash
@@ -115,7 +115,7 @@ export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/
 # paths
 # TODO hash?
 export BIN=/usr/local/bin
-export DOTFILES="$HOME/Settings/dotfiles"
+export DOTFILES="$HOME/dotfiles"
 
 # language
 export LANG=de_DE.UTF-8
@@ -144,7 +144,7 @@ export WORDCHARS='*?_-.[]~=/&;!#$%^(){}<>/'
 
 # $LS_COLORS
 # TODO
-eval $(gdircolors -b "$DOTFILES/themes/dircolors/zenburn.256dark")
+eval $(gdircolors -b ~dotfiles/themes/dircolors/zenburn.256dark)
 # used by k
 # export LSCOLORS='di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
 export LSCOLORS='exfxcxdxbxegedabagacad'
@@ -204,10 +204,11 @@ zstyle ':completion:*:rm:*' ignore-line yes
 
 export WORKON_HOME=~dev/Envs
 export PROJECT_HOME=~dev
+export VIRTUALENVWRAPPER_PYTHON="$WORKON_HOME/python3.6/bin/python"
 source "$BIN/virtualenvwrapper.sh"
 
 # set default virtual_env
-export VIRTUALENV_DEFAULT_PATH="$WORKON_HOME/python3.4.1/bin/activate"
+export VIRTUALENV_DEFAULT_PATH="$WORKON_HOME/python3.6/bin/activate"
 # load it
 if [[ $(basename "$VIRTUAL_ENV") == "" ]]
 then
@@ -576,7 +577,7 @@ clipboard_plain_text () {
 }
 
 function clipboard_rm_python () {
-    # rm ">>> " "from clipboard entry
+    # rm ">>> " from clipboard entry
     pbpaste | cut -c 4- | pbcopy
 }
 
@@ -1345,10 +1346,10 @@ source ~dotfiles/zsh/plugins/zsh-history-substring-search/zsh-history-substring-
 
 source ~dotfiles/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
 
-source ~dotfiles/zsh/plugins/k/k.sh
+# source ~dotfiles/zsh/plugins/k/k.sh
 
 ## source completions and bindings
-source ~dotfiles/zsh/plugins/fzf/completion.zsh
+source ~dotfiles/zsh/plugins/fzf/fzf-completion.zsh
 source ~dotfiles/zsh/plugins/fzf/fzf-git.zsh
 # https://junegunn.kr/2016/07/fzf-git/
 # source ~dotfiles/zsh/plugins/fzf/git-completion.zsh
