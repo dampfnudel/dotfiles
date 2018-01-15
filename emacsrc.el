@@ -54,6 +54,7 @@
                 skewer-mode             ; Live web development
                 company-tern            ; Tern backend for company-mode.
                 org-trello              ; 2-way sync org & trello
+                vue-mode                ; major mode for vue.js
                 ;; new package
                 ;; themes
                 rebecca-theme           ; dark
@@ -513,7 +514,7 @@ the tangled file is compiled."
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 ;; TODO test indentation
 (custom-set-variables
- '(js2-basic-offset 4)
+ '(js2-basic-offset 2)
  '(js2-bounce-indent-p t)
 )
 
@@ -536,9 +537,13 @@ the tangled file is compiled."
 ;; TODO: do it like vims match-tag-always
 (setq web-mode-enable-current-element-highlight t)
 
+;; indentation
 (defun my-web-mode-hook ()
   "Hooks for Web mode."
   (setq web-mode-markup-indent-offset 2))
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+
 (add-hook 'web-mode-hook  'my-web-mode-hook)
 
 (require 'evil-surround)
