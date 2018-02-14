@@ -151,17 +151,18 @@ the tangled file is compiled."
 ;; trust theme
 (setq custom-safe-themes t)
 ;; (load-theme 'labburn)
-;; (load-theme 'material-light)
+(load-theme 'challenger-deep)
 ;; (load-theme 'spacemacs-dark)
-;; (load-theme 'spacemacs-light)
 ;; (load-theme 'rebecca)
 ;; (load-theme 'reykjavik)
 ;; (load-theme 'darcula)
 ;; (load-theme 'monokai)
 ;; (load-theme 'sanityinc-tomorrow-blue)
 ;; (load-theme 'darktooth)
-(load-theme 'challenger-deep)
 ;; (load-theme 'avk-darkblue-yellow)
+
+;; (load-theme 'material-light)
+;; (load-theme 'spacemacs-light)
 ;; set font
 (set-frame-font "Envy Code R 16")
 
@@ -186,37 +187,36 @@ the tangled file is compiled."
 ;; disable tool-bar
 (tool-bar-mode -1)
 
-;; slows down emacs
-;; show line numbers
-(global-linum-mode -1)
-(line-number-mode -1)
+;; #slowemacs
+(global-linum-mode)
+;; (line-number-mode)
 
 ;; y & n instead of yes & no
 (fset 'yes-or-no-p 'y-or-n-p)
 
-; #slowemacs
+;; #slowemacs
 ;; 80-column-ruler
-;; (add-to-list 'load-path (expand-file-name
-;;     (concat user-emacs-directory "other-srcs/Fill-Column-Indicator")))
-;; (setq fci-rule-column 81)
-;; (require 'fill-column-indicator)
-;; 
-;; (setq-default fill-column 80)
-;; (setq-default auto-fill-function 'do-auto-fill)
-;; 
-;; ;; TODO define list of used programming languages (prog-mode doesn't work with js)
-;; (add-hook 'python-mode-hook 'turn-on-fci-mode)
-;; (add-hook 'js-mode-hook 'turn-on-fci-mode)
-;; 
-;; ;; highlight current line
-;; (global-hl-line-mode)
-;; ;; disable hl-line-mode slows down emacs in certain modes
-;; ;; M-x cutomize-themes
-;; (add-hook 'special-mode-hook (lambda () (hl-line-mode -1)))
-;; ;; M-x package-list-packages
-;; (add-hook 'package-menu-mode-hook (lambda () (hl-line-mode -1)))
-;; ;; magit
-;; (add-hook 'magit-mode-hook (lambda () (global-hl-line-mode -1)))
+(add-to-list 'load-path (expand-file-name
+    (concat user-emacs-directory "other-srcs/Fill-Column-Indicator")))
+(setq fci-rule-column 81)
+(require 'fill-column-indicator)
+
+(setq-default fill-column 80)
+(setq-default auto-fill-function 'do-auto-fill)
+
+;; TODO define list of used programming languages (prog-mode doesn't work with js)
+(add-hook 'python-mode-hook 'turn-on-fci-mode)
+(add-hook 'js-mode-hook 'turn-on-fci-mode)
+
+;; highlight current line
+(global-hl-line-mode)
+;; #slowemacs
+;; M-x cutomize-themes
+(add-hook 'special-mode-hook (lambda () (hl-line-mode -1)))
+;; M-x package-list-packages
+(add-hook 'package-menu-mode-hook (lambda () (hl-line-mode -1)))
+;; magit
+(add-hook 'magit-mode-hook (lambda () (global-hl-line-mode -1)))
 ; https://stackoverflow.com/questions/6837511/automatically-disable-a-global-minor-mode-for-a-specific-major-mode
 ;(define-global-minor-mode my-global-centered-cursor-mode global-undo-tree-mode
 ;  (lambda ()
@@ -229,16 +229,20 @@ the tangled file is compiled."
 
 ; #slowemacs
 ;; wrap long lines
-;;(global-visual-line-mode)
-;(set-default 'truncate-lines t)
+(global-visual-line-mode)
+(set-default 'truncate-lines t)
 
 ;; start fullscreen
 ;(toggle-frame-maximized)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-;; slows down emacs
-;; display column number
-;; (setq column-number-mode t)
+(require 'spaceline-config)
+(spaceline-toggle-minor-modes-off)
+(setq powerline-default-separator 'wave)
+;; mode-line highlight to change color depending on the evil state
+(setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
+;; fix mismatching color spaces on macOS
+(setq ns-use-srgb-colorspace nil)
 
 ;; switch frames with <Shift-Left/Right/Up/Down>
 (windmove-default-keybindings)
@@ -326,7 +330,6 @@ the tangled file is compiled."
 (setq-default evil-symbol-word-search t)
 
 ;; org-mode for .org-files
-; #slowemacs
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 ;; required by require
 (setq org-log-done t)
@@ -458,14 +461,14 @@ the tangled file is compiled."
 
 (add-hook 'after-init-hook 'global-company-mode)
 
-;; fix the company popup (80-column-ruler break it)
-;(defun on-off-fci-before-company(command)
-;  (when (string= "show" command)
-;    (turn-off-fci-mode))
-;  (when (string= "hide" command)
-;    (turn-on-fci-mode)))
+; fix the company popup (80-column-ruler break it)
+(defun on-off-fci-before-company(command)
+  (when (string= "show" command)
+    (turn-off-fci-mode))
+  (when (string= "hide" command)
+    (turn-on-fci-mode)))
 
-;(advice-add 'company-call-frontends :before #'on-off-fci-before-company)
+(advice-add 'company-call-frontends :before #'on-off-fci-before-company)
 
 ;; complete with tab
 ;(defun complete-or-indent ()
@@ -553,6 +556,7 @@ the tangled file is compiled."
 (which-key-mode)
 
 (require 'spaceline-config)
+(require 'spaceline)
 (spaceline-spacemacs-theme)
 
 ;; TODO requrie
@@ -895,8 +899,6 @@ the tangled file is compiled."
     (org-babel-tangle))))
 
 (add-hook 'after-save-hook 'tangle-init-zsh)
-
-(custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
 
 (defun kill-ring-save-until (x)
   "kill-ring-save the line at point until the linenumber you pass."

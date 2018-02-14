@@ -378,10 +378,16 @@ the tangled file is compiled."
 
 *** modeline
 
+**** spaceline
+
 #+BEGIN_SRC emacs-lisp
-;; slows down emacs
-;; display column number
-;; (setq column-number-mode t)
+(require 'spaceline-config)
+(spaceline-toggle-minor-modes-off)
+(setq powerline-default-separator 'wave)
+;; mode-line highlight to change color depending on the evil state
+(setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
+;; fix mismatching color spaces on macOS
+(setq ns-use-srgb-colorspace nil)
 #+END_SRC
 
 *** frames
@@ -849,6 +855,7 @@ decide
 
 #+BEGIN_SRC emacs-lisp
 (require 'spaceline-config)
+(require 'spaceline)
 (spaceline-spacemacs-theme)
 #+END_SRC
 
