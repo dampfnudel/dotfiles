@@ -278,17 +278,18 @@ the tangled file is compiled."
 ;; trust theme
 (setq custom-safe-themes t)
 ;; (load-theme 'labburn)
-;; (load-theme 'material-light)
+(load-theme 'challenger-deep)
 ;; (load-theme 'spacemacs-dark)
-;; (load-theme 'spacemacs-light)
 ;; (load-theme 'rebecca)
 ;; (load-theme 'reykjavik)
 ;; (load-theme 'darcula)
 ;; (load-theme 'monokai)
 ;; (load-theme 'sanityinc-tomorrow-blue)
 ;; (load-theme 'darktooth)
-(load-theme 'challenger-deep)
 ;; (load-theme 'avk-darkblue-yellow)
+
+;; (load-theme 'material-light)
+;; (load-theme 'spacemacs-light)
 ;; set font
 (set-frame-font "Envy Code R 16")
 #+END_SRC
