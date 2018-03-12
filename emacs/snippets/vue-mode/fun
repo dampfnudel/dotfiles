@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: fun
+# key: fun
+# --
+${0:function name}: function (${1:params}) {
+  $2
+}

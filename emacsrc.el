@@ -150,7 +150,7 @@ the tangled file is compiled."
 ;; theme
 ;; trust theme
 (setq custom-safe-themes t)
-;; (load-theme 'labburn)
+(load-theme 'labburn)
 ;; (load-theme 'material-light)
 ;; (load-theme 'spacemacs-dark)
 ;; (load-theme 'spacemacs-light)
@@ -160,7 +160,7 @@ the tangled file is compiled."
 ;; (load-theme 'monokai)
 ;; (load-theme 'sanityinc-tomorrow-blue)
 ;; (load-theme 'darktooth)
-(load-theme 'challenger-deep)
+;; (load-theme 'doom-nova)
 ;; (load-theme 'avk-darkblue-yellow)
 ;; set font
 (set-frame-font "Envy Code R 16")
@@ -383,6 +383,11 @@ the tangled file is compiled."
 ;; Set to <your Dropbox root directory>/MobileOrg.
 (setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
 
+(add-hook 'html-mode-hook
+    (lambda ()
+        ;; Default indentation is usually 4 spaces, changing to 2.
+        (set (make-local-variable 'sgml-basic-offset) 2)))
+
 ;(setq python-shell-interpreter "ipython"
 ;      python-shell-interpreter-args "--simple-prompt --pprint")
 (setq python-shell-interpreter "ipython")
@@ -417,6 +422,7 @@ the tangled file is compiled."
 
 (add-hook 'python-mode-hook 'anaconda-mode)
 
+(add-hook 'vue[JavaScript] 'tern-mode)
 (add-hook 'js2-mode-hook 'tern-mode)
 (eval-after-load "company"
  '(add-to-list 'company-backends 'company-tern))
@@ -439,7 +445,7 @@ the tangled file is compiled."
 ;; snippet direcories
 ;; TODO always use latest default collection
 (setq yas-snippet-dirs
-      '("~/Settings/dotfiles/emacs/snippets"               ;; personal snippets
+      '("~/dotfiles/emacs/snippets"               ;; personal snippets
         "~/.emacs.d/elpa/yasnippet-20170923.1646/snippets" ;; the default collection
         ))
 
@@ -518,6 +524,16 @@ the tangled file is compiled."
  '(js2-bounce-indent-p t)
 )
 
+(add-hook 'js2-mode
+    (lambda ()
+        ;; Default indentation is usually 4 spaces, changing to 2.
+        (set (make-local-variable 'sgml-basic-offset) 2)))
+
+(add-hook 'js2-mode
+          (function (lambda ()
+                      (setq indent-tabs-mode nil
+                            tab-width 2))))
+
 (add-hook 'js2-mode-hook 'skewer-mode)
 (add-hook 'css-mode-hook 'skewer-css-mode)
 (add-hook 'html-mode-hook 'skewer-html-mode)
@@ -546,8 +562,17 @@ the tangled file is compiled."
 
 (add-hook 'web-mode-hook  'my-web-mode-hook)
 
-(require 'evil-surround)
-(global-evil-surround-mode 1)
+(add-hook 'vue-mode
+    (lambda ()
+        ;; Default indentation is usually 4 spaces, changing to 2.
+        (set (make-local-variable 'sgml-basic-offset) 2)))
+
+(add-hook 'vue-mode
+          (function (lambda ()
+                      (setq indent-tabs-mode nil
+                            tab-width 2))))
+
+;;(re(global-evil-surround-mode 1)
 
 (require 'which-key)
 (which-key-mode)

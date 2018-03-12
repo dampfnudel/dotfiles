@@ -144,6 +144,7 @@ hash -d tmp=$HOME/tmp
 hash -d trash=$HOME/.Trash
 hash -d utils=$HOME/utils
 hash -d videos=$HOME/Movies
+hash -d tedas=~dev/tedas/vueclient/
 # mounts
 hash -d i32=/Volumes/INGOT32
 hash -d i64=/Volumes/INGOT64
@@ -167,6 +168,15 @@ hash -d zshrc=$HOME/Settings/dotfiles/zshrc.zsh
 #+BEGIN_SRC shell
 # $PATH
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/bin:$PATH"
+
+# node.js
+NPM_PACKAGES="~/.node_modules"
+PATH="$NPM_PACKAGES/bin:$PATH"
+
+# Unset manpath so we can inherit from /etc/manpath via the `manpath` command
+unset MANPATH # delete if you already modified MANPATH elsewhere in your config
+export MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
+
 
 # paths
 # TODO hash?
@@ -200,7 +210,7 @@ export WORDCHARS='*?_-.[]~=/&;!#$%^(){}<>/'
 
 # $LS_COLORS
 # TODO
-eval $(gdircolors -b ~dotfiles/themes/dircolors/zenburn.256dark)
+eval `gdircolors <(python ~dev/base16/templates/base16-gnu-dircolors/scripts/dircolors)`
 # used by k
 # export LSCOLORS='di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
 export LSCOLORS='exfxcxdxbxegedabagacad'
@@ -377,6 +387,9 @@ alias moon='curl -s wttr.in/Moon|head -25'
 
 # git
 alias gs='git status'
+alias gc='git commit -m'
+alias gd='git diff --color | diff-so-fancy'
+alias ga='git add'
 alias gpl='git pull'
 alias gps='git push'
 alias gl='git log'
@@ -1752,7 +1765,9 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 ** TODO from vim
 ** TODO basecolor16
 #+BEGIN_SRC shell
-export PROMPT='%F{green}%n%f@%F{blue}%m%f %F{red}%~ %f% %# '
+# export PROMPT='%F{green}%n%f@%F{blue}%m%f %F{red}%~ %f% %# '
+# source /Users/markus.bayer/dev/impure/async.zsh && source /Users/markus.bayer/dev/impure/impure.zsh
+source /Users/markus.bayer/dev/zsh-clean/clean.zsh
 #+END_SRC
 
 * Original zshrc
@@ -1789,8 +1804,9 @@ export PROMPT='%F{green}%n%f@%F{blue}%m%f %F{red}%~ %f% %# '
       # LSCOLORS='gxfxcxdxbxegedabagacad'
 
       # gnu dircolors
-      alias dircolors='gdircolors'
-      eval `dircolors /Users/mbayer/Settings/dotfiles/zenburn.256dark`
+      # alias dircolors='gdircolors'
+      # eval `dircolors /Users/mbayer/Settings/dotfiles/zenburn.256dark`
+      eval `gdircolors <(python ~dev/base16/templates/base16-gnu-dircolors/scripts/dircolors)`
   # }}}
 
   # antigen {{{
