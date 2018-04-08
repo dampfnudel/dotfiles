@@ -188,7 +188,7 @@ the tangled file is compiled."
 (tool-bar-mode -1)
 
 ;; #slowemacs
-(global-linum-mode)
+;; (global-linum-mode)
 ;; (line-number-mode)
 
 ;; y & n instead of yes & no
@@ -210,22 +210,6 @@ the tangled file is compiled."
 
 ;; highlight current line
 (global-hl-line-mode)
-;; #slowemacs
-;; M-x cutomize-themes
-(add-hook 'special-mode-hook (lambda () (hl-line-mode -1)))
-;; M-x package-list-packages
-(add-hook 'package-menu-mode-hook (lambda () (hl-line-mode -1)))
-;; magit
-(add-hook 'magit-mode-hook (lambda () (global-hl-line-mode -1)))
-; https://stackoverflow.com/questions/6837511/automatically-disable-a-global-minor-mode-for-a-specific-major-mode
-;(define-global-minor-mode my-global-centered-cursor-mode global-undo-tree-mode
-;  (lambda ()
-;    (when (not (memq major-mode
-;                     (list 'fireplace-mode)))
-;      (global-undo-tree-mode))))
-;
-;(my-global-centered-cursor-mode 1)
-
 
 ; #slowemacs
 ;; wrap long lines
@@ -237,6 +221,8 @@ the tangled file is compiled."
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 (require 'spaceline-config)
+(require 'spaceline)
+(spaceline-spacemacs-theme)
 (spaceline-toggle-minor-modes-off)
 (setq powerline-default-separator 'wave)
 ;; mode-line highlight to change color depending on the evil state
@@ -341,8 +327,9 @@ the tangled file is compiled."
 (setq org-todo-keywords
        '((sequence "TODO" "NEXT" "BLOCKED" "|" "DONE" "FAILED")))
 ;; concat agenda from this files
-(setq org-agenda-files (append '("~/Documents/org/agenda.gpg" "~/Documents/org/wiederkehrende-tasks.org")))
-;; (setq org-agenda-files (append '("~/Documents/org/agenda.gpg" "~/Documents/org/wiederkehrende-tasks.org") (file-expand-wildcards "~/Documents/org/cal/*\.org")))
+(setq org-agenda-files (append '("~/Documents/org/agenda.gpg"
+"~/Documents/org/wiederkehrende-tasks.org"
+"~/Documents/org/backlog.org")))
 
 ;; indentation options
 (setq org-startup-folded "showeverything")
@@ -554,10 +541,6 @@ the tangled file is compiled."
 
 (require 'which-key)
 (which-key-mode)
-
-(require 'spaceline-config)
-(require 'spaceline)
-(spaceline-spacemacs-theme)
 
 ;; TODO requrie
 (require 'highlight)
