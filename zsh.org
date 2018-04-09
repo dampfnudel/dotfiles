@@ -277,7 +277,7 @@ zstyle ':completion:*:*:*:users' ignored-patterns \
 zstyle ':completion:*:emacs:*' ignored-patterns '*.(o|a|so|aux|dvi|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pdf|ps|pyc)'
 # avoid getting offered the same filename with rm
 zstyle ':completion:*:rm:*' ignore-line yes
-#zstyle ':completion:*:*:git:*' script ~dotfiles/zsh/completions/git-completion.zsh
+zstyle ':completion:*:*:git:*' script ~dotfiles/zsh/completions/git-completion.zsh
 #+END_SRC
 
 ** Python
@@ -1604,12 +1604,6 @@ fi
 ** zsh-autosuggestions
 #+BEGIN_SRC shell
 source ~dotfiles/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-#+END_SRC
-
-** zsh-history-search-multi-word
-https://github.com/zdharma/history-search-multi-word
-#+BEGIN_SRC shell
-# source ~dotfiles/zsh/plugins/history-search-multi-word/history-search-multi-word.plugin.zsh
 #+END_SRC
 
 ** zsh-history-substring-search                                     :plugin:

@@ -201,7 +201,7 @@ zstyle ':completion:*:*:*:users' ignored-patterns \
 zstyle ':completion:*:emacs:*' ignored-patterns '*.(o|a|so|aux|dvi|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pdf|ps|pyc)'
 # avoid getting offered the same filename with rm
 zstyle ':completion:*:rm:*' ignore-line yes
-#zstyle ':completion:*:*:git:*' script ~dotfiles/zsh/completions/git-completion.zsh
+zstyle ':completion:*:*:git:*' script ~dotfiles/zsh/completions/git-completion.zsh
 
 export WORKON_HOME=~dev/Envs
 export PROJECT_HOME=~dev
@@ -1342,8 +1342,6 @@ fi
 
 source ~dotfiles/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
-# source ~dotfiles/zsh/plugins/history-search-multi-word/history-search-multi-word.plugin.zsh
-
 source ~dotfiles/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 source ~dotfiles/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
@@ -1388,9 +1386,3 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 # export FZF_CTRL_T_OPTS="--bind 'ctrl-x:execute(echo {}|awk '{print \$2}'|pbcopy)+accept'"
 
 export PROMPT='%F{green}%n%f@%F{blue}%m%f %F{red}%~ %f% %# '
-# enable vcs_info used by the prompt
-# autoload -Uz vcs_info
-# zstyle ':vcs_info:*' enable git svn
-# precmd() { vcs_info }
-# source ~impure/async.zsh
-# source ~impure/impure.zsh
