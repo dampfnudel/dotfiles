@@ -835,9 +835,20 @@ count_files () {
         echo "$d : $files"
     done
 }
+
 function list_all_apps () {
     # list all applications on the system
     mdfind 'kMDItemContentTypeTree == "com.apple.application"c'
+}
+
+git_commits_today () {
+    # list all commits made today, group by regex
+    for TICKETNR in "$@"
+    do
+        echo "$TICKET"
+        git log --reverse --since="6am" --oneline --abbrev-commit |cut -c 9- |grep $TICKET |sed 's/'$TICKET'//' |sed 's/.*/- &/'
+        echo ""
+    done
 }
 #+END_SRC
 
