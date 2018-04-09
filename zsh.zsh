@@ -201,6 +201,7 @@ zstyle ':completion:*:*:*:users' ignored-patterns \
 zstyle ':completion:*:emacs:*' ignored-patterns '*.(o|a|so|aux|dvi|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pdf|ps|pyc)'
 # avoid getting offered the same filename with rm
 zstyle ':completion:*:rm:*' ignore-line yes
+#zstyle ':completion:*:*:git:*' script ~dotfiles/zsh/completions/git-completion.zsh
 
 export WORKON_HOME=~dev/Envs
 export PROJECT_HOME=~dev
@@ -261,6 +262,7 @@ alias yt='$WORKON_HOME/python3.4.1/bin/youtube-dl --no-mtime --no-cache-dir'
 alias wttr='curl -s http://wttr.in | tail +8 | head -30'
 # moonphase
 alias moon='curl -s wttr.in/Moon|head -25'
+alias parrot='curl parrot.live'
 
 # git
 alias gs='git status'
@@ -348,6 +350,7 @@ alias -s org=emacs
 alias -s jpg=imgcat
 alias -s png=imgcat
 
+# TODO is_in_git_repo; bindkey
 # called on every cd
 chpwd () {
     # put the current directory in the title/tab bar
@@ -1385,3 +1388,9 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 # export FZF_CTRL_T_OPTS="--bind 'ctrl-x:execute(echo {}|awk '{print \$2}'|pbcopy)+accept'"
 
 export PROMPT='%F{green}%n%f@%F{blue}%m%f %F{red}%~ %f% %# '
+# enable vcs_info used by the prompt
+# autoload -Uz vcs_info
+# zstyle ':vcs_info:*' enable git svn
+# precmd() { vcs_info }
+# source ~impure/async.zsh
+# source ~impure/impure.zsh

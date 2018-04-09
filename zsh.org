@@ -277,6 +277,7 @@ zstyle ':completion:*:*:*:users' ignored-patterns \
 zstyle ':completion:*:emacs:*' ignored-patterns '*.(o|a|so|aux|dvi|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pdf|ps|pyc)'
 # avoid getting offered the same filename with rm
 zstyle ':completion:*:rm:*' ignore-line yes
+#zstyle ':completion:*:*:git:*' script ~dotfiles/zsh/completions/git-completion.zsh
 #+END_SRC
 
 ** Python
@@ -373,6 +374,7 @@ alias yt='$WORKON_HOME/python3.4.1/bin/youtube-dl --no-mtime --no-cache-dir'
 alias wttr='curl -s http://wttr.in | tail +8 | head -30'
 # moonphase
 alias moon='curl -s wttr.in/Moon|head -25'
+alias parrot='curl parrot.live'
 
 # git
 alias gs='git status'
@@ -475,6 +477,7 @@ alias -s png=imgcat
 
 ** Helper functions
 #+BEGIN_SRC shell
+# TODO is_in_git_repo; bindkey
 # called on every cd
 chpwd () {
     # put the current directory in the title/tab bar
@@ -1334,7 +1337,7 @@ fi
 | Cmd-Right       | end-of-line                   |                                |
 | Ctrl-N          | vi-find-next-char             |                                |
 | Ctrl-Shift-Left | copy-prev-word                | clone previous word            |
-| Cmd-Backspace   | backward-kill-word            |                                |
+| Alt-Backspace | backward-kill-word            |                                |
 | Ctrl-X          | delete-char                   |                                |
 | Ctrl-K          | cd ..                         |                                |
 | Ctrl-L          | ls -lah                       |                                |
