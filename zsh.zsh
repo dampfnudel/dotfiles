@@ -641,6 +641,23 @@ function li () {
     (cd "$dir" && realpath "$(ls -1t | head -n$idx | tail -1)")
 }
 
+function git_log_today () {
+    git log --pretty=format:'%Cgreen%cd%Creset - %s%Creset' --abbrev-commit --date=iso|grep $(date "+%Y-%m-%d")
+}
+
+function git_log_yesterday () {
+    git log --pretty=format:'%Cgreen%cd%Creset - %s%Creset' --abbrev-commit --date=iso|grep $(date -j -v-1d "+%Y-%m-%d")
+}
+
+function git_log_group_by () {
+    for TICKETNR in "$@"
+    do
+        echo "$TICKET"
+        git log --reverse --since="6am" --oneline --abbrev-commit |cut -c 9- |grep $TICKET |sed 's/'$TICKET'//' |sed 's/.*/- &/'
+        echo ""
+    done
+}
+
 function gru () {
     # print the git remote url
     git config --get remote.origin.url
@@ -676,9 +693,20 @@ count_files () {
         echo "$d : $files"
     done
 }
+
 function list_all_apps () {
     # list all applications on the system
     mdfind 'kMDItemContentTypeTree == "com.apple.application"c'
+}
+
+git_commits_today () {
+    # list all commits made today, group by regex
+    for TICKETNR in "$@"
+    do
+        echo "$TICKET"
+        git log --reverse --since="6am" --oneline --abbrev-commit |cut -c 9- |grep $TICKET |sed 's/'$TICKET'//' |sed 's/.*/- &/'
+        echo ""
+    done
 }
 
 function kill_lines_containing () {
