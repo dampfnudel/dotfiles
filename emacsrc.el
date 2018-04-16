@@ -151,7 +151,8 @@ the tangled file is compiled."
 ;; trust theme
 (setq custom-safe-themes t)
 ;; (load-theme 'labburn)
-(load-theme 'challenger-deep)
+(load-theme 'solarized-light)
+;; (load-theme 'challenger-deep)
 ;; (load-theme 'spacemacs-dark)
 ;; (load-theme 'rebecca)
 ;; (load-theme 'reykjavik)
@@ -291,6 +292,18 @@ the tangled file is compiled."
 
 ;; persist bookmarks in this file
 (setq bookmark-default-file (concat user-emacs-directory "persistence/bookmarks"))
+
+;; use homebrew git
+(setq magit-git-executable "/usr/local/bin/git")
+;(custom-set-faces
+; ;; other faces
+; '(magit-diff-added ((((type tty)) (:foreground "green"))))
+; '(magit-diff-added-highlight ((((type tty)) (:foreground "LimeGreen"))))
+; '(magit-diff-context-highlight ((((type tty)) (:foreground "default"))))
+; '(magit-diff-file-heading ((((type tty)) nil)))
+; '(magit-diff-removed ((((type tty)) (:foreground "red"))))
+; '(magit-diff-removed-highlight ((((type tty)) (:foreground "IndianRed"))))
+; '(magit-section-highlight ((((type tty)) nil))))
 
 ;; required by require
 (defun zone-choose (pgm)
