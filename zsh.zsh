@@ -85,7 +85,7 @@ hash -d pictures=$HOME/Pictures
 hash -d screenshots=~pictures/Screenshots
 hash -d regiobot=$HOME/Workspace/project-inquant/gitlab
 hash -d rezepte=$HOME/Documents/org/rezepte
-hash -d scripts=$HOME/Workspace/scripts
+hash -d scripts=~dotfiles/scripts
 hash -d settings=$HOME/Settings
 hash -d tmp=$HOME/tmp
 hash -d trash=$HOME/.Trash
@@ -110,7 +110,7 @@ hash -d zsh_history=$HOME/.zsh_history
 hash -d zshrc=$HOME/Settings/dotfiles/zshrc.zsh
 
 # $PATH
-export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/bin:$PATH"
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/bin:${PATH}"
 
 # paths
 # TODO hash?
@@ -263,9 +263,12 @@ alias wttr='curl -s http://wttr.in | tail +8 | head -30'
 # moonphase
 alias moon='curl -s wttr.in/Moon|head -25'
 alias parrot='curl parrot.live'
+# diff
+alias diff='git diff --no-index --color "$@" | diff-so-fancy'
 
 # git
 alias gs='git status'
+alias gd='git diff'
 alias gpl='git pull'
 alias gps='git push'
 alias gl='git log'
