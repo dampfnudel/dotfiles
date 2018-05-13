@@ -369,7 +369,7 @@ alias wget="wget -c"
 alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
 alias chrome_headless='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu'
 alias yt3='$WORKON_HOME/python3.4.1/bin/youtube-dl --verbose --extract-audio --audio-format mp3 --no-mtime --no-cache-dir'
-alias yt='$WORKON_HOME/python3.4.1/bin/youtube-dl --no-mtime --no-cache-dir'
+alias yt='$WORKON_HOME/python3.4.1/bin/youtube-dl --ignore-errors --no-mtime --no-cache-dir'
 # weather
 alias wttr='curl -s http://wttr.in | tail +8 | head -30'
 # moonphase
