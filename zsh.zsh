@@ -642,7 +642,6 @@ function gbn () {
     # print the git branch name
     git branch|grep "\*"|awk '{print $2}'
 }
-
 lscat () {
     # print a separated list of files in dir $1
     local dir
@@ -677,6 +676,10 @@ function kill_lines_containing () {
     # delete lines containing pattern $1 in file $2
     if [ $# -lt 2 ]; then echo "Usage: kill_lines_containing <PATTERN> <FILE>"; return 1; fi
     sed -i '' "/$1/d" "$2"
+}
+
+function vimpipe () {
+    \vim – -u NONE -es ‘+1’ « +$* » ‘+%print’ ‘+:qa!’ | tail -n +2
 }
 
 function ff () {

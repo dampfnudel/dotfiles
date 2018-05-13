@@ -801,7 +801,6 @@ function gbn () {
     # print the git branch name
     git branch|grep "\*"|awk '{print $2}'
 }
-
 lscat () {
     # print a separated list of files in dir $1
     local dir
@@ -842,8 +841,16 @@ function kill_lines_containing () {
     if [ $# -lt 2 ]; then echo "Usage: kill_lines_containing <PATTERN> <FILE>"; return 1; fi
     sed -i '' "/$1/d" "$2"
 }
-
 #+END_SRC
+
+** manipulate stdin with vim
+http://javascript-ninja.fr/using-vimpipe-to-have-the-power-of-vim-to-manipulate-stdin/
+#+BEGIN_SRC shell
+function vimpipe () {
+    \vim – -u NONE -es ‘+1’ « +$* » ‘+%print’ ‘+:qa!’ | tail -n +2
+}
+#+END_SRC
+
 
 ** Find
 http://www.macdevcenter.com/pub/a/mac/2006/01/04/mdfind.html?page=4
