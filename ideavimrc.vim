@@ -2,6 +2,8 @@
 
 ## use the system clipboard
 set clipboard+=unnamed
+## disable timeout for key sequences
+set notimeout
 
 # search
 
@@ -10,6 +12,7 @@ set hlsearch
 ## case insensitive until the use of uppercase letters in the pattern
 set smartcase
 set ignorecase
+set incsearch
 
 # keymappings / keybindings
 
@@ -17,34 +20,40 @@ set ignorecase
 map E $
 map B ^
 map ö /
-map ä *
-map <Space>g *
-map <Space><Tab> :action SearchEverywhere <CR> foooo
-map <Space><Space> :action SearchEverywhere <CR>
+map Ö :action FileStructurePopup <CR>
+map ä :action FindInPath <CR>
+map Ä :action SelectIn <CR>
+map # :action FindUsages <CR>
+map ü :action Refactorings.QuickListPopupAction <CR>
+# map <Space><Space> :action SearchEverywhere <CR>
 
 ## mappings
 
 ### edit
-map <Space>- :action CommentByLineComment <CR>
-map <Space>. :action CommentByBlockComment <CR>
-map <Space>r :action RenameElement <CR>
 map ~ :action EditorToggleCase <CR>
+map + :action EditorSelectWord <CR>
+map - :action EditorUnSelectWord <CR>
 
 ### goto
-map <Space>f :action FindInPath <CR>
-map gs :action SelectIn <CR>
+# map <Space>f :action FindInPath <CR>
 map gf :action Forward <CR>
 map gb :action Back <CR>
-map <Space><Tab> :action Back <CR>
 map gd :action GotoDeclaration <CR>
+map gu :action FindUsages <CR>
 map gfn :action MethodDown <CR>
 map gfp :action MethodUp <CR>
 map g; :action JumpToLastChange <CR>
 
 ### splits
-map <Space>| :action SplitVertically <CR>
+#map | :action SplitVertically <CR>
 map <Space>l :action NextSplitter <CR>
 map <Shift><Right> :action NextSplitter <CR>
 map <Space>h :action PrevSplitter <CR>
 map <Shift><Left> :action PrevSplitter <CR>
 map <Space>x :action Unsplit <CR>
+
+## delete
+## change last word in line
+map <Space>cl Ebcw
+## change from = to $
+map <Space>c= Bf=wC <Del>
