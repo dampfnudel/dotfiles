@@ -12,8 +12,9 @@
 # ████    ███▄     ▄█    ▄█    ███   ███    ███     ███    ███ ███    ███
 # ████     ▀████████▀  ▄████████▀    ███    █▀      ███    ███ ████████
 #                                                   ███    ███
-
+#
 # ASCII-Art credits: http://patorjk.com/software/taag/#p=display&f=Delta%20Corps%20Priest%201&t=.zshrc
+
 * INDEX
 [[#INDEX]]
 [[#setup]]
@@ -515,9 +516,6 @@ function __expect () {
         echo "$arguments_expected arguments required"
         return 1
     fi
-}
-test () {
-__expect 2
 }
 #+END_SRC
 

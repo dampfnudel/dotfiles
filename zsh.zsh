@@ -389,9 +389,6 @@ function __expect () {
         return 1
     fi
 }
-test () {
-__expect 2
-}
 
 # TODO rm
 # example fzf completion https://github.com/junegunn/fzf/wiki/Examples-(completion)
