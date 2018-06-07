@@ -5,6 +5,9 @@ set clipboard+=unnamed
 ## disable timeout for key sequences
 set notimeout
 
+## vim-surround
+set surround
+
 # search
 
 ## highlight hits
@@ -40,8 +43,8 @@ map gf :action Forward <CR>
 map gb :action Back <CR>
 map gd :action GotoDeclaration <CR>
 map gu :action FindUsages <CR>
-map gfn :action MethodDown <CR>
-map gfp :action MethodUp <CR>
+map gfj :action MethodDown <CR>
+map gfk :action MethodUp <CR>
 map g; :action JumpToLastChange <CR>
 
 ### splits
