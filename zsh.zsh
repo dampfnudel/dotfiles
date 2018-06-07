@@ -1376,6 +1376,8 @@ if [[ $- == *i* ]]; then
     bindkey '^R' fzf-history-widget
 fi
 
+fpath=(/usr/local/share/zsh-completions $fpath)
+
 source ~dotfiles/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # source ~dotfiles/zsh/plugins/history-search-multi-word/history-search-multi-word.plugin.zsh

@@ -1638,6 +1638,27 @@ fi
 :PROPERTIES:
 :CUSTOM_ID: plugins
 :END:
+** zsh-completions
+https://github.com/zsh-users/zsh-completions
+Installed via homebrew
+
+To activate these completions, add the following to your .zshrc:
+
+  fpath=(/usr/local/share/zsh-completions $fpath)
+
+You may also need to force rebuild `zcompdump`:
+
+  rm -f ~/.zcompdump; compinit
+
+Additionally, if you receive "zsh compinit: insecure directories" warnings when attempting
+to load these completions, you may need to run this:
+
+  chmod go-w '/usr/local/share'
+
+#+BEGIN_SRC shell
+fpath=(/usr/local/share/zsh-completions $fpath)
+#+END_SRC
+
 ** zsh-autosuggestions
 #+BEGIN_SRC shell
 source ~dotfiles/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
