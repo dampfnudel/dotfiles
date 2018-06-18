@@ -868,6 +868,19 @@ git_commits_today () {
 #+END_SRC
 
 ** File
+** actions
+*** git
+**** delete branch
+#+BEGIN_SRC shell
+git_delete_branch () {
+    __expect 1 "$#" || return 1
+
+    # remote
+    git push -d origin "$1"
+    # local
+    git branch -d "$1"
+}
+#+END_SRC
 
 ** Modify
 #+BEGIN_SRC shell

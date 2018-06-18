@@ -706,6 +706,15 @@ git_commits_today () {
     done
 }
 
+git_delete_branch () {
+    __expect 1 "$#" || return 1
+
+    # remote
+    git push -d origin "$1"
+    # local
+    git branch -d "$1"
+}
+
 function kill_lines_containing () {
     # delete lines containing pattern $1 in file $2
     if [ $# -lt 2 ]; then echo "Usage: kill_lines_containing <PATTERN> <FILE>"; return 1; fi
