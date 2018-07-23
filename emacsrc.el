@@ -150,7 +150,7 @@ the tangled file is compiled."
 ;; theme
 ;; trust theme
 (setq custom-safe-themes t)
-(load-theme 'labburn)
+;; (load-theme 'labburn)
 ;; (load-theme 'material-light)
 ;; (load-theme 'spacemacs-dark)
 ;; (load-theme 'spacemacs-light)
@@ -160,7 +160,7 @@ the tangled file is compiled."
 ;; (load-theme 'monokai)
 ;; (load-theme 'sanityinc-tomorrow-blue)
 ;; (load-theme 'darktooth)
-;; (load-theme 'doom-nova)
+(load-theme 'doom-nova)
 ;; (load-theme 'avk-darkblue-yellow)
 ;; set font
 (set-frame-font "Envy Code R 16")

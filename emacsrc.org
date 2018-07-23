@@ -133,6 +133,7 @@ add them to the packages list and call package-install-from-ini
                 vue-mode                ; major mode for vue.js
                 ;; new package
                 ;; themes
+                challenger-deep-theme   ; dark
                 rebecca-theme           ; dark
                 gruvbox-theme           ; light & dark
                 solarized-theme         ; light & dark
@@ -277,7 +278,7 @@ the tangled file is compiled."
 ;; theme
 ;; trust theme
 (setq custom-safe-themes t)
-(load-theme 'labburn)
+;; (load-theme 'labburn)
 ;; (load-theme 'material-light)
 ;; (load-theme 'spacemacs-dark)
 ;; (load-theme 'spacemacs-light)
@@ -288,6 +289,7 @@ the tangled file is compiled."
 ;; (load-theme 'sanityinc-tomorrow-blue)
 ;; (load-theme 'darktooth)
 ;; (load-theme 'doom-nova)
+(load-theme 'challenger-deep)
 ;; (load-theme 'avk-darkblue-yellow)
 ;; set font
 (set-frame-font "Envy Code R 16")
@@ -1266,7 +1268,7 @@ prevent losing the selection after a shift operation by re-selecting
     (define-key evil-normal-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
     ;; (define-key evil-normal-state-map (kbd "ä") 'delete-other-windows)
     ;; (define-key evil-normal-state-map (kbd "Ä") 'evil-search-highlight-persist-remove-all)
-    (define-key evil-normal-state-map (kbd "ö") 'avy-goto-line)
+    (define-key evil-normal-state-map (kbd "ö") 'evil-search-forward)
     (define-key evil-normal-state-map (kbd "Ö") 'avy-goto-char)
     (define-key evil-normal-state-map (kbd "f") 'avy-goto-char-timer)
     (define-key evil-normal-state-map (kbd "F") 'avy-goto-char-in-line)
