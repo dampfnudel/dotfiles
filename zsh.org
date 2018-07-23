@@ -1793,7 +1793,7 @@ source ~dotfiles/zsh/plugins/fzf/fzf-git.zsh
 ## default commands
 export FZF_DEFAULT_COMMAND="
     (git ls-tree -r --name-only HEAD \$(git rev-parse --show-toplevel) ||
-    rg --files --no-ignore --hidden --follow -g '!{.git,node_modules}/*') 2> /dev/null"
+    rg --files --hidden --follow -g '!{.git,node_modules}/*') 2> /dev/null"
 
 # TODO preview with someting fast, fallback to pygmentize
 export FZF_DEFAULT_OPTS="--multi --cycle --select-1 --exit-0
