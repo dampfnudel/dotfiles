@@ -638,12 +638,15 @@ function li () {
     (cd "$dir" && realpath "$(ls -1t | head -n$idx | tail -1)")
 }
 
+function git_log_week () {
+    git log --branches --remotes --tags --oneline --pretty=format:"%Cgreen%cd%Creset - %s%Creset" --abbrev-commit --date=local --date=format:'%d.%m-%Y %H:%M %a' --after="$(date -v Sun)"
+}
 function git_log_today () {
-    git log --pretty=format:'%Cgreen%cd%Creset - %s%Creset' --abbrev-commit --date=iso|grep $(date "+%Y-%m-%d")
+    git log --branches --remotes --tags --pretty=format:'%Cgreen%cd%Creset - %s%Creset' --abbrev-commit --date=iso|grep $(date "+%Y-%m-%d")
 }
 
 function git_log_yesterday () {
-    git log --pretty=format:'%Cgreen%cd%Creset - %s%Creset' --abbrev-commit --date=iso|grep $(date -j -v-1d "+%Y-%m-%d")
+    git log --branches --remotes --tags --pretty=format:'%Cgreen%cd%Creset - %s%Creset' --abbrev-commit --date=iso|grep $(date -j -v-1d "+%Y-%m-%d")
 }
 
 function git_log_group_by () {

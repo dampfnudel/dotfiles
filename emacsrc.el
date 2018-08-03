@@ -57,6 +57,7 @@
                 vue-mode                ; major mode for vue.js
                 ;; new package
                 ;; themes
+                challenger-deep-theme   ; dark
                 rebecca-theme           ; dark
                 gruvbox-theme           ; light & dark
                 solarized-theme         ; light & dark
@@ -160,7 +161,8 @@ the tangled file is compiled."
 ;; (load-theme 'monokai)
 ;; (load-theme 'sanityinc-tomorrow-blue)
 ;; (load-theme 'darktooth)
-(load-theme 'doom-nova)
+;; (load-theme 'doom-nova)
+(load-theme 'challenger-deep)
 ;; (load-theme 'avk-darkblue-yellow)
 ;; set font
 (set-frame-font "Envy Code R 16")
@@ -779,7 +781,7 @@ the tangled file is compiled."
     (define-key evil-normal-state-map (kbd "-") 'evilnc-comment-or-uncomment-lines)
     ;; (define-key evil-normal-state-map (kbd "ä") 'delete-other-windows)
     ;; (define-key evil-normal-state-map (kbd "Ä") 'evil-search-highlight-persist-remove-all)
-    (define-key evil-normal-state-map (kbd "ö") 'avy-goto-line)
+    (define-key evil-normal-state-map (kbd "ö") 'evil-search-forward)
     (define-key evil-normal-state-map (kbd "Ö") 'avy-goto-char)
     (define-key evil-normal-state-map (kbd "f") 'avy-goto-char-timer)
     (define-key evil-normal-state-map (kbd "F") 'avy-goto-char-in-line)
