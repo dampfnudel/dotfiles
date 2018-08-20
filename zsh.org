@@ -198,7 +198,7 @@ export SAVEHIST=1000000
 if [[ -n $SSH_CONNECTION ]]; then
     export EDITOR="$BIN/vim"
 else
-    export EDITOR=~scripts/emacs.sh
+    export EDITOR=open -a "Emacs"
     # TODO rm obsolete
     export EDITOR_TAB=${EDITOR}
     export VIM_EDITOR="$BIN/mvim"
