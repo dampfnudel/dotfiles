@@ -19,6 +19,8 @@
     (let* ((packages
             '(auto-compile              ; automatically compile Emacs Lisp libraries
                 evil                    ; extensible vi layer
+                evil-collection         ; A set of keybindings for evil-mode
+                evil-magit              ; Black magic or evil keys for magit https://github.com/justbur/evil-magit
                 evil-leader             ; the <leader> feature from Vim
                 evil-search-highlight-persist             ; highlight the search term in all buffers persistently
                 evil-nerd-commenter     ; comment code efficiently
@@ -315,17 +317,21 @@ the tangled file is compiled."
     (let ((zone-programs (list (intern pgm))))
         (zone)))
 
+(setq evil-want-integration nil)
+(require 'evil)
+(when (require 'evil-collection nil t)
+  (evil-collection-init))
+
+;; use evil search instead of isearch
+(setq evil-search-module 'evil-search)
+(evil-mode 1)
+;; let evil treat _ as part of a word
+(setq-default evil-symbol-word-search t)
+
 (require 'evil-leader)
 (global-evil-leader-mode)
 ;; set space as leader-key
 (evil-leader/set-leader "<SPC>")
-
-;; use evil search instead of isearch
-(setq evil-search-module 'evil-search)
-(require 'evil)
-(evil-mode 1)
-;; let evil treat _ as part of a word
-(setq-default evil-symbol-word-search t)
 
 ;; org-mode for .org-files
 ; #slowemacs
@@ -354,7 +360,7 @@ the tangled file is compiled."
 ;; initial langauges for org-babel support
 (org-babel-do-load-languages
     'org-babel-load-languages '(
-        (sh . t)
+        (shell . t)
         (python . t)
         (ruby . t)
         (sqlite . t)
@@ -671,6 +677,12 @@ the tangled file is compiled."
 (setq avy-all-windows nil)
 
 (custom-set-variables '(org-trello-files '("/Users/mbayer/Documents/org/liversa/backlog.org")))
+
+;; optional: this is the evil state that evil-magit will use
+;;(setq evil-magit-state 'normal)
+;; optional: disable additional bindings for yanking text
+;;(setq evil-magit-use-y-for-yank nil)
+(require 'evil-magit)
 
 
 

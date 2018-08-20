@@ -95,6 +95,8 @@ add them to the packages list and call package-install-from-ini
     (let* ((packages
             '(auto-compile              ; automatically compile Emacs Lisp libraries
                 evil                    ; extensible vi layer
+                evil-collection         ; A set of keybindings for evil-mode
+                evil-magit              ; Black magic or evil keys for magit https://github.com/justbur/evil-magit
                 evil-leader             ; the <leader> feature from Vim
                 evil-search-highlight-persist             ; highlight the search term in all buffers persistently
                 evil-nerd-commenter     ; comment code efficiently
@@ -511,6 +513,21 @@ and copy it over the desired file.
         (zone)))
 #+END_SRC
 
+** evil
+
+#+BEGIN_SRC emacs-lisp
+(setq evil-want-integration nil)
+(require 'evil)
+(when (require 'evil-collection nil t)
+  (evil-collection-init))
+
+;; use evil search instead of isearch
+(setq evil-search-module 'evil-search)
+(evil-mode 1)
+;; let evil treat _ as part of a word
+(setq-default evil-symbol-word-search t)
+#+END_SRC
+
 ** evil-leader
 
 #+BEGIN_SRC emacs-lisp
@@ -518,17 +535,6 @@ and copy it over the desired file.
 (global-evil-leader-mode)
 ;; set space as leader-key
 (evil-leader/set-leader "<SPC>")
-#+END_SRC
-
-** evil
-
-#+BEGIN_SRC emacs-lisp
-;; use evil search instead of isearch
-(setq evil-search-module 'evil-search)
-(require 'evil)
-(evil-mode 1)
-;; let evil treat _ as part of a word
-(setq-default evil-symbol-word-search t)
 #+END_SRC
 
 ** org-mode                                                        :builtin:
@@ -561,7 +567,7 @@ and copy it over the desired file.
 ;; initial langauges for org-babel support
 (org-babel-do-load-languages
     'org-babel-load-languages '(
-        (sh . t)
+        (shell . t)
         (python . t)
         (ruby . t)
         (sqlite . t)
@@ -1043,6 +1049,15 @@ only use the current window for candidates.
     (custom-set-variables '(org-trello-files '("/Users/mbayer/Documents/org/liversa/backlog.org")))
 #+END_SRC
 
+** evil-magit
+
+#+BEGIN_SRC emacs-lisp
+;; optional: this is the evil state that evil-magit will use
+;;(setq evil-magit-state 'normal)
+;; optional: disable additional bindings for yanking text
+;;(setq evil-magit-use-y-for-yank nil)
+(require 'evil-magit)
+#+END_SRC
 ** new package
 
 #+BEGIN_SRC emacs-lisp
