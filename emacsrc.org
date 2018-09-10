@@ -902,6 +902,7 @@ decide
 
 ** evil-search-highlight-persist                                     :bloat:
 
+https://stackoverflow.com/questions/25768036/emacs-evil-non-incremental-search-and-persistent-highlighting
 #+BEGIN_SRC emacs-lisp
 ;; TODO requrie
 (require 'highlight)
