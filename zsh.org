@@ -198,7 +198,7 @@ export SAVEHIST=1000000
 if [[ -n $SSH_CONNECTION ]]; then
     export EDITOR="$BIN/vim"
 else
-    export EDITOR=open -a "Emacs"
+    export EDITOR='open -a "Emacs"'
     # TODO rm obsolete
     export EDITOR_TAB=${EDITOR}
     export VIM_EDITOR="$BIN/mvim"
@@ -365,10 +365,16 @@ alias stat='stat -x'
 ## tools
 # emacs
 alias e="eval $EDITOR"
+alias magit='emacsclient -n -e \(magit-status\)'
+
 # vim
 alias cvim='/usr/local/bin/vim'
 # create parent directories on demand
 alias mkdir="mkdir -pv"
+
+alias lse='exa --long --all --group-directories-first --git --colour-scale'
+alias lle='exa --group-directories-first --git --colour-scale'
+alias cat='bat'
 # clipboard
 alias p='pbpaste'
 alias y='pbcopy'
@@ -1698,8 +1704,14 @@ https://github.com/zdharma/fast-syntax-highlighting
 source ~dotfiles/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
 #+END_SRC
 
+** bat                                                              :plugin:
+https://github.com/sharkdp/bat
+bat --list-themes
+#+BEGIN_SRC shell
+export BAT_THEME="1337"
+#+END_SRC
+
 ** k                                                                :plugin:
-TODO LS_COLORS
 https://github.com/supercrabtree/k
 #+BEGIN_SRC shell
 # source ~dotfiles/zsh/plugins/k/k.sh

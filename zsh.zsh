@@ -141,7 +141,7 @@ export SAVEHIST=1000000
 if [[ -n $SSH_CONNECTION ]]; then
     export EDITOR="$BIN/vim"
 else
-    export EDITOR=~scripts/emacs.sh
+    export EDITOR='open -a "Emacs"'
     # TODO rm obsolete
     export EDITOR_TAB=${EDITOR}
     export VIM_EDITOR="$BIN/mvim"
@@ -252,10 +252,16 @@ alias stat='stat -x'
 ## tools
 # emacs
 alias e="eval $EDITOR"
+alias magit='emacsclient -n -e \(magit-status\)'
+
 # vim
 alias cvim='/usr/local/bin/vim'
 # create parent directories on demand
 alias mkdir="mkdir -pv"
+
+alias lse='exa --long --all --group-directories-first --git --colour-scale'
+alias lle='exa --group-directories-first --git --colour-scale'
+alias cat='bat'
 # clipboard
 alias p='pbpaste'
 alias y='pbcopy'
@@ -1397,6 +1403,8 @@ source ~dotfiles/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~dotfiles/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 source ~dotfiles/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+
+export BAT_THEME="1337"
 
 # source ~dotfiles/zsh/plugins/k/k.sh
 
