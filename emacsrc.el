@@ -57,6 +57,7 @@
                 company-tern            ; Tern backend for company-mode.
                 org-trello              ; 2-way sync org & trello
                 vue-mode                ; major mode for vue.js
+                org-bullet              ; utf-8 bullets for org-mode
                 ;; new package
                 ;; themes
                 challenger-deep-theme   ; dark
@@ -328,11 +329,6 @@ the tangled file is compiled."
 ;; let evil treat _ as part of a word
 (setq-default evil-symbol-word-search t)
 
-(require 'evil-leader)
-(global-evil-leader-mode)
-;; set space as leader-key
-(evil-leader/set-leader "<SPC>")
-
 ;; org-mode for .org-files
 ; #slowemacs
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
@@ -390,6 +386,11 @@ the tangled file is compiled."
 (setq org-mobile-inbox-for-pull "~/Documents/org/mobile-captured.org")
 ;; Set to <your Dropbox root directory>/MobileOrg.
 (setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
+
+(require 'evil-leader)
+(global-evil-leader-mode)
+;; set space as leader-key
+(evil-leader/set-leader "<SPC>")
 
 (add-hook 'html-mode-hook
     (lambda ()
@@ -935,7 +936,31 @@ the tangled file is compiled."
 
 (add-hook 'after-save-hook 'tangle-init-zsh)
 
+(defadvice load-theme (before clear-previous-themes activate)
+  "Clear existing theme settings instead of layering them"
+  (mapc #'disable-theme custom-enabled-themes))
+
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+(add-to-list 'default-frame-alist '(ns-appearance . dark))
+
+;; no icon
+(setq ns-use-proxy-icon nil)
+
+(pixel-scroll-mode)
+
 (custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
+
+(require 'org-bullets)
+
+;; Clean bullets
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+(setq org-bullets-bullet-list
+      '("◉" "○"))
+(add-hook 'org-mode-hook
+          (lambda ()
+            (org-bullets-mode 1)
+            (org-indent-mode t)))
 
 (defun kill-ring-save-until (x)
   "kill-ring-save the line at point until the linenumber you pass."

@@ -554,15 +554,6 @@ and copy it over the desired file.
 (setq-default evil-symbol-word-search t)
 #+END_SRC
 
-** evil-leader
-
-#+BEGIN_SRC emacs-lisp
-(require 'evil-leader)
-(global-evil-leader-mode)
-;; set space as leader-key
-(evil-leader/set-leader "<SPC>")
-#+END_SRC
-
 ** org-mode                                                        :builtin:
 
 #+BEGIN_SRC emacs-lisp
@@ -623,6 +614,30 @@ and copy it over the desired file.
 (setq org-mobile-inbox-for-pull "~/Documents/org/mobile-captured.org")
 ;; Set to <your Dropbox root directory>/MobileOrg.
 (setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
+#+END_SRC
+
+** org-bullets
+#+BEGIN_SRC elisp
+(require 'org-bullets)
+
+;; Clean bullets
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+(setq org-bullets-bullet-list
+      '("◉" "○"))
+(add-hook 'org-mode-hook
+          (lambda ()
+            (org-bullets-mode 1)
+            (org-indent-mode t)))
+#+END_SRC
+
+** evil-leader
+
+#+BEGIN_SRC emacs-lisp
+(require 'evil-leader)
+(global-evil-leader-mode)
+;; set space as leader-key
+(evil-leader/set-leader "<SPC>")
 #+END_SRC
 
 ** html-mode                                                       :builtin:
