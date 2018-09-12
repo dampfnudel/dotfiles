@@ -313,6 +313,23 @@ Improve theme loading; from https://www.reddit.com/r/emacs/comments/4mzynd/what_
 ;; (setq vc-follow-symlinks t)
 #+END_SRC
 
+** title bar                                                         :macOS:
+
+#+BEGIN_SRC elisp
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+(add-to-list 'default-frame-alist '(ns-appearance . dark))
+
+;; no icon
+(setq ns-use-proxy-icon nil)
+#+END_SRC
+
+** scrolling
+Scrolling more naturally
+
+#+BEGIN_SRC elisp
+(pixel-scroll-mode)
+#+END_SRC
+
 ** cursor
 
 #+BEGIN_SRC emacs-lisp
