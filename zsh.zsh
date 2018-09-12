@@ -230,9 +230,9 @@ fi
 # TODO section for overriding
 ## list
 # use gnu ls for dircolors
-alias ls='gls --color=auto'
+alias _ls='gls --color=auto'
 # list details
-alias ll='ls -lah'
+alias _ll='ls -lah'
 # sort by size
 alias lss='ls -lahS'
 # sort by date
@@ -259,8 +259,8 @@ alias cvim='/usr/local/bin/vim'
 # create parent directories on demand
 alias mkdir="mkdir -pv"
 
-alias lse='exa --long --all --group-directories-first --git --colour-scale'
-alias lle='exa --group-directories-first --git --colour-scale'
+alias ll='exa --long --all --group-directories-first --git --colour-scale'
+alias ls='exa --group-directories-first --git --colour-scale'
 alias cat='bat'
 # clipboard
 alias p='pbpaste'
@@ -360,6 +360,8 @@ alias -g _acd='./(*.bz2|*.gz|*.tgz|*.zip|*.z)'
 # funky
 alias -g _x='| xargs'
 alias -g map='_x'
+## github
+alias -g _gh='https://github.com/'
 
 # TODO
 # open org-mode files in emacs
