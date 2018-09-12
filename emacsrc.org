@@ -276,6 +276,14 @@ the tangled file is compiled."
 
 ** theme
 
+Improve theme loading; from https://www.reddit.com/r/emacs/comments/4mzynd/what_emacs_theme_are_you_currently_using/d43c5cw/
+
+#+BEGIN_SRC elisp
+(defadvice load-theme (before clear-previous-themes activate)
+  "Clear existing theme settings instead of layering them"
+  (mapc #'disable-theme custom-enabled-themes))
+#+END_SRC
+
 #+BEGIN_SRC emacs-lisp
 ;; TODO
 ;; theme
