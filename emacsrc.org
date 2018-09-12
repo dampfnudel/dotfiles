@@ -133,6 +133,7 @@ add them to the packages list and call package-install-from-ini
                 company-tern            ; Tern backend for company-mode.
                 org-trello              ; 2-way sync org & trello
                 vue-mode                ; major mode for vue.js
+                org-bullet              ; utf-8 bullets for org-mode
                 ;; new package
                 ;; themes
                 challenger-deep-theme   ; dark
