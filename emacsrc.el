@@ -882,8 +882,9 @@ the tangled file is compiled."
     ;; map command key to meta
     (if (boundp 'ns-command-modifier)
         (setq ns-command-modifier 'meta))
-    (if (boundp 'ns-option-modifier)
-        (setq ns-option-modifier nil))
+    ;; TODO bind something useful
+    ;(if (boundp 'ns-option-modifier)
+    ;    (setq ns-option-modifier nil))
 
     ;; make use of <Meta-Up> <Meta-Down>
     ;; TODO double mapped
