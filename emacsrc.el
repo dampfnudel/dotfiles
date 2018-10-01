@@ -371,11 +371,12 @@ the tangled file is compiled."
 (add-hook 'org-mode-hook (lambda () (org-autolist-mode)))
 
 ;; org-capture
-(setq org-default-notes-file "~/Documents/org/backlog.org")
+(setq org-default-notes-file "~/dotfiles/gists/til.org")
 
 (setq org-capture-templates
 '(("t" "Todo" entry (file "~/Documents/org/backlog.org")
-        "* TODO %?")))
+        "* TODO %?")
+   ("g" "Gist" entry (file "~/dotfiles/gists/til.org"))))
 
 ;; Set to the location of your Org files on your local system
 (setq org-directory "~/Documents/org")
@@ -883,8 +884,8 @@ the tangled file is compiled."
     (if (boundp 'ns-command-modifier)
         (setq ns-command-modifier 'meta))
     ;; TODO bind something useful
-    ;(if (boundp 'ns-option-modifier)
-    ;    (setq ns-option-modifier nil))
+    (if (boundp 'ns-option-modifier)
+        (setq ns-option-modifier nil))
 
     ;; make use of <Meta-Up> <Meta-Down>
     ;; TODO double mapped
