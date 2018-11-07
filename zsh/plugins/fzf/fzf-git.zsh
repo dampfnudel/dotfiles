@@ -52,7 +52,7 @@ function git_branch_fzf () {
     # print a selected branch name
     is_in_git_repo || return
     git branch -a --color=always | grep -v '/HEAD\s' | sort |
-    fzf_git --ansi --multi --tac --preview-window right:70% \
+    fzf_git --ansi --multi --tac --preview-window right:30% \
         --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1) | head -'$LINES |
     sed 's/^..//' | cut -d' ' -f1 |
     sed 's#^remotes/##'

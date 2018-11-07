@@ -723,6 +723,20 @@ function chrome_print_tabs () {
 
 }
 
+function firefox_print_tabs () {
+    # list the opened tabs in Firefox
+    osascript -e '
+    tell application "Firefox" to activate
+		tell application "System Events"
+			keystroke "l" using command down
+			keystroke "c" using command down
+		end tell
+		delay 0.5
+		return the clipboard
+    end tell'
+
+}
+
 function cat_links () {
     # extract the links from a given url
     __expect 1 "$#" || return 1
@@ -815,7 +829,7 @@ function git_log_week () {
 }
 
 function git_log_today () {
-    git log --branches --remotes --tags --pretty=format:'%Cgreen%cd%Creset - %s%Creset' --abbrev-commit --date=iso|grep $(date "+%Y-%m-%d")
+    git log --branches --remotes --tags --pretty=format:'%Cgreen%cd%Creset - %s%Creset' --abbrev-commit --date=iso|grep $(date "+%Y-%m-%d")|cut -c 27-
 }
 
 function git_log_yesterday () {
