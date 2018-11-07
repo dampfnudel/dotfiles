@@ -47,6 +47,7 @@ map gu :action FindUsages <CR>
 map gfj :action MethodDown <CR>
 map gfk :action MethodUp <CR>
 map g; :action JumpToLastChange <CR>
+map gn :action JumpToNextChange <CR>
 
 ### splits
 #map | :action SplitVertically <CR>
