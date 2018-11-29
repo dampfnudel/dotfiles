@@ -28,7 +28,7 @@ map ä :action FindInPath <CR>
 map Ä :action SelectIn <CR>
 map # :action FindUsages <CR>
 map ü :action Refactorings.QuickListPopupAction <CR>
-map Ü :action QuickDocumentation <CR>
+map Ü :action InsertLiveTemplate <CR>
 # map <Space><Space> :action SearchEverywhere <CR>
 
 ## mappings

@@ -228,6 +228,8 @@ then
 fi
 
 # TODO section for overriding
+## format clipboard
+alias break_lines="pbpaste | sed 's/\\n/\r/g' | pbcopy"
 ## list
 # use gnu ls for dircolors
 alias _ls='gls --color=auto'
@@ -288,7 +290,11 @@ alias gpl='git pull'
 alias gps='git push'
 alias gl='git log'
 alias gco='git checkout'
+alias gcd='git checkout develop'
+alias gcm='git checkout master'
+alias gmd='git merge develop'
 
+alias git_undo_last_local_commit='git reset HEAD~'
 alias git_push_fire='git add -A && git commit -a --allow-empty-message -m "" && git push'
 alias git_undo_commit='git reset --soft HEAD~'
 
@@ -736,6 +742,18 @@ git_commits_today () {
     done
 }
 
+convert_org_to_markdown () {
+  [ ! -f "$1" ] && echo "existing file expected" && exit 1
+
+  filename=$(basename -- "$1")
+  filename="${filename%.*}"
+  outfile="$filename.md"
+
+  pandoc "$1" --atx-headers -f org -t markdown -s -o "$outfile"
+
+  echo "$outfile"
+}
+
 git_delete_branch () {
     __expect 1 "$#" || return 1
 
@@ -894,7 +912,7 @@ vim () {
 }
 
 # TODO as var alias
-gcd () {
+cd_git_root () {
     # cd to git root
     cd "$(git rev-parse --show-toplevel)"
 }
