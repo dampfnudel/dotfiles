@@ -228,8 +228,6 @@ then
 fi
 
 # TODO section for overriding
-## format clipboard
-alias break_lines="pbpaste | sed 's/\\n/\r/g' | pbcopy"
 ## list
 # use gnu ls for dircolors
 alias _ls='gls --color=auto'
@@ -267,6 +265,7 @@ alias cat='bat'
 # clipboard
 alias p='pbpaste'
 alias y='pbcopy'
+
 alias bpython='$WORKON_HOME/python3.4.1/bin/bpython'
 alias grep='grep --color'
 ## internet
@@ -293,6 +292,7 @@ alias gco='git checkout'
 alias gcd='git checkout develop'
 alias gcm='git checkout master'
 alias gmd='git merge develop'
+alias gu='gitup open .'
 
 alias git_undo_last_local_commit='git reset HEAD~'
 alias git_push_fire='git add -A && git commit -a --allow-empty-message -m "" && git push'
@@ -346,6 +346,9 @@ alias -g _shrugf='<(echo "¯\\_(ツ)_/¯")'
 alias -g _shrugv='${$(echo "¯\\_(ツ)_/¯")}'
 
 ## filter
+alias -g _newlines="|sed 's/\\n/\
+/g'"
+
 # filter columns
 alias -g _awk1="|awk '{print \$1}'"
 alias -g _awk2="|awk '{print \$2}'"
@@ -609,7 +612,7 @@ function print_external_ip () {
     curl ipecho.net/plain
 }
 
-clipboard_plain_text () {
+function clipboard_plain_text () {
     # convert clipboard content to plain text
     pbpaste | textutil -convert txt -stdin -stdout -encoding 30 | pbcopy
 }
@@ -617,6 +620,15 @@ clipboard_plain_text () {
 function clipboard_rm_python () {
     # rm ">>> " from clipboard entry
     pbpaste | cut -c 4- | pbcopy
+}
+function clipboard_json_pp () {
+    # requires /usr/bin/json_pp
+    pbpaste | json_pp | pbcopy
+}
+function clipboard_newlines_replace () {
+    ## format clipboard
+    pbpaste | sed 's/\\n/\
+/g' | pbcopy
 }
 
 function fdr() {
