@@ -20,6 +20,7 @@ set incsearch
 # keymappings / keybindings
 
 ## remappings
+map f F
 map E $
 map B ^
 map ö /
@@ -62,3 +63,6 @@ map <Space>x :action Unsplit <CR>
 map <Space>cl Ebcw
 ## change from = to $
 map <Space>c= Bf=wC <Del>
+
+# emacsIDEs
+map f :action emacsIDEAs.AceJump <CR>
