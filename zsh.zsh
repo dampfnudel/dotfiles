@@ -288,6 +288,7 @@ alias ga='git add'
 alias gpl='git pull'
 alias gps='git push'
 alias gl='git log'
+alias gll='git log --name-status HEAD^..HEAD' # last commit
 alias gco='git checkout'
 alias gcd='git checkout develop'
 alias gcm='git checkout master'
@@ -678,10 +679,24 @@ function li () {
     (cd "$dir" && realpath "$(ls -1t | head -n$idx | tail -1)")
 }
 
+function git_stats_week () {
+    git log --shortstat --after="$(date -v Sun)" | grep -E "fil(e|es) changed" | awk '{files+=$1; inserted+=$4; deleted+=$6} END {print "files changed: ", files, "lines inserted: ", inserted, "lines deleted: ", deleted }'
+}
+
+function git_commitcount () {
+    git shortlog -sn
+}
+
 function git_branch_unmerged () {
     git branch --no-merged master
 }
 
+function git_stats_week () {
+    git log --shortstat --after="$(date -v Sun)" | grep -E "fil(e|es) changed" | awk '{files+=$1; inserted+=$4; deleted+=$6} END {print "files changed: ", files, "lines inserted: ", inserted, "lines deleted: ", deleted }'
+}
+function git_commitcount () {
+    git shortlog -sn
+}
 function git_log_week () {
     git log --branches --remotes --tags --oneline --pretty=format:"%Cgreen%cd%Creset - %s%Creset" --abbrev-commit --date=local --date=format:'%d.%m-%Y %H:%M %a' --after="$(date -v Sun)"
 }
@@ -1472,6 +1487,9 @@ export FZF_DEFAULT_COMMAND="
     (git ls-tree -r --name-only HEAD \$(git rev-parse --show-toplevel) ||
     rg --files --hidden --follow -g '!{.git,node_modules}/*') 2> /dev/null"
 
+# {} single-quoted string of the current line.
+# {+} space-separated list of the selected lines (or the current line if no selection was made) individually quoted.
+# {q} current query string.
 # TODO preview with someting fast, fallback to pygmentize
 export FZF_DEFAULT_OPTS="--multi --cycle --select-1 --exit-0
     --border --margin 1% --prompt 'ϟ ' --no-height --no-reverse
@@ -1488,7 +1506,7 @@ export FZF_DEFAULT_OPTS="--multi --cycle --select-1 --exit-0
     --bind='?:toggle-preview'
     --bind 'ctrl-e:execute(\$EDITOR {})+accept'
     --bind 'ctrl-o:execute(open {})+accept'
-    --bind 'ctrl-y:execute(echo {}|pbcopy)+accept'
+    --bind 'ctrl-y:execute(echo {+}|pbcopy)'
     --bind 'ctrl-j:jump'"
 
 # to apply the command to CTRL-T as well (CTRL-F in my case)
