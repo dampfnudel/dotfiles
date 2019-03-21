@@ -131,6 +131,8 @@ export DOTFILES="$HOME/dotfiles"
 export LANG=de_DE.UTF-8
 export LC_ALL=de_DE.UTF-8
 
+export TC=Europe/Berlin
+
 # history
 # TODO rm 2
 export HISTFILE="$HOME/.zsh_history2"
@@ -242,8 +244,8 @@ alias lst='find . -maxdepth 1 -type f -mtime 1'
 # numFiles: number of (non-hidden) files in current directory
 alias lsc='echo $(ls -1 | wc -l)'
 alias k='k -h'     # human readable sizes
-# disk usage statistics default
-alias du="du -ach | sort"
+# disk usage statistics default (-h(uman readanle))
+alias du="du -ach | sort -h"
 # free diskspace with human readable size
 alias df='df -h'
 # stat with human readable times
@@ -259,8 +261,10 @@ alias cvim='/usr/local/bin/vim'
 # create parent directories on demand
 alias mkdir="mkdir -pv"
 
-alias ll='exa --long --all --group-directories-first --git --colour-scale'
+alias ll='exa --long --header --all --group-directories-first --git --colour-scale'
 alias ls='exa --group-directories-first --git --colour-scale'
+alias lsg='exa --group-directories-first --git --colour-scale'
+alias tree='exa --tree'
 alias cat='bat'
 # clipboard
 alias p='pbpaste'
