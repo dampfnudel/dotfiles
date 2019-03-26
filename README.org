@@ -1,0 +1,17 @@
+* Paths
+~/bin
+~/dev
+~/dotfiles
+~/dotfiles/gists
+~/dotfiles/scripts
+~/tmp
+~/utils
+
+* Symlinks
+~/.emacs.d/init.el -> ~/dotfiles/emacsrc.el
+~/.hammerspoon -> ~/dotfiles/hammerspoon
+~/.npmrc -> ~/dotfiles/npmrc.sh
+~/.zshrc -> ~/dotfiles/zsh.zsh
+
+* TODOs
+~/org
