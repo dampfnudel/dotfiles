@@ -687,6 +687,10 @@ function git_stats_week () {
     git log --shortstat --after="$(date -v Sun)" | grep -E "fil(e|es) changed" | awk '{files+=$1; inserted+=$4; deleted+=$6} END {print "files changed: ", files, "lines inserted: ", inserted, "lines deleted: ", deleted }'
 }
 
+function git_log_last () {
+    git log --pretty=format:'%Cgreen%cd%Creset - %s%Creset' --abbrev-commit --date=iso HEAD^..HEAD
+}
+
 function git_commitcount () {
     git shortlog -sn
 }
@@ -695,9 +699,6 @@ function git_branch_unmerged () {
     git branch --no-merged master
 }
 
-function git_stats_week () {
-    git log --shortstat --after="$(date -v Sun)" | grep -E "fil(e|es) changed" | awk '{files+=$1; inserted+=$4; deleted+=$6} END {print "files changed: ", files, "lines inserted: ", inserted, "lines deleted: ", deleted }'
-}
 function git_commitcount () {
     git shortlog -sn
 }
@@ -785,7 +786,7 @@ convert_org_to_markdown () {
   echo "$outfile"
 }
 
-git_delete_branch () {
+git_rm_branch () {
     __expect 1 "$#" || return 1
 
     # remote
