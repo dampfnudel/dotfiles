@@ -620,7 +620,7 @@
         alias wttr='curl -s http://wttr.in | tail +8 | head -30'
         alias moon='curl -s wttr.in/Moon|head -25'
         alias yt3='$WORKON_HOME/python3.4.1/bin/youtube-dl --verbose --extract-audio --audio-format mp3 --no-mtime --no-cache-dir'
-        alias yt='$WORKON_HOME/python3.4.1/bin/youtube-dl --no-mtime --no-cache-dir'
+        alias yt='$WORKON_HOME/python3.4.1/bin/youtube-dl --ignore-errors --no-mtime --no-cache-dir --no-call-home'
         # alias emacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs'
         # alias emacs='open -a Emacs.app'
         alias cemacs='/usr/local/Cellar/emacs/24.5/Emacs.app/Contents/MacOS/Emacs -nw'
