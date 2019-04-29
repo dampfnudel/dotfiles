@@ -151,8 +151,8 @@ the tangled file is compiled."
 ;; trust theme
 (setq custom-safe-themes t)
 ;; (load-theme 'labburn)
-(load-theme 'solarized-light)
-;; (load-theme 'challenger-deep)
+;; (load-theme 'solarized-light)
+(load-theme 'challenger-deep)
 ;; (load-theme 'spacemacs-dark)
 ;; (load-theme 'rebecca)
 ;; (load-theme 'reykjavik)
@@ -341,7 +341,6 @@ the tangled file is compiled."
        '((sequence "TODO" "NEXT" "BLOCKED" "|" "DONE" "FAILED")))
 ;; concat agenda from this files
 (setq org-agenda-files (append '("~/Documents/org/agenda.gpg"
-"~/Documents/org/wiederkehrende-tasks.org"
 "~/Documents/org/backlog.org")))
 
 ;; indentation options
@@ -385,6 +384,10 @@ the tangled file is compiled."
 (setq org-mobile-inbox-for-pull "~/Documents/org/mobile-captured.org")
 ;; Set to <your Dropbox root directory>/MobileOrg.
 (setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
+
+;; if there is a #+ATTR.*: width="300", resize to 300, otherwise resize to 200
+;; (setq org-image-actual-width '(200))
+(setq org-image-actual-width nil)
 
 ;(setq python-shell-interpreter "ipython"
 ;      python-shell-interpreter-args "--simple-prompt --pprint")
@@ -895,6 +898,10 @@ the tangled file is compiled."
     (org-babel-tangle))))
 
 (add-hook 'after-save-hook 'tangle-init-zsh)
+
+(require 'epa-file)
+(custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
+(epa-file-enable)
 
 (defun kill-ring-save-until (x)
   "kill-ring-save the line at point until the linenumber you pass."
