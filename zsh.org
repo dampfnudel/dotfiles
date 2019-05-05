@@ -318,7 +318,7 @@ https://virtualenvwrapper.readthedocs.io/en/latest/
 #+BEGIN_SRC shell
 export WORKON_HOME=~dev/Envs
 export PROJECT_HOME=~dev
-export VIRTUALENVWRAPPER_PYTHON="$WORKON_HOME/python3.6/bin/python"
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
 source "$BIN/virtualenvwrapper.sh"
 #+END_SRC
 
