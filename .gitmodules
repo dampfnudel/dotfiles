@@ -19,3 +19,6 @@
 [submodule "zsh/plugins/fast-syntax-highlighting"]
 	path = zsh/plugins/fast-syntax-highlighting
 	url = https://github.com/zdharma/fast-syntax-highlighting.git
+[submodule "utils/powerlevel10k"]
+	path = utils/powerlevel10k
+	url = https://github.com/romkatv/powerlevel10k.git
