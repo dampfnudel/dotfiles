@@ -549,6 +549,7 @@ and copy it over the desired file.
 
 #+BEGIN_SRC emacs-lisp
 (setq evil-want-integration nil)
+(setq evil-want-keybinding nil)
 (require 'evil)
 (when (require 'evil-collection nil t)
   (evil-collection-init))
