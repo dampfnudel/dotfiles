@@ -1919,7 +1919,8 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 #+BEGIN_SRC shell
 # export PROMPT='%F{green}%n%f@%F{blue}%m%f %F{red}%~ %f% %# '
 # source /Users/markus.bayer/dev/impure/async.zsh && source /Users/markus.bayer/dev/impure/impure.zsh
-source /Users/markus.bayer/dev/zsh-clean/clean.zsh
+source ~/dotfiles/utils/powerlevel10k/powerlevel10k.zsh-theme
+source ~/dotfiles/themes/pure-power.zsh
 #+END_SRC
 
 * Original zshrc
