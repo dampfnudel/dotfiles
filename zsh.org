@@ -168,7 +168,7 @@ hash -d zshrc=$HOME/Settings/dotfiles/zshrc.zsh
 ** ZSH Parameters
 #+BEGIN_SRC shell
 # $PATH
-export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/bin:$PATH"
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/bin:/Applications/Postgres.app/Contents/Versions/11/bin:/usr/local/Cellar/gettext/0.19.8.1/bin:$PATH"
 
 # node.js
 NPM_PACKAGES="~/.node_modules"
@@ -223,7 +223,7 @@ export LSCOLORS='exfxcxdxbxegedabagacad'
 ** Python Parameters
 #+BEGIN_SRC shell
 # project amber
-export DJANGO_SETTINGS_MODULE=amber.settings
+#export DJANGO_SETTINGS_MODULE=amber.settings
 #+END_SRC
 
 ** Other Parameters
@@ -313,27 +313,34 @@ zstyle ':completion:*:rm:*' ignore-line yes
               cd - > /dev/null
           fi
 
-*** virtualenvwrapper                                              :plugin:
+*** virtualenvwrapper :tangle no                                             :plugin:
 https://virtualenvwrapper.readthedocs.io/en/latest/
 #+BEGIN_SRC shell
-export WORKON_HOME=~dev/Envs
-export PROJECT_HOME=~dev
-export VIRTUALENVWRAPPER_PYTHON="$WORKON_HOME/python3.6/bin/python"
-source "$BIN/virtualenvwrapper.sh"
+# export WORKON_HOME=~dev/Envs
+# export PROJECT_HOME=~dev
+# export VIRTUALENVWRAPPER_PYTHON="$WORKON_HOME/python3.6/bin/python"
+# source "$BIN/virtualenvwrapper.sh"
 #+END_SRC
 
-*** virtualenv                                                     :plugin:
+*** virtualenv :tangle no                                                    :plugin:
 https://virtualenv.pypa.io/en/latest/
 #+BEGIN_SRC shell
 # set default virtual_env
-export VIRTUALENV_DEFAULT_PATH="$WORKON_HOME/python3.6/bin/activate"
-# load it
-if [[ $(basename "$VIRTUAL_ENV") == "" ]]
-then
-    if [[ -f "$VIRTUALENV_DEFAULT_PATH" ]]; then
-        source "$VIRTUALENV_DEFAULT_PATH"
-    fi
-fi
+# export VIRTUALENV_DEFAULT_PATH="$WORKON_HOME/python3.6/bin/activate"
+# # load it
+# if [[ $(basename "$VIRTUAL_ENV") == "" ]]
+# then
+#     if [[ -f "$VIRTUALENV_DEFAULT_PATH" ]]; then
+#         source "$VIRTUALENV_DEFAULT_PATH"
+#     fi
+# fi
+#+END_SRC
+
+*** pyenv
+#+BEGIN_SRC shell
+export PATH="/Users/markus.bayer/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
 #+END_SRC
 
 * Aliases
@@ -841,6 +848,11 @@ function li () {
     # no index: index=last
     if [ -z "$2" ]; then idx="1"; else idx="$2"; fi
     (cd "$dir" && realpath "$(ls -1t | head -n$idx | tail -1)")
+}
+
+function git_diff_stats () {
+    # count added/removed lines
+    git diff --numstat | awk '{ added += $1; removed += $2 } END { print "+" added " -" removed }'
 }
 
 function git_stats_week () {

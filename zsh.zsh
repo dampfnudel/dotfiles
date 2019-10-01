@@ -111,7 +111,7 @@ hash -d zsh_history=$HOME/.zsh_history
 hash -d zshrc=$HOME/Settings/dotfiles/zshrc.zsh
 
 # $PATH
-export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/bin:$PATH"
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/bin:/Applications/Postgres.app/Contents/Versions/11/bin:/usr/local/Cellar/gettext/0.19.8.1/bin:$PATH"
 
 # node.js
 NPM_PACKAGES="~/.node_modules"
@@ -162,7 +162,7 @@ eval `gdircolors <(python ~dev/base16/templates/base16-gnu-dircolors/scripts/dir
 export LSCOLORS='exfxcxdxbxegedabagacad'
 
 # project amber
-export DJANGO_SETTINGS_MODULE=amber.settings
+#export DJANGO_SETTINGS_MODULE=amber.settings
 
 # PGP
 GPG_TTY=$(tty)
@@ -214,20 +214,24 @@ zstyle ':completion:*:emacs:*' ignored-patterns '*.(o|a|so|aux|dvi|swp|fig|bbl|b
 # avoid getting offered the same filename with rm
 zstyle ':completion:*:rm:*' ignore-line yes
 
-export WORKON_HOME=~dev/Envs
-export PROJECT_HOME=~dev
-export VIRTUALENVWRAPPER_PYTHON="$WORKON_HOME/python3.6/bin/python"
-source "$BIN/virtualenvwrapper.sh"
+# export WORKON_HOME=~dev/Envs
+# export PROJECT_HOME=~dev
+# export VIRTUALENVWRAPPER_PYTHON="$WORKON_HOME/python3.6/bin/python"
+# source "$BIN/virtualenvwrapper.sh"
 
 # set default virtual_env
-export VIRTUALENV_DEFAULT_PATH="$WORKON_HOME/python3.6/bin/activate"
-# load it
-if [[ $(basename "$VIRTUAL_ENV") == "" ]]
-then
-    if [[ -f "$VIRTUALENV_DEFAULT_PATH" ]]; then
-        source "$VIRTUALENV_DEFAULT_PATH"
-    fi
-fi
+# export VIRTUALENV_DEFAULT_PATH="$WORKON_HOME/python3.6/bin/activate"
+# # load it
+# if [[ $(basename "$VIRTUAL_ENV") == "" ]]
+# then
+#     if [[ -f "$VIRTUALENV_DEFAULT_PATH" ]]; then
+#         source "$VIRTUALENV_DEFAULT_PATH"
+#     fi
+# fi
+
+export PATH="/Users/markus.bayer/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
 
 # TODO section for overriding
 ## list
