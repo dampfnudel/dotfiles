@@ -156,7 +156,7 @@ export WORDCHARS='*?_-.[]~=/&;!#$%^(){}<>/'
 
 # $LS_COLORS
 # TODO
-eval `gdircolors <(python ~dev/base16/templates/base16-gnu-dircolors/scripts/dircolors)`
+# eval `gdircolors <(python ~dev/base16/templates/base16-gnu-dircolors/scripts/dircolors)`
 # used by k
 # export LSCOLORS='di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
 export LSCOLORS='exfxcxdxbxegedabagacad'
@@ -214,10 +214,10 @@ zstyle ':completion:*:emacs:*' ignored-patterns '*.(o|a|so|aux|dvi|swp|fig|bbl|b
 # avoid getting offered the same filename with rm
 zstyle ':completion:*:rm:*' ignore-line yes
 
-# export WORKON_HOME=~dev/Envs
-# export PROJECT_HOME=~dev
-# export VIRTUALENVWRAPPER_PYTHON="$WORKON_HOME/python3.6/bin/python"
-# source "$BIN/virtualenvwrapper.sh"
+export WORKON_HOME=~dev/Envs
+export PROJECT_HOME=~dev
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
+source "$BIN/virtualenvwrapper.sh"
 
 # set default virtual_env
 # export VIRTUALENV_DEFAULT_PATH="$WORKON_HOME/python3.6/bin/activate"
@@ -1525,4 +1525,5 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # export PROMPT='%F{green}%n%f@%F{blue}%m%f %F{red}%~ %f% %# '
 # source /Users/markus.bayer/dev/impure/async.zsh && source /Users/markus.bayer/dev/impure/impure.zsh
-source /Users/markus.bayer/dev/zsh-clean/clean.zsh
+source ~/dotfiles/utils/powerlevel10k/powerlevel10k.zsh-theme
+source ~/dotfiles/themes/pure-power.zsh

@@ -32,6 +32,7 @@ git clone https://github.com/TeMPOraL/nyan-mode.git ~/.emacs.d/other-srcs
 git clone https://github.com/alpaker/Fill-Column-Indicator.git ~/.emacs.d/other-srcs
 git clone https://github.com/philiparvidsson/zweilight-emacs.git ~/.emacs.d/other-srcs
 git clone https://github.com/dunn/company-emoji.git ~/.emacs.d/other-srcs
+git clone https://github.com/sabof/org-bullets.git
 #+END_SRC
 
 ** external dependencies
@@ -244,11 +245,11 @@ always tangle and byte-compile the =org=-document after changes.
 "If the current buffer is 'emacsrc.org' the code-blocks are tangled, and
 the tangled file is compiled."
 (when (equal (buffer-file-name)
-    (expand-file-name "~/Settings/dotfiles/emacsrc.org"))
+    (expand-file-name "~/dotfiles/emacsrc.org"))
     ;; avoid running hooks when tangling.
     (let ((prog-mode-hook nil))
     (org-babel-tangle)
-    (byte-compile-file (expand-file-name "~/Settings/dotfiles/emacsrc.el")))))
+    (byte-compile-file (expand-file-name "~/dotfiles/emacsrc.el")))))
 
 (add-hook 'after-save-hook 'tangle-init-emacs)
 #+END_SRC
@@ -257,7 +258,7 @@ the tangled file is compiled."
 (defun tangle-init-zsh ()
 "If the current buffer is 'zsh.org' the code-blocks are tangled"
 (when (equal (buffer-file-name)
-    (expand-file-name "~/Settings/dotfiles/zsh.org"))
+    (expand-file-name "~/dotfiles/zsh.org"))
     ;; avoid running hooks when tangling.
     (let ((prog-mode-hook nil))
     (org-babel-tangle))))
@@ -322,6 +323,11 @@ Improve theme loading; from https://www.reddit.com/r/emacs/comments/4mzynd/what_
 
 ;; no icon
 (setq ns-use-proxy-icon nil)
+
+(setq frame-title-format
+      '((:eval (if (buffer-file-name)
+                   (abbreviate-file-name (buffer-file-name))
+                 "%b"))))
 #+END_SRC
 
 ** scrolling
@@ -551,6 +557,7 @@ and copy it over the desired file.
 
 #+BEGIN_SRC emacs-lisp
 (setq evil-want-integration nil)
+(setq evil-want-keybinding nil)
 (require 'evil)
 (when (require 'evil-collection nil t)
   (evil-collection-init))
@@ -627,6 +634,9 @@ and copy it over the desired file.
 
 ** org-bullets
 #+BEGIN_SRC elisp
+(add-to-list 'load-path (expand-file-name
+    (concat user-emacs-directory "other-srcs/org-bullets")))
+
 (require 'org-bullets)
 
 ;; Clean bullets
@@ -1453,7 +1463,7 @@ prevent losing the selection after a shift operation by re-selecting
 
 (defun insert-org-minimal-theme ()
   (interactive)
-    (insert "#+SETUPFILE: ~/Settings/dotfiles/org-minimal-theme.setup"))
+    (insert "#+SETUPFILE: ~/dotfiles/org-minimal-theme.setup"))
 
 (defun insert-org-title ()
   (interactive)
