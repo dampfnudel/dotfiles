@@ -1,14 +1,8 @@
 # -*- mode: snippet -*-
-# name: recipe
-# key: recipe
+# name: header
+# key: header
 # --
 #+TITLE: $1
 #+CREATED: `(format-time-string "[%Y-%m-%d %a %H:%M]")`
-#+ORIGIN: $2
-#+READY-IN: $3
 
-* Zutaten
-- $4
-
-* Zubereitung
-- $5
+$2
