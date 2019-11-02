@@ -284,6 +284,7 @@ the tangled file is compiled."
 ;; (load-theme 'darktooth)
 ;; (load-theme 'doom-nova)
 ;; (load-theme 'challenger-deep)
+;; (load-theme 'doom-dracula)
 ;; (load-theme 'avk-darkblue-yellow)
 ;; set font
 (set-frame-font "Envy Code R 16")
@@ -421,6 +422,8 @@ the tangled file is compiled."
 ;; TODO shebangs, doesn't work
 (add-to-list 'magic-mode-alist '("# vim: set ft=zsh ts=4 sw=4 expandtab :" . sh-mode))
 (add-to-list 'auto-mode-alist '("\\.zsh\\'" . sh-mode))
+
+(setq magit-diff-refine-hunk 'all)
 
 ;; persist bookmarks in this file
 (setq bookmark-default-file (concat user-emacs-directory "persistence/bookmarks"))

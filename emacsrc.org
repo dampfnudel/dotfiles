@@ -305,6 +305,7 @@ Improve theme loading; from https://www.reddit.com/r/emacs/comments/4mzynd/what_
 ;; (load-theme 'darktooth)
 ;; (load-theme 'doom-nova)
 ;; (load-theme 'challenger-deep)
+;; (load-theme 'doom-dracula)
 ;; (load-theme 'avk-darkblue-yellow)
 ;; set font
 (set-frame-font "Envy Code R 16")
@@ -521,6 +522,13 @@ map files to major-modes
 #+END_SRC
 
 * packages
+
+** magit
+Whether to show word-granularity differences within diff hunks.
+https://magit.vc/manual/magit/Diff-Options.html#Diff-Options
+#+BEGIN_SRC emacs-lisp
+(setq magit-diff-refine-hunk 'all)
+#+END_SRC
 
 ** bookmarks                                                       :builtin:
 

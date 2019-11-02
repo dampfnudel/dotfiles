@@ -111,7 +111,7 @@ hash -d zsh_history=$HOME/.zsh_history
 hash -d zshrc=$HOME/Settings/dotfiles/zshrc.zsh
 
 # $PATH
-export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/bin:$PATH"
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/bin:/Applications/Postgres.app/Contents/Versions/11/bin:/usr/local/Cellar/gettext/0.19.8.1/bin:$PATH"
 
 # node.js
 NPM_PACKAGES="~/.node_modules"
@@ -162,7 +162,7 @@ export WORDCHARS='*?_-.[]~=/&;!#$%^(){}<>/'
 export LSCOLORS='exfxcxdxbxegedabagacad'
 
 # project amber
-export DJANGO_SETTINGS_MODULE=amber.settings
+#export DJANGO_SETTINGS_MODULE=amber.settings
 
 # PGP
 GPG_TTY=$(tty)
@@ -220,14 +220,18 @@ export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
 source "$BIN/virtualenvwrapper.sh"
 
 # set default virtual_env
-export VIRTUALENV_DEFAULT_PATH="$WORKON_HOME/python3.6/bin/activate"
-# load it
-if [[ $(basename "$VIRTUAL_ENV") == "" ]]
-then
-    if [[ -f "$VIRTUALENV_DEFAULT_PATH" ]]; then
-        source "$VIRTUALENV_DEFAULT_PATH"
-    fi
-fi
+# export VIRTUALENV_DEFAULT_PATH="$WORKON_HOME/python3.6/bin/activate"
+# # load it
+# if [[ $(basename "$VIRTUAL_ENV") == "" ]]
+# then
+#     if [[ -f "$VIRTUALENV_DEFAULT_PATH" ]]; then
+#         source "$VIRTUALENV_DEFAULT_PATH"
+#     fi
+# fi
+
+export PATH="/Users/markus.bayer/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
 
 # TODO section for overriding
 ## list
