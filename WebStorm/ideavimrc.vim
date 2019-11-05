@@ -20,16 +20,28 @@ set incsearch
 # keymappings / keybindings
 
 ## remappings
-map f F
-map E $
+map # :action FindUsages <CR>
 map B ^
+# map f F
+map E $
+# nnoremap E $
+# nnoremap $ :action EditorMatchBrace <CR>
+
+# in current file
 map ö /
 map Ö :action FileStructurePopup <CR>
-map ä :action FindInPath <CR>
-map Ä :action SelectIn <CR>
-map # :action FindUsages <CR>
-map ü :action Refactorings.QuickListPopupAction <CR>
-map Ü :action InsertLiveTemplate <CR>
+map ge :action GotoNextError <CR>
+
+# in current project
+map ä :action RecentFiles <CR>
+map Ä :action FindInPath <CR>
+
+# map ü :action SelectIn <CR>
+map ü :action VimReformatVisual <CR>
+map Ü :action Refactorings.QuickListPopupAction <CR>
+
+map ß :action InsertLiveTemplate <CR>
+
 # map <Space><Space> :action SearchEverywhere <CR>
 
 ## mappings
@@ -40,6 +52,9 @@ map + :action EditorSelectWord <CR>
 map - :action EditorUnSelectWord <CR>
 
 ### goto
+map <Space> :action MethodDown <CR>
+map <Shift><Up> :action MethodUp <CR>
+map <Shift><Down> :action MethodDown <CR>
 # map <Space>f :action FindInPath <CR>
 map gf :action Forward <CR>
 map gb :action Back <CR>
@@ -65,4 +80,4 @@ map <Space>cl Ebcw
 map <Space>c= Bf=wC <Del>
 
 # emacsIDEs
-map f :action emacsIDEAs.AceJump <CR>
+# map f :action emacsIDEAs.AceJump <CR>
