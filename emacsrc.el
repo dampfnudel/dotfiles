@@ -1,118 +1,3 @@
-(require 'server)
-(unless (server-running-p)
-  (server-start))
-
-(defun tangle-init-zsh ()
-"If the current buffer is 'zsh.org' the code-blocks are tangled"
-(when (equal (buffer-file-name)
-    (expand-file-name "~/dotfiles/zsh.org"))
-    ;; avoid running hooks when tangling.
-    (let ((prog-mode-hook nil))
-    (org-babel-tangle))))
-
-(add-hook 'after-save-hook 'tangle-init-zsh)
-
-(defadvice load-theme (before clear-previous-themes activate)
-  "Clear existing theme settings instead of layering them"
-  (mapc #'disable-theme custom-enabled-themes))
-
-(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-(add-to-list 'default-frame-alist '(ns-appearance . dark))
-
-;; no icon
-(setq ns-use-proxy-icon nil)
-
-(setq frame-title-format
-      '((:eval (if (buffer-file-name)
-                   (abbreviate-file-name (buffer-file-name))
-                 "%b"))))
-
-(pixel-scroll-mode)
-
-(custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
-
-(add-to-list 'load-path (expand-file-name
-    (concat user-emacs-directory "other-srcs/org-bullets")))
-
-(require 'org-bullets)
-
-;; Clean bullets
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-
-(setq org-bullets-bullet-list
-      '("◉" "○"))
-(add-hook 'org-mode-hook
-          (lambda ()
-            (org-bullets-mode 1)
-            (org-indent-mode t)))
-
-(defun kill-ring-save-until (x)
-  "kill-ring-save the line at point until the linenumber you pass."
-  (interactive "nUntil: ")
-  (setq offset (- x (line-number-at-pos)))
-  (save-excursion
-    (move-beginning-of-line nil)
-    (set-mark-command nil)
-    (forward-line offset)
-    (move-end-of-line nil)
-    (kill-ring-save (region-beginning) (region-end)))
-  (message "yanked %i lines" (1+ offset)))
-
-(defun copy-line ()
-    (interactive)
-        (save-excursion
-          (back-to-indentation)
-          (kill-ring-save
-           (point)
-           (line-end-position)))
-           (message "1 line copied"))
-
-(defun daily ()
-    "setup journal windows and buffers"
-    (interactive)
-    (delete-other-windows)
-    (find-file "~/Documents/org/journal.org")
-    (split-window-right)
-    (evil-window-right 1)
-    (find-file "~/Documents/org/agenda.org")
-    (evil-window-left 1)
-    (evil-goto-first-line)
-    (evil-open-above 0)
-    (evil-open-above 0)
-    (insert "day")
-    (yas-expand))
-
-(defun toggle-word-case ()
-  "Toggle the letter case of current word or text selection.
-Always cycle in this order: Init Caps, ALL CAPS, all lower.
-
-URL `http://ergoemacs.org/emacs/modernization_upcase-word.html'
-Version 2016-01-08"
-  (interactive)
-  (let (
-        (deactivate-mark nil)
-        -p1 -p2)
-    (if (use-region-p)
-        (setq -p1 (region-beginning)
-              -p2 (region-end))
-      (save-excursion
-        (skip-chars-backward "[:alnum:]")
-        (setq -p1 (point))
-        (skip-chars-forward "[:alnum:]")
-        (setq -p2 (point))))
-    (when (not (eq last-command this-command))
-      (put this-command 'state 0))
-    (cond
-     ((equal 0 (get this-command 'state))
-      (upcase-initials-region -p1 -p2)
-      (put this-command 'state 1))
-     ((equal 1  (get this-command 'state))
-      (upcase-region -p1 -p2)
-      (put this-command 'state 2))
-     ((equal 2 (get this-command 'state))
-      (downcase-region -p1 -p2)
-      (put this-command 'state 0)))))
-
 (package-initialize)
 (require 'package)
 (require 'cl)
@@ -578,6 +463,9 @@ the tangled file is compiled."
         "~/.emacs.d/elpa/yasnippet-20170923.1646/snippets" ;; the default collection
         ))
 
+;; had to do this by hand
+(yas-reload-all)
+
 ;; required by require
 (global-git-gutter-mode +1)
 ; live update
@@ -845,6 +733,24 @@ the tangled file is compiled."
     (switch-to-buffer (get-buffer-create "*scratch*"))
     (lisp-interaction-mode))
 
+(defun my-scratch-buffer ()
+"Create a new scratch buffer -- \*scratch\*"
+(interactive)
+  (let ((n 0)
+        bufname buffer)
+    (catch 'done
+      (while t
+        (setq bufname (concat "*scratch"
+          (if (= n 0) "" (int-to-string n))
+            "*"))
+        (setq n (1+ n))
+        (when (not (get-buffer bufname))
+          (setq buffer (get-buffer-create bufname))
+          (with-current-buffer buffer
+            (org-mode))
+          ;; When called non-interactively, the `t` targets the other window (if it exists).
+          (throw 'done (switch-to-buffer buffer t))) ))))
+
 (defun copy-file-name-to-clipboard ()
   "Copy the current buffer file name to the clipboard."
   (interactive)
@@ -1042,3 +948,122 @@ the tangled file is compiled."
 (defun insert-src ()
   (interactive)
   (insert "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC"))
+
+(require 'server)
+(unless (server-running-p)
+  (server-start))
+
+(defun tangle-init-zsh ()
+"If the current buffer is 'zsh.org' the code-blocks are tangled"
+(when (equal (buffer-file-name)
+    (expand-file-name "~/dotfiles/zsh.org"))
+    ;; avoid running hooks when tangling.
+    (let ((prog-mode-hook nil))
+    (org-babel-tangle))))
+
+(add-hook 'after-save-hook 'tangle-init-zsh)
+
+(defadvice load-theme (before clear-previous-themes activate)
+  "Clear existing theme settings instead of layering them"
+  (mapc #'disable-theme custom-enabled-themes))
+
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+(add-to-list 'default-frame-alist '(ns-appearance . dark))
+
+;; no icon
+(setq ns-use-proxy-icon nil)
+
+(setq frame-title-format
+      '((:eval (if (buffer-file-name)
+                   (abbreviate-file-name (buffer-file-name))
+                 "%b"))))
+
+(pixel-scroll-mode)
+
+(custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
+
+(setq initial-major-mode 'org-mode)
+
+(setq initial-scratch-message nil)
+
+(add-to-list 'load-path (expand-file-name
+    (concat user-emacs-directory "other-srcs/org-bullets")))
+
+(require 'org-bullets)
+
+;; Clean bullets
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+(setq org-bullets-bullet-list
+      '("◉" "○"))
+(add-hook 'org-mode-hook
+          (lambda ()
+            (org-bullets-mode 1)
+            (org-indent-mode t)))
+
+(defun kill-ring-save-until (x)
+  "kill-ring-save the line at point until the linenumber you pass."
+  (interactive "nUntil: ")
+  (setq offset (- x (line-number-at-pos)))
+  (save-excursion
+    (move-beginning-of-line nil)
+    (set-mark-command nil)
+    (forward-line offset)
+    (move-end-of-line nil)
+    (kill-ring-save (region-beginning) (region-end)))
+  (message "yanked %i lines" (1+ offset)))
+
+(defun copy-line ()
+    (interactive)
+        (save-excursion
+          (back-to-indentation)
+          (kill-ring-save
+           (point)
+           (line-end-position)))
+           (message "1 line copied"))
+
+(defun daily ()
+    "setup journal windows and buffers"
+    (interactive)
+    (delete-other-windows)
+    (find-file "~/Documents/org/journal.org")
+    (split-window-right)
+    (evil-window-right 1)
+    (find-file "~/Documents/org/agenda.org")
+    (evil-window-left 1)
+    (evil-goto-first-line)
+    (evil-open-above 0)
+    (evil-open-above 0)
+    (insert "day")
+    (yas-expand))
+
+(defun toggle-word-case ()
+  "Toggle the letter case of current word or text selection.
+Always cycle in this order: Init Caps, ALL CAPS, all lower.
+
+URL `http://ergoemacs.org/emacs/modernization_upcase-word.html'
+Version 2016-01-08"
+  (interactive)
+  (let (
+        (deactivate-mark nil)
+        -p1 -p2)
+    (if (use-region-p)
+        (setq -p1 (region-beginning)
+              -p2 (region-end))
+      (save-excursion
+        (skip-chars-backward "[:alnum:]")
+        (setq -p1 (point))
+        (skip-chars-forward "[:alnum:]")
+        (setq -p2 (point))))
+    (when (not (eq last-command this-command))
+      (put this-command 'state 0))
+    (cond
+     ((equal 0 (get this-command 'state))
+      (upcase-initials-region -p1 -p2)
+      (put this-command 'state 1))
+     ((equal 1  (get this-command 'state))
+      (upcase-region -p1 -p2)
+      (put this-command 'state 2))
+     ((equal 2 (get this-command 'state))
+      (downcase-region -p1 -p2)
+      (put this-command 'state 0)))))

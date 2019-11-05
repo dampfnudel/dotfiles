@@ -518,6 +518,17 @@ map files to major-modes
 (add-to-list 'auto-mode-alist '("\\.zsh\\'" . sh-mode))
 #+END_SRC
 
+** scratch buffer
+*** mode
+#+BEGIN_SRC elisp
+(setq initial-major-mode 'org-mode)
+#+END_SRC
+
+*** header
+#+BEGIN_SRC elisp
+(setq initial-scratch-message nil)
+#+END_SRC
+
 * packages
 
 ** magit
@@ -755,6 +766,9 @@ and copy it over the desired file.
       '("~/dotfiles/emacs/snippets"               ;; personal snippets
         "~/.emacs.d/elpa/yasnippet-20170923.1646/snippets" ;; the default collection
         ))
+
+;; had to do this by hand
+(yas-reload-all)
 #+END_SRC
 
 ** git-gutter
@@ -1244,12 +1258,31 @@ Version 2016-01-08"
 #+END_SRC
 
 ** recreate scratch buffer
+https://emacs.stackexchange.com/questions/45629/template-for-new-file
 #+BEGIN_SRC emacs-lisp
 (defun create-scratch-buffer nil
     "create a scratch buffer"
     (interactive)
     (switch-to-buffer (get-buffer-create "*scratch*"))
     (lisp-interaction-mode))
+
+(defun my-scratch-buffer ()
+"Create a new scratch buffer -- \*scratch\*"
+(interactive)
+  (let ((n 0)
+        bufname buffer)
+    (catch 'done
+      (while t
+        (setq bufname (concat "*scratch"
+          (if (= n 0) "" (int-to-string n))
+            "*"))
+        (setq n (1+ n))
+        (when (not (get-buffer bufname))
+          (setq buffer (get-buffer-create bufname))
+          (with-current-buffer buffer
+            (org-mode))
+          ;; When called non-interactively, the `t` targets the other window (if it exists).
+          (throw 'done (switch-to-buffer buffer t))) ))))
 #+END_SRC
 
 ** copy file name to clipboard
