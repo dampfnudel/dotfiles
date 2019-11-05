@@ -1259,6 +1259,7 @@ bindkey '^[^[[D' backward-word                      # alt <arrow-left>..........
 bindkey '^[^[[C' forward-word                       # alt <arrow-right>...........move a word forward
 bindkey '^A' beginning-of-line                      # cmd <arrow-left>............move to the beginning of the line
 bindkey '^E' end-of-line                            # cmd <arrow-right>...........move to the end of the line
+bindkey " " magic-space                             # <space>.....................do history expansion
 # bindkey '^[[1;2B' down-line
 # bindkey '^[[1;2A' up-line
 bindkey '^N' vi-find-next-char

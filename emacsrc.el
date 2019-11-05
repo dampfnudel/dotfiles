@@ -81,6 +81,7 @@
                 darktooth-theme         ; dark
                 gotham-theme            ; dark
                 doom-themes             ; light & dark
+                kaolin-themes           ; light & dark
                 spacegray-theme         ; dark
                 obsidian-theme          ; dark
                 metalheart-theme        ; dark
@@ -154,6 +155,8 @@ the tangled file is compiled."
 ;; theme
 ;; trust theme
 (setq custom-safe-themes t)
+(require 'kaolin-themes)
+(load-theme 'kaolin-aurora t)
 ;; (load-theme 'labburn)
 ;; (load-theme 'material-light)
 ;; (load-theme 'spacemacs-dark)
@@ -166,7 +169,7 @@ the tangled file is compiled."
 ;; (load-theme 'darktooth)
 ;; (load-theme 'doom-nova)
 ;; (load-theme 'challenger-deep)
-(load-theme 'doom-dracula)
+;; (load-theme 'doom-dracula)
 ;; (load-theme 'avk-darkblue-yellow)
 ;; set font
 (set-frame-font "Envy Code R 16")
